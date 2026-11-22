@@ -63,7 +63,7 @@ def player_to_nbt(entity, controller: PlayerController, items: ItemRegistry,
     for effect in entity.status_effects.active():
         active_effects.append({
             "Id": NBTTag(TAG_BYTE, int(effect.effect)),
-            "Amplifier": NBTTag(TAG_BYTE, effect.amplifier),
+            "Amplifier": NBTTag(TAG_BYTE, effect.amplifier if effect.amplifier < 128 else effect.amplifier - 256),
             "Duration": NBTTag(TAG_INT, effect.duration),
             "Ambient": NBTTag(TAG_BYTE, int(effect.ambient)),
             "ShowParticles": NBTTag(TAG_BYTE, int(effect.show_particles)),
@@ -155,7 +155,7 @@ def player_from_nbt(document: NBTDocument, entity, controller: PlayerController,
             try:
                 kind = EffectType(int(effect["Id"]))
                 entity.status_effects.add(StatusEffect(
-                    kind, int(effect["Duration"]), int(effect.get("Amplifier", 0)),
+                    kind, int(effect["Duration"]), int(_plain(effect.get("Amplifier", 0))) & 0xFF,
                     bool(effect.get("Ambient", 0)), bool(effect.get("ShowParticles", 1)),
                 ))
             except (ValueError, KeyError):
