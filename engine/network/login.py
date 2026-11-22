@@ -1,18 +1,155 @@
-"""Offline-mode protocol 340 login client.
-
-Online-mode encryption/session authentication is deliberately rejected until
-the RSA/AES-CFB8 and Mojang session-authentication components are supplied.
-"""
+"""Online-mode protocol 340 login with injected session authentication."""
 from __future__ import annotations
 
+import hashlib
 import json
 import uuid
-from dataclasses import dataclass
 
 from engine.network.codec import PacketBuffer, ProtocolError
 from engine.network.connection import (
     ConnectionState, MinecraftConnection, encode_login_start,
 )
+
+
+def _read_login_packet(connection: MinecraftConnection, username: str):
+    while True:
+        packet_id, payload = connection.receive()
+        if packet_id == 0x03:
+            buffer = PacketBuffer(payload)
+            threshold = buffer.read_varint()
+            if buffer.remaining:
+                raise ProtocolError("trailing Set Compression payload")
+            connection.set_compression(threshold)
+            continue
+        if packet_id == 0x00:
+            buffer = PacketBuffer(payload)
+            reason = buffer.read_string()
+            try:
+                reason = json.loads(reason)
+            except json.JSONDecodeError:
+                pass
+            raise ProtocolError(f"login rejected: {reason}")
+        if packet_id == 0x01:
+            raise ProtocolError("unexpected second encryption request")
+        if packet_id == 0x02:
+            buffer = PacketBuffer(payload)
+            raw_uuid = buffer.read_string(max_chars=36)
+            accepted_name = buffer.read_string(max_chars=16)
+            if buffer.remaining:
+                raise ProtocolError("trailing Login Success payload")
+            try:
+                player_uuid = uuid.UUID(raw_uuid)
+            except ValueError as exc:
+                raise ProtocolError("invalid Login Success UUID") from exc
+            if accepted_name != username:
+                raise ProtocolError("server returned a different username")
+            connection.state = ConnectionState.PLAY
+            return LoginIdentity(player_uuid, accepted_name)
+        raise ProtocolError(f"unexpected login packet ID: {packet_id}")
+
+
+def minecraft_server_hash(server_id: str, shared_secret: bytes,
+                          public_key_der: bytes) -> str:
+    """Return Minecraft's signed SHA-1 server hash in Java BigInteger hex form."""
+    digest = hashlib.sha1(server_id.encode("ascii") + shared_secret + public_key_der).digest()
+    value = int.from_bytes(digest, "big", signed=True)
+    return ("-" if value < 0 else "") + format(abs(value), "x")
+
+
+def login_online(host: str, port: int, username: str, access_token: str,
+                 profile_uuid: uuid.UUID,
+                 session_join, timeout: float = 10.0):
+    """Online-mode login.
+
+    session_join(access_token, profile_uuid, server_hash) must perform the
+    authenticated session join operation and raise on rejection. The token is
+    only passed to this callback and is never logged or persisted here.
+    """
+    if not isinstance(profile_uuid, uuid.UUID):
+        profile_uuid = uuid.UUID(str(profile_uuid))
+    if not isinstance(access_token, str) or not access_token:
+        raise ValueError("a valid launcher access token is required")
+    if not callable(session_join):
+        raise TypeError("session_join callback is required")
+
+    connection = MinecraftConnection.connect(host, port, timeout)
+    try:
+        connection.send_handshake(host, port, ConnectionState.LOGIN)
+        connection.send(0x00, _login_start_payload(username))
+        while True:
+            packet_id, payload = connection.receive()
+            if packet_id == 0x03:
+                buffer = PacketBuffer(payload)
+                threshold = buffer.read_varint()
+                if buffer.remaining:
+                    raise ProtocolError("trailing Set Compression payload")
+                connection.set_compression(threshold)
+                continue
+            if packet_id == 0x00:
+                buffer = PacketBuffer(payload)
+                raise ProtocolError(f"login rejected: {buffer.read_string()}")
+            if packet_id != 0x01:
+                if packet_id == 0x02:
+                    buffer = PacketBuffer(payload)
+                    raw_uuid = buffer.read_string(max_chars=36)
+                    accepted_name = buffer.read_string(max_chars=16)
+                    if accepted_name != username:
+                        raise ProtocolError("server returned a different username")
+                    connection.state = ConnectionState.PLAY
+                    return connection, LoginIdentity(uuid.UUID(raw_uuid), accepted_name)
+                raise ProtocolError(f"unexpected login packet ID: {packet_id}")
+            request = PacketBuffer(payload)
+            server_id = request.read_string(max_chars=20)
+            key_length = request.read_varint()
+            if not 1 <= key_length <= 8192:
+                raise ProtocolError("invalid server public-key length")
+            public_key_der = request.read(key_length)
+            token_length = request.read_varint()
+            if not 1 <= token_length <= 1024:
+                raise ProtocolError("invalid encryption verify-token length")
+            verify_token = request.read(token_length)
+            if request.remaining:
+                raise ProtocolError("trailing Encryption Request payload")
+
+            try:
+                from cryptography.hazmat.primitives import hashes, serialization
+                from cryptography.hazmat.primitives.asymmetric import padding
+            except ImportError as exc:
+                raise RuntimeError("online-mode login requires the cryptography package") from exc
+
+            try:
+                public_key = serialization.load_der_public_key(public_key_der)
+                shared_secret = __import__("secrets").token_bytes(16)
+                encrypted_secret = public_key.encrypt(shared_secret, padding.PKCS1v15())
+                encrypted_token = public_key.encrypt(verify_token, padding.PKCS1v15())
+            except Exception as exc:
+                raise ProtocolError("invalid server RSA public key") from exc
+
+            server_hash = minecraft_server_hash(server_id, shared_secret, public_key_der)
+            session_join(access_token, profile_uuid, server_hash)
+
+            response = PacketBuffer()
+            response.write_varint(len(encrypted_secret))
+            response.write(encrypted_secret)
+            response.write_varint(len(encrypted_token))
+            response.write(encrypted_token)
+            connection.send(0x01, response.to_bytes())
+            connection.enable_encryption(shared_secret)
+            identity = _read_login_packet(connection, username)
+            if identity.player_uuid != profile_uuid:
+                raise ProtocolError("authenticated UUID does not match selected profile")
+            return connection, identity
+    except Exception:
+        connection.close()
+        raise
+
+
+def _login_start_payload(username: str) -> bytes:
+    if not isinstance(username, str) or not 1 <= len(username) <= 16:
+        raise ValueError("username must contain 1..16 characters")
+    buffer = PacketBuffer()
+    buffer.write_string(username, max_chars=16)
+    return buffer.to_bytes()
 
 
 @dataclass(frozen=True)
@@ -26,46 +163,12 @@ def login_offline(host: str, port: int, username: str, timeout: float = 10.0):
     connection = MinecraftConnection.connect(host, port, timeout)
     try:
         connection.send_handshake(host, port, ConnectionState.LOGIN)
-        connection.socket.sendall(encode_login_start(username))
-        while True:
-            packet_id, payload = connection.receive()
-            if packet_id == 0x03:  # Set Compression
-                buffer = PacketBuffer(payload)
-                threshold = buffer.read_varint()
-                if buffer.remaining:
-                    raise ProtocolError("trailing Set Compression payload")
-                connection.set_compression(threshold)
-                continue
-            if packet_id == 0x00:  # Login Disconnect
-                buffer = PacketBuffer(payload)
-                reason = buffer.read_string()
-                try:
-                    detail = json.loads(reason)
-                except json.JSONDecodeError:
-                    detail = reason
-                raise ProtocolError(f"login rejected: {detail}")
-            if packet_id == 0x01:  # Encryption Request
-                raise ProtocolError(
-                    "server requires online-mode encryption; this client currently supports offline-mode only"
-                )
-            if packet_id == 0x02:  # Login Success
-                buffer = PacketBuffer(payload)
-                raw_uuid = buffer.read_string(max_chars=36)
-                accepted_name = buffer.read_string(max_chars=16)
-                if buffer.remaining:
-                    raise ProtocolError("trailing Login Success payload")
-                try:
-                    player_uuid = uuid.UUID(raw_uuid)
-                except ValueError as exc:
-                    raise ProtocolError("invalid Login Success UUID") from exc
-                if accepted_name != username:
-                    raise ProtocolError("server returned a different username")
-                connection.state = ConnectionState.PLAY
-                return connection, LoginIdentity(player_uuid, accepted_name)
-            raise ProtocolError(f"unexpected login packet ID: {packet_id}")
+        connection.send(0x00, _login_start_payload(username))
+        identity = _read_login_packet(connection, username)
+        return connection, identity
     except Exception:
         connection.close()
         raise
 
 
-__all__ = ["LoginIdentity", "login_offline"]
+__all__ = ["LoginIdentity", "login_offline", "login_online", "minecraft_server_hash"]
