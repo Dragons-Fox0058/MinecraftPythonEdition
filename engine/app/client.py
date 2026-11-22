@@ -121,7 +121,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     jump_requested = False
     inventory = Inventory()
     selected_hotbar_slot = inventory.selected_hotbar_slot
-    hotbar_block_ids = (1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 20, 21, 24, 31, 32, 37, 38, 39, 40, 49, 56, 58, 73, 74, 80, 82, 89, 129, 153)
+    hotbar_block_ids = (1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 20, 21, 24, 31, 32, 37, 38, 39, 40, 49, 56, 58, 73, 74, 79, 80, 82, 89, 129, 153, 161)
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
