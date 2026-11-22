@@ -9,6 +9,7 @@ from engine.network.codec import (
     PacketBuffer, ProtocolError, encode_packet, decode_packet,
     encode_compressed_packet, decode_compressed_packet,
 )
+from engine.network.login import login_offline
 from engine.network.status import query_server
 from engine.network.connection import (
     ConnectionState, decode_handshake, encode_handshake,
@@ -96,6 +97,30 @@ class TestProtocolHandshake(unittest.TestCase):
                 json.dumps({"version": {"name": "1.12.2", "protocol": 340}})
             )
         )["version"]["protocol"], 340)
+
+    def test_offline_login_success(self):
+        player_uuid = uuid.uuid4()
+        payload = PacketBuffer()
+        payload.write_string(str(player_uuid))
+        payload.write_string("TestPlayer", max_chars=16)
+        fake = FakeSocket(encode_packet(0x02, payload.to_bytes()))
+        connection = MinecraftConnection(fake)
+        with patch("engine.network.login.MinecraftConnection.connect",
+                   return_value=connection):
+            returned, identity = login_offline("localhost", 25565, "TestPlayer")
+        self.assertIs(returned, connection)
+        self.assertEqual(identity.player_uuid, player_uuid)
+        self.assertEqual(identity.username, "TestPlayer")
+        self.assertEqual(connection.state, ConnectionState.PLAY)
+
+    def test_offline_login_rejects_online_mode_encryption(self):
+        fake = FakeSocket(encode_packet(0x01, b""))
+        connection = MinecraftConnection(fake)
+        with patch("engine.network.login.MinecraftConnection.connect",
+                   return_value=connection):
+            with self.assertRaises(ProtocolError):
+                login_offline("localhost", 25565, "TestPlayer")
+        self.assertTrue(fake.closed)
 
     def test_status_query_performs_status_and_ping_exchange(self):
         status = {"version": {"name": "1.12.2", "protocol": 340},
