@@ -71,6 +71,17 @@ def chunk_to_nbt(chunk: Chunk, *, last_update: int = 0,
             section["Add"] = _pack_nibbles(add)
         sections.append(section)
 
+    heightmap = []
+    for z in range(16):
+        for x in range(16):
+            height = 0
+            for y in range(255, -1, -1):
+                if (int(chunk.blocks[x, z, y]) >> 4) != 0:
+                    height = y + 1
+                    break
+            heightmap.append(height)
+    biome_bytes = bytes(int(chunk.biomes[x, z]) for z in range(16) for x in range(16))
+
     level = {
         "xPos": NBTTag(TAG_INT, int(chunk.pos.x)),
         "zPos": NBTTag(TAG_INT, int(chunk.pos.z)),
@@ -80,8 +91,8 @@ def chunk_to_nbt(chunk: Chunk, *, last_update: int = 0,
         "LightPopulated": NBTTag(TAG_BYTE, 1 if light_populated else 0),
         "V": NBTTag(TAG_BYTE, 1),
         "Sections": NBTList(TAG_COMPOUND, tuple(sections)),
-        "Biomes": bytes(256),
-        "HeightMap": tuple(0 for _ in range(256)),
+        "Biomes": biome_bytes,
+        "HeightMap": tuple(heightmap),
         "Entities": NBTList(TAG_COMPOUND, ()),
         "TileEntities": NBTList(TAG_COMPOUND, ()),
         "TileTicks": NBTList(TAG_COMPOUND, ()),
@@ -101,6 +112,25 @@ def chunk_from_nbt(document: NBTDocument, *, expected_pos: ChunkPos | None = Non
         if expected_pos is not None and (cx, cz) != (expected_pos.x, expected_pos.z):
             raise ChunkFormatError("chunk coordinates do not match expected position")
         chunk = Chunk(ChunkPos(cx, cz))
+        biome_data = level.get("Biomes", bytes(256))
+        if len(biome_data) != 256:
+            raise ChunkFormatError("Biomes must contain 256 bytes")
+        index = 0
+        for z in range(16):
+            for x in range(16):
+                chunk.biomes[x, z] = biome_data[index]
+                index += 1
+        heights = level.get("HeightMap", tuple(0 for _ in range(256)))
+        if len(heights) != 256:
+            raise ChunkFormatError("HeightMap must contain 256 entries")
+        index = 0
+        for z in range(16):
+            for x in range(16):
+                height = int(_plain(heights[index]))
+                if not 0 <= height <= 256:
+                    raise ChunkFormatError("HeightMap value outside world bounds")
+                chunk.heightmap[x, z] = height
+                index += 1
         seen = set()
         for section in raw_sections.values:
             sy = int(_plain(section["Y"]))
