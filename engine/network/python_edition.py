@@ -34,7 +34,7 @@ class PythonEditionClient:
 
     @staticmethod
     def _encode(message: dict) -> bytes:
-        raw = json.dumps(message, ensure_ascii=False, separators=(",", ":")).encode("utf-8") + b"\\n"
+        raw = json.dumps(message, ensure_ascii=False, separators=(",", ":")).encode("utf-8") + b"\n"
         if len(raw) > MAX_MESSAGE_BYTES:
             raise ServerError("message exceeds size limit")
         return raw
