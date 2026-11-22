@@ -32,6 +32,9 @@ class World:
         self.world_time.tick(self.game_rules.get_bool("doDaylightCycle"))
         for entity in tuple(self._entities):
             if getattr(entity, "dead", False):
+                controller = getattr(entity, "gameplay_controller", None)
+                if controller is not None:
+                    controller.on_death()
                 self.remove_entity(entity)
                 continue
             update = getattr(entity, "on_update", None)
