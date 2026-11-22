@@ -30,6 +30,8 @@ class SmeltingRecipe:
             raise TypeError("ingredient must be an Ingredient")
         if not isinstance(output, ItemStack) or output.is_empty:
             raise ValueError("output must be a non-empty ItemStack")
+        if output.count > output.item.max_stack_size:
+            raise ValueError("output exceeds max_stack_size")
         if isinstance(experience, bool) or not isinstance(experience, (int, float)) or not math.isfinite(experience) or experience < 0:
             raise ValueError("experience must be a non-negative number")
         self.ingredient = ingredient
