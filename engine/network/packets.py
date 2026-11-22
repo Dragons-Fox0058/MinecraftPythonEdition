@@ -1,6 +1,7 @@
 """Typed packet payload builders for common protocol-340 play actions."""
 from __future__ import annotations
 
+import math
 import struct
 from dataclasses import dataclass
 
@@ -33,8 +34,9 @@ def serverbound_player(on_ground: bool) -> tuple[int, bytes]:
 
 def serverbound_position(x: float, y: float, z: float,
                          on_ground: bool) -> tuple[int, bytes]:
-    if not all(isinstance(v, (int, float)) for v in (x, y, z)):
-        raise TypeError("player coordinates must be numeric")
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+               and math.isfinite(v) for v in (x, y, z)):
+        raise ValueError("player coordinates must be finite numbers")
     if not isinstance(on_ground, bool):
         raise TypeError("on_ground must be bool")
     return (PACKET_IDS[ConnectionState.PLAY]["serverbound_position"],
@@ -46,8 +48,9 @@ def serverbound_position_look(x: float, y: float, z: float, yaw: float,
     if not isinstance(on_ground, bool):
         raise TypeError("on_ground must be bool")
     values = (x, y, z, yaw, pitch)
-    if not all(isinstance(v, (int, float)) for v in values):
-        raise TypeError("position and rotation values must be numeric")
+    if not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+               and math.isfinite(v) for v in values):
+        raise ValueError("position and rotation values must be finite numbers")
     return (PACKET_IDS[ConnectionState.PLAY]["serverbound_position_look"],
             struct.pack(">dddff?", float(x), float(y), float(z),
                         float(yaw), float(pitch), on_ground))
@@ -57,6 +60,10 @@ def serverbound_look(yaw: float, pitch: float,
                      on_ground: bool) -> tuple[int, bytes]:
     if not isinstance(on_ground, bool):
         raise TypeError("on_ground must be bool")
+    if (not isinstance(yaw, (int, float)) or isinstance(yaw, bool)
+            or not isinstance(pitch, (int, float)) or isinstance(pitch, bool)
+            or not math.isfinite(yaw) or not math.isfinite(pitch)):
+        raise ValueError("yaw and pitch must be finite numbers")
     return (PACKET_IDS[ConnectionState.PLAY]["serverbound_look"],
             struct.pack(">ff?", float(yaw), float(pitch), on_ground))
 
