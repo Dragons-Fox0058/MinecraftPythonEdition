@@ -29,6 +29,7 @@ class PlayerController:
         self.hunger = hunger or HungerManager()
         self.food_registry = food_registry if food_registry is not None else FoodRegistry()
         self.difficulty = difficulty
+        self.death_processed = False
         self.breaking = BlockBreaking(self.world, drop_resolver=block_drop_resolver)
         self.drops = ItemDropManager(self.world)
         self.interaction = InteractionManager(self.world)
@@ -93,6 +94,22 @@ class PlayerController:
 
     def try_pickup(self, item_entity) -> bool:
         return item_entity.try_pickup(self.inventory)
+
+    def on_death(self) -> tuple:
+        """Drop carried items once unless keepInventory is enabled."""
+        if self.death_processed:
+            return ()
+        self.death_processed = True
+        if self.world.game_rules.get_bool("keepInventory"):
+            return ()
+        spawned = []
+        carried = list(self.inventory.slots) + list(self.inventory.armor) + [self.inventory.offhand]
+        for stack in carried:
+            if not stack.is_empty:
+                entity = self.drop_item(stack)
+                if entity is not None:
+                    spawned.append(entity)
+        return tuple(spawned)
 
 
 __all__ = ["PlayerController"]
