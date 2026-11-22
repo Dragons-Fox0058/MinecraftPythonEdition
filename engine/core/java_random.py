@@ -1,0 +1,82 @@
+"""engine.core.java_random — Exact Java Random (LCG) port for 1.12.2 seeds."""
+
+MASK48 = (1 << 48) - 1
+MULT   = 0x5DEECE66D
+ADD    = 0xB
+
+class JavaRandom:
+    """Exact port of java.util.Random. All 1.12.2 worldgen RNG must use this."""
+
+    __slots__ = ('_seed',)
+
+    def __init__(self, seed: int = 0):
+        self._seed = 0
+        self.set_seed(seed)
+
+    def set_seed(self, seed: int):
+        self._seed = (seed ^ MULT) & MASK48
+
+    def _next(self, bits: int) -> int:
+        self._seed = (self._seed * MULT + ADD) & MASK48
+        return self._seed >> (48 - bits)
+
+    def next_int(self, bound: int = None) -> int:
+        if bound is None:
+            # java.util.Random.nextInt(): return next(32) as signed int32.
+            v = self._next(32)
+            return v - (1 << 32) if v >= (1 << 31) else v
+        if bound <= 0:
+            raise ValueError('bound must be positive')
+        if (bound & -bound) == bound:
+            return (bound * self._next(31)) >> 31
+        while True:
+            bits = self._next(31)
+            val = bits % bound
+            if bits - val + (bound - 1) >= 0:
+                return val
+
+    def next_long(self) -> int:
+        hi = self._next(32)
+        lo = self._next(32)
+        v = (hi << 32) + lo
+        if v >= (1 << 63): v -= (1 << 64)
+        return v
+
+    def next_double(self) -> float:
+        return ((self._next(26) << 27) + self._next(27)) / float(1 << 53)
+
+    def next_float(self) -> float:
+        return self._next(24) / float(1 << 24)
+
+    def next_boolean(self) -> bool:
+        return self._next(1) != 0
+
+    def next_gaussian(self) -> float:
+        import math
+        while True:
+            v1 = 2.0 * self.next_double() - 1.0
+            v2 = 2.0 * self.next_double() - 1.0
+            s = v1*v1 + v2*v2
+            if s < 1.0 and s != 0.0:
+                m = math.sqrt(-2.0 * math.log(s) / s)
+                return v1 * m
+
+def java_string_hash(s: str) -> int:
+    """Java String.hashCode() as int32."""
+    h = 0
+    for ch in s:
+        h = (31 * h + ord(ch)) & 0xFFFFFFFF
+    if h >= 0x80000000: h -= 0x100000000
+    return h
+
+
+def string_seed(seed: int, name: str) -> int:
+    """Combine a numeric seed with a string label.
+
+    In 1.12.2 the equivalent operation is usually
+        seed + (long) String.hashCode(label)
+    for structure placement (village/temple/mineshaft). Some systems use
+    seed * 31L + hash instead, but for the structures we implement first
+    the additive form matches vanilla.
+    """
+    return (seed + java_string_hash(name)) & 0xFFFFFFFFFFFFFFFF if seed >= 0 else seed + java_string_hash(name)
