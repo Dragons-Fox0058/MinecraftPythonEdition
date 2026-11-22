@@ -94,6 +94,15 @@ class TestBlockBreaking(unittest.TestCase):
         self.assertEqual(result.drops, ())
         self.assertEqual(len(self.world.entities), 0)
 
+    def test_drop_resolver_failure_does_not_remove_block(self):
+        def broken_resolver(block, pos):
+            raise RuntimeError("loot table unavailable")
+        breaking = BlockBreaking(self.world, drop_resolver=broken_resolver)
+        self.world.set_block_state_id(self.pos, VB.DIRT.block_id)
+        with self.assertRaises(RuntimeError):
+            breaking.damage_block(self.pos, dig_speed=1000, can_harvest=True)
+        self.assertEqual(self.world.get_block_state_id(self.pos), VB.DIRT.block_id)
+
     def test_do_tile_drops_rule_disables_drops(self):
         item = Item(902, "test:disabled_drop")
         breaking = BlockBreaking(
