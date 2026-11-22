@@ -37,11 +37,17 @@ def _mapgen_chunk_random(world_seed: int, chunk_x: int, chunk_z: int) -> JavaRan
     return JavaRandom(chunk_seed)
 
 
+def _java_make_odd(value: int) -> int:
+    """Java's value / 2L * 2L + 1L, including truncation toward zero."""
+    half = value // 2 if value >= 0 else -((-value) // 2)
+    return _signed_long(half * 2 + 1)
+
+
 def _population_chunk_random(world_seed: int, chunk_x: int, chunk_z: int) -> JavaRandom:
     """Java 1.12.2 feature-population chunk RNG seed derivation."""
     seed_rng = JavaRandom(world_seed)
-    x_seed = seed_rng.next_long() | 1
-    z_seed = seed_rng.next_long() | 1
+    x_seed = _java_make_odd(seed_rng.next_long())
+    z_seed = _java_make_odd(seed_rng.next_long())
     chunk_seed = _signed_long(((chunk_x * x_seed) + (chunk_z * z_seed)) ^ world_seed)
     return JavaRandom(chunk_seed)
 
