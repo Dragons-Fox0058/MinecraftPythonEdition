@@ -24,9 +24,17 @@ def main(*, seed: int = 0) -> None:
     except ImportError as exc:
         raise RuntimeError("Desktop mode requires glfw and PyOpenGL; install requirements.txt") from exc
 
-    chunk = ChunkGeneratorOverworld(int(seed)).generate_chunk(0, 0)
-    mesh = ChunkMeshBuilder().build(chunk)
-    camera = Camera(position=(8.0, 92.0, -12.0), yaw=0.0, pitch=28.0)
+    generator = ChunkGeneratorOverworld(int(seed))
+    chunks = {(cx, cz): generator.generate_chunk(cx, cz)
+              for cz in range(-1, 2) for cx in range(-1, 2)}
+    mesh_builder = ChunkMeshBuilder()
+    meshes = {}
+    for (cx, cz), chunk in chunks.items():
+        neighbors = {(cx + dx, cz + dz): chunks[(cx + dx, cz + dz)]
+                     for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                     if (cx + dx, cz + dz) in chunks}
+        meshes[(cx, cz)] = mesh_builder.build(chunk, neighbors=neighbors)
+    camera = Camera(position=(8.0, 92.0, -22.0), yaw=0.0, pitch=28.0)
     input_state = InputState()
     lan_server = None
     lan_client = None
@@ -86,7 +94,8 @@ def main(*, seed: int = 0) -> None:
 
         glfw.set_key_callback(window, on_key)
         glfw.set_cursor_pos_callback(window, on_mouse)
-        renderer.upload_chunk_mesh((0, 0), mesh)
+        for key, mesh in meshes.items():
+            renderer.upload_chunk_mesh(key, mesh)
         previous = time.perf_counter()
         network_send_timer = 0.0
         try:
