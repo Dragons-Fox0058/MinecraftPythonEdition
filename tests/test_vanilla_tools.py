@@ -27,6 +27,7 @@ class TestVanillaToolMappings(unittest.TestCase):
         self.assertEqual(self.registry.dig_speed(self.items["iron_pickaxe"], "stone"), 6.0)
         self.assertEqual(self.registry.dig_speed(self.items["golden_axe"], "planks"), 12.0)
         self.assertEqual(self.registry.dig_speed(self.items["iron_shovel"], "sand"), 6.0)
+        self.assertEqual(self.registry.dig_speed(self.items["iron_shovel"], "grass"), 6.0)
         self.assertEqual(self.registry.dig_speed(self.items["iron_shovel"], "stone"), 1.0)
 
     def test_pickaxe_harvest_tiers(self):
