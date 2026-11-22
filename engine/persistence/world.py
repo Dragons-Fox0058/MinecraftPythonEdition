@@ -14,6 +14,7 @@ from engine.persistence.player import save_player_data, load_player_data
 from engine.gameplay.items import ItemRegistry
 from engine.gameplay.player import PlayerController
 from engine.world.world import World
+from engine.worldgen.provider import ChunkProviderOverworld
 
 DATA_VERSION_1_12_2 = 1343
 
@@ -125,6 +126,8 @@ def load_world(directory: str | os.PathLike) -> World:
         name = str(data["LevelName"])
         world = World(name)
         world.seed = int(data["RandomSeed"])
+        # Continue generating missing chunks with the saved world's seed.
+        world._provider = ChunkProviderOverworld(world.seed)
         world.spawn_point = BlockPos(
             int(data.get("SpawnX", 0)),
             int(data.get("SpawnY", 64)),
