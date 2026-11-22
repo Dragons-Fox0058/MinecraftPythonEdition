@@ -31,7 +31,8 @@ class BlockPlacement:
         self.block_resolver = block_resolver
 
     def place(self, stack: ItemStack, clicked_pos: BlockPos, face: EnumFacing,
-              can_place: Callable[[Block, BlockPos], bool] | None = None) -> PlacementResult:
+              can_place: Callable[[Block, BlockPos], bool] | None = None,
+              *, consume: bool = True) -> PlacementResult:
         if not isinstance(stack, ItemStack):
             raise TypeError("stack must be an ItemStack")
         if not isinstance(clicked_pos, BlockPos):
@@ -40,6 +41,8 @@ class BlockPlacement:
             raise TypeError("face must be an EnumFacing")
         if can_place is not None and not callable(can_place):
             raise TypeError("can_place must be callable or None")
+        if not isinstance(consume, bool):
+            raise TypeError("consume must be a bool")
         if stack.is_empty:
             return PlacementResult(False, clicked_pos, None, "empty_stack")
 
@@ -66,7 +69,8 @@ class BlockPlacement:
             return PlacementResult(False, target, block.block_id, "collision")
 
         self.world.set_block_state_id(target, block.block_id)
-        stack.shrink(1)
+        if consume:
+            stack.shrink(1)
         return PlacementResult(True, target, block.block_id, "placed")
 
 
