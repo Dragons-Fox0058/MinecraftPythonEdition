@@ -283,9 +283,7 @@ class PlaySession:
 
         if packet_id == CLIENTBOUND["disconnect"]:
             self.last_disconnect = decode_disconnect(payload)
-            self.connected = False
-            self._remove_remote_entities()
-            self.connection.close()
+            self.close()
             return self._emit("disconnect", self.last_disconnect)
 
         if packet_id == CLIENTBOUND["update_health"]:
@@ -612,6 +610,8 @@ class PlaySession:
                 break
             self.process_packet(packet_id, payload)
             processed += 1
+            if not self.connected:
+                break
 
         with self._receiver_error_lock:
             receiver_error = self._receiver_error
