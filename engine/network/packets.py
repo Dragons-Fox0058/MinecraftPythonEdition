@@ -102,12 +102,23 @@ class PlayerPositionLookPacket:
 
 
 @dataclass(frozen=True)
+class ChunkSectionData:
+    section_y: int
+    block_states: tuple[int, ...]
+    block_light: bytes
+    sky_light: bytes
+
+
+@dataclass(frozen=True)
 class ChunkDataPacket:
     chunk_x: int
     chunk_z: int
     ground_up: bool
     primary_bitmask: int
     data: bytes
+    sections: tuple[ChunkSectionData, ...]
+    biomes: bytes | None
+    block_entity_count: int
     block_entities_payload: bytes
 
 
@@ -137,7 +148,9 @@ def decode_clientbound_player_position_look(payload: bytes) -> PlayerPositionLoo
     return PlayerPositionLookPacket(x, y, z, yaw, pitch, flags, teleport_id)
 
 
-def decode_clientbound_chunk_data(payload: bytes) -> ChunkDataPacket:
+def decode_clientbound_chunk_data(payload: bytes, *, has_sky_light: bool = True) -> ChunkDataPacket:
+    if not isinstance(has_sky_light, bool):
+        raise TypeError("has_sky_light must be bool")
     buffer = PacketBuffer(payload)
     chunk_x, chunk_z = struct.unpack(">ii", buffer.read(8))
     ground_up = buffer.read(1)[0]
@@ -145,13 +158,62 @@ def decode_clientbound_chunk_data(payload: bytes) -> ChunkDataPacket:
         raise ProtocolError("invalid chunk ground-up flag")
     bitmask = buffer.read_varint()
     data_length = buffer.read_varint()
-    if bitmask < 0 or data_length < 0 or data_length > buffer.remaining:
-        raise ProtocolError("invalid chunk data length or bitmask")
+    if bitmask < 0 or bitmask > 0xFFFF or data_length < 0 or data_length > buffer.remaining:
+        raise ProtocolError("invalid chunk data length or primary bitmask")
     chunk_data = buffer.read(data_length)
-    # Block-entity NBT compounds follow this byte array. Keep the remainder
-    # opaque until the complete tile-entity schema is available.
-    return ChunkDataPacket(chunk_x, chunk_z, bool(ground_up), bitmask,
-                           chunk_data, buffer.read_remaining())
+    section_buffer = PacketBuffer(chunk_data)
+    sections = []
+    for section_y in range(16):
+        if not (bitmask & (1 << section_y)):
+            continue
+        bits_per_block = section_buffer.read(1)[0]
+        if not 4 <= bits_per_block <= 16:
+            raise ProtocolError("invalid chunk section bits-per-block")
+        palette = None
+        palette_length = section_buffer.read_varint()
+        if bits_per_block <= 8:
+            if not 1 <= palette_length <= (1 << bits_per_block):
+                raise ProtocolError("invalid indirect chunk palette length")
+            palette = tuple(section_buffer.read_varint() for _ in range(palette_length))
+            if any(value < 0 or value > 0xFFFF for value in palette):
+                raise ProtocolError("chunk palette state ID is out of range")
+        elif palette_length != 0:
+            raise ProtocolError("direct chunk palette must have zero entries")
+        long_count = section_buffer.read_varint()
+        expected_longs = 64 * bits_per_block
+        if long_count != expected_longs:
+            raise ProtocolError("invalid compacted chunk data array length")
+        packed = struct.unpack(">" + "Q" * long_count,
+                               section_buffer.read(long_count * 8))
+        value_mask = (1 << bits_per_block) - 1
+        states = []
+        for index in range(4096):
+            bit_index = index * bits_per_block
+            long_index = bit_index >> 6
+            bit_offset = bit_index & 63
+            value = packed[long_index] >> bit_offset
+            if bit_offset + bits_per_block > 64:
+                value |= packed[long_index + 1] << (64 - bit_offset)
+            value &= value_mask
+            if palette is not None:
+                if value >= len(palette):
+                    raise ProtocolError("chunk palette index is out of range")
+                value = palette[value]
+            states.append(value)
+        block_light = section_buffer.read(2048)
+        sky_light = section_buffer.read(2048) if has_sky_light else b""
+        sections.append(ChunkSectionData(section_y, tuple(states), block_light, sky_light))
+    biomes = section_buffer.read(256) if ground_up else None
+    if section_buffer.remaining:
+        raise ProtocolError("trailing chunk section data")
+    block_entity_count = buffer.read_varint()
+    if not 0 <= block_entity_count <= 4096:
+        raise ProtocolError("invalid chunk block-entity count")
+    block_entities_payload = buffer.read_remaining()
+    return ChunkDataPacket(
+        chunk_x, chunk_z, bool(ground_up), bitmask, chunk_data,
+        tuple(sections), biomes, block_entity_count, block_entities_payload,
+    )
 
 
 def decode_clientbound_keep_alive(payload: bytes) -> int:
@@ -173,6 +235,6 @@ __all__ = ["serverbound_chat", "serverbound_keep_alive", "serverbound_player",
            "serverbound_position", "serverbound_position_look", "serverbound_look",
            "serverbound_held_item", "serverbound_digging",
            "decode_clientbound_keep_alive", "decode_clientbound_chat",
-           "JoinGamePacket", "PlayerPositionLookPacket", "ChunkDataPacket",
+           "JoinGamePacket", "PlayerPositionLookPacket", "ChunkSectionData", "ChunkDataPacket",
            "decode_clientbound_join_game", "decode_clientbound_player_position_look",
            "decode_clientbound_chunk_data"]
