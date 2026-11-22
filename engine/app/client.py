@@ -17,7 +17,7 @@ from engine.gameplay.player import PlayerController
 from engine.gameplay.effects import StatusEffectManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.drops import EntityItem
-from engine.gameplay.vanilla_tools import create_vanilla_tool_registry
+from engine.gameplay.vanilla_tools import create_vanilla_tool_items, create_vanilla_tool_registry
 from engine.gameplay.vanilla_drops import resolve_vanilla_block_drops
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
@@ -118,7 +118,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     jump_requested = False
     inventory = Inventory()
     selected_hotbar_slot = inventory.selected_hotbar_slot
-    hotbar_block_ids = (1, 2, 3, 4, 5, 12, 13, 20, 24, 49)
+    hotbar_block_ids = (1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 20, 21, 24, 49, 56, 73, 74, 129, 153)
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
@@ -127,12 +127,29 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     }
     for item in block_items.values():
         item_registry.register(item)
+    drop_items = dict(block_items)
     flint_item = Item(318, "minecraft:flint")
-    item_registry.register(flint_item)
+    ordinary_drop_items = {
+        263: Item(263, "minecraft:coal"),
+        264: Item(264, "minecraft:diamond"),
+        331: Item(331, "minecraft:redstone"),
+        351: Item(351, "minecraft:dye", has_subtypes=True),
+        388: Item(388, "minecraft:emerald"),
+        406: Item(406, "minecraft:quartz"),
+        318: flint_item,
+    }
+    for item in ordinary_drop_items.values():
+        item_registry.register(item)
+    drop_items.update(ordinary_drop_items)
     item_to_block = {item: block_id for block_id, item in block_items.items()}
-    # Start with an empty hand/tool catalogue. Vanilla harvest requirements still
-    # apply: stone/ores cannot be harvested by hand even before tools are added.
-    tool_registry = create_vanilla_tool_registry({})
+
+    # Register the complete vanilla pickaxe/axe/shovel item subset. A small
+    # wooden-tool bootstrap is supplied only to brand-new local test worlds;
+    # existing player saves retain their own inventory unchanged.
+    tool_items = create_vanilla_tool_items()
+    for item in tool_items.values():
+        item_registry.register(item)
+    tool_registry = create_vanilla_tool_registry(tool_items)
     controller = PlayerController(
         player, inventory=inventory, difficulty="normal",
         tool_registry=tool_registry,
@@ -141,6 +158,10 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     player_file = save_directory / "playerdata" / f"{player_uuid}.dat"
     if player_file.is_file():
         load_world_player(save_directory, player_uuid, player, controller, item_registry)
+    else:
+        inventory.set_slot(0, ItemStack(tool_items["wooden_pickaxe"]))
+        inventory.set_slot(1, ItemStack(tool_items["wooden_axe"]))
+        inventory.set_slot(2, ItemStack(tool_items["wooden_shovel"]))
     interaction = InteractionManager(world)
 
     def resolve_block_drop(block, pos):
@@ -152,7 +173,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
             ^ (pos.y * 132897987541) ^ (pos.z * 42317861)
         )
         return resolve_vanilla_block_drops(
-            block, block_items, flint_item=flint_item,
+            block, drop_items, flint_item=flint_item,
             rng=random.Random(drop_seed),
         )
 
