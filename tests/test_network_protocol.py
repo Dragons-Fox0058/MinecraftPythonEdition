@@ -17,6 +17,8 @@ from engine.network.packets import (
     serverbound_chat, serverbound_keep_alive, serverbound_position,
     serverbound_position_look, serverbound_held_item, serverbound_digging,
     decode_clientbound_keep_alive, decode_clientbound_chat,
+    decode_clientbound_join_game, decode_clientbound_player_position_look,
+    decode_clientbound_chunk_data,
 )
 from engine.network.login import login_offline, login_online, minecraft_server_hash
 from engine.network.status import query_server
@@ -186,6 +188,38 @@ class TestProtocolHandshake(unittest.TestCase):
             with self.assertRaises(ProtocolError):
                 login_offline("localhost", 25565, "TestPlayer")
         self.assertTrue(fake.closed)
+
+    def test_clientbound_join_game_and_player_position_decoders(self):
+        payload = PacketBuffer()
+        payload.write(struct.pack(">iBiBB", 123, 1, -1, 2, 20))
+        payload.write_string("default")
+        payload.write(b"\x01")
+        packet = decode_clientbound_join_game(payload.to_bytes())
+        self.assertEqual(packet.entity_id, 123)
+        self.assertEqual(packet.dimension, -1)
+        self.assertEqual(packet.level_type, "default")
+        self.assertTrue(packet.reduced_debug_info)
+
+        position = struct.pack(">dddffB", 1.5, 64.0, -2.5, 90.0, 10.0, 3)
+        teleport = PacketBuffer()
+        teleport.write_varint(42)
+        decoded = decode_clientbound_player_position_look(position + teleport.to_bytes())
+        self.assertEqual((decoded.x, decoded.y, decoded.z), (1.5, 64.0, -2.5))
+        self.assertEqual(decoded.teleport_id, 42)
+
+    def test_clientbound_chunk_data_decoder(self):
+        payload = struct.pack(">iiB", -2, 4, 1)
+        bitmask = PacketBuffer()
+        bitmask.write_varint(5)
+        length = PacketBuffer()
+        length.write_varint(4)
+        raw = payload + bitmask.to_bytes() + length.to_bytes() + b"abcd" + b"tile-nbt"
+        chunk = decode_clientbound_chunk_data(raw)
+        self.assertEqual((chunk.chunk_x, chunk.chunk_z), (-2, 4))
+        self.assertTrue(chunk.ground_up)
+        self.assertEqual(chunk.primary_bitmask, 5)
+        self.assertEqual(chunk.data, b"abcd")
+        self.assertEqual(chunk.block_entities_payload, b"tile-nbt")
 
     def test_common_play_packet_payloads(self):
         packet_id, payload = serverbound_chat("hello")
