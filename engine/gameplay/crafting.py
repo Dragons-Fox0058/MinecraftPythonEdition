@@ -154,6 +154,12 @@ class RecipeManager:
                 return recipe
         return None
 
+    def extend(self, other: "RecipeManager") -> None:
+        """Append another manager's recipes in registration order."""
+        if not isinstance(other, RecipeManager):
+            raise TypeError("other must be a RecipeManager")
+        self._recipes.extend(other._recipes)
+
     def __len__(self) -> int:
         return len(self._recipes)
 
