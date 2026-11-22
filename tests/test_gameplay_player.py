@@ -3,7 +3,10 @@ import unittest
 
 from engine.core import BlockPos, EnumFacing
 from engine.entities import EntityPlayer
-from engine.gameplay import FoodProperties, FoodRegistry, Item, ItemRegistry, ItemStack
+from engine.gameplay import (
+    ArmorDefinition, ArmorRegistry, DamageSource,
+    FoodProperties, FoodRegistry, Item, ItemRegistry, ItemStack,
+)
 from engine.gameplay.crafting import CraftingGrid
 from engine.gameplay.vanilla_food_recipes import register_vanilla_food_recipes
 from engine.gameplay.player import PlayerController
@@ -19,6 +22,34 @@ class TestPlayerController(unittest.TestCase):
         self.stone_item = Item(500, "test:stone_block")
         self.apple = Item(501, "test:apple")
         self.controller.food_registry.register(self.apple, FoodProperties(4, 0.3))
+
+    def test_player_damage_uses_equipped_armor(self):
+        armor_item = Item(700, "test:chestplate", max_stack_size=1, max_damage=100)
+        armor_registry = ArmorRegistry()
+        armor_registry.register(ArmorDefinition(armor_item, 8, 2.0))
+        player = EntityPlayer(self.world, 4, 64, 4)
+        controller = PlayerController(player, armor_registry=armor_registry)
+        controller.inventory.set_armor_slot(1, ItemStack(armor_item, 1))
+        self.assertTrue(controller.damage(10.0, DamageSource("mob")))
+        self.assertAlmostEqual(player.health, 11.6)
+        self.assertEqual(controller.inventory.armor[1].damage, 3)
+
+    def test_unblockable_player_damage_bypasses_armor_and_wear(self):
+        armor_item = Item(701, "test:helmet", max_stack_size=1, max_damage=100)
+        armor_registry = ArmorRegistry()
+        armor_registry.register(ArmorDefinition(armor_item, 3))
+        player = EntityPlayer(self.world, 5, 64, 5)
+        controller = PlayerController(player, armor_registry=armor_registry)
+        controller.inventory.set_armor_slot(0, ItemStack(armor_item, 1))
+        self.assertTrue(controller.damage(5.0, DamageSource("void", absolute=True)))
+        self.assertEqual(player.health, 15.0)
+        self.assertEqual(controller.inventory.armor[0].damage, 0)
+
+    def test_player_damage_rejects_invalid_amounts(self):
+        for amount in (-1, float("nan"), float("inf"), True):
+            with self.subTest(amount=amount):
+                with self.assertRaises(ValueError):
+                    self.controller.damage(amount)
 
     def test_controller_attaches_player_components(self):
         self.assertIs(self.player.inventory, self.controller.inventory)
