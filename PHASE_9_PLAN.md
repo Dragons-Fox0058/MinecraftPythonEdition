@@ -18,9 +18,10 @@
 - [ ] Frustum culling, chunk render scheduling, dirty-mesh rebuilds, and render-distance management.
 - [ ] Player camera, mouse capture, keyboard movement, block raycast, and interaction wiring.
 - [ ] HUD, hotbar, inventory, menus, pause screen, and settings.
-- [ ] Audio and user-facing launcher/build pipeline.
+- [ ] Audio, HUD, inventory, pause/settings menus, and full in-game server/join UI.
+- [x] User-facing Tk launcher entrypoint and Windows PyInstaller EXE build workflow.
 - [ ] Windows build and real desktop smoke tests.
 
 ## Status
 
-Phase 9 is **in progress**. The application, input, and CPU mesh foundations are testable without a graphical display. This is not yet a playable desktop client: there is no window/context backend, GPU renderer, texture atlas, or HUD.
+Phase 9 is **in progress**. A first desktop preview now opens a GLFW/OpenGL 3.3 window, generates and meshes one overworld chunk, and supports free-camera movement. The launcher source and Windows EXE build workflow are present. Placeholder colors remain; textures, interaction, chunk streaming, HUD/inventory/menus, desktop smoke tests, and a verified EXE artifact remain outstanding.
