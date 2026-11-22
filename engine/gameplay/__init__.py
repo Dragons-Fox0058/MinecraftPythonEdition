@@ -9,5 +9,6 @@ from engine.gameplay.crafting import Ingredient, ShapedRecipe, ShapelessRecipe, 
 from engine.gameplay.furnace import FuelRegistry, SmeltingRecipe, SmeltingRecipeManager, Furnace
 from engine.gameplay.health import HungerManager
 from engine.gameplay.time import GameRules, WorldTime
+from engine.gameplay.player import PlayerController
 
-__all__ = ["Item", "ItemRegistry", "ItemStack", "ITEM_REGISTRY", "Inventory", "BlockBreaking", "BlockBreakResult", "BlockPlacement", "PlacementResult", "EntityItem", "ItemDropManager", "Ingredient", "ShapedRecipe", "ShapelessRecipe", "RecipeManager", "CraftingGrid", "FuelRegistry", "SmeltingRecipe", "SmeltingRecipeManager", "Furnace", "HungerManager", "GameRules", "WorldTime"]
+__all__ = ["Item", "ItemRegistry", "ItemStack", "ITEM_REGISTRY", "Inventory", "BlockBreaking", "BlockBreakResult", "BlockPlacement", "PlacementResult", "EntityItem", "ItemDropManager", "Ingredient", "ShapedRecipe", "ShapelessRecipe", "RecipeManager", "CraftingGrid", "FuelRegistry", "SmeltingRecipe", "SmeltingRecipeManager", "Furnace", "HungerManager", "GameRules", "WorldTime", "PlayerController"]
