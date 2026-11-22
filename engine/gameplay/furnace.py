@@ -83,6 +83,50 @@ class Furnace:
     def is_burning(self) -> bool:
         return self.burn_time > 0
 
+    @property
+    def burn_progress(self) -> float:
+        if self.current_item_burn_time <= 0:
+            return 0.0
+        return min(1.0, self.burn_time / self.current_item_burn_time)
+
+    @property
+    def cook_progress(self) -> float:
+        return min(1.0, self.cook_time / self.total_cook_time)
+
+    @staticmethod
+    def _insert_stack(current: ItemStack, incoming: ItemStack) -> ItemStack:
+        remainder = incoming.copy()
+        if remainder.is_empty:
+            return remainder
+        if current.is_empty:
+            moved = min(remainder.count, remainder.item.max_stack_size)
+            current.item = remainder.item
+            current.count = moved
+            current.metadata = remainder.metadata
+            current.damage = remainder.damage
+            current.nbt = remainder.copy().nbt
+            remainder.shrink(moved)
+        else:
+            current.merge_from(remainder)
+        return remainder
+
+    def insert_input(self, stack: ItemStack) -> ItemStack:
+        if not isinstance(stack, ItemStack):
+            raise TypeError("stack must be an ItemStack")
+        return self._insert_stack(self.input, stack)
+
+    def insert_fuel(self, stack: ItemStack) -> ItemStack:
+        if not isinstance(stack, ItemStack):
+            raise TypeError("stack must be an ItemStack")
+        if self.fuels.get_burn_time(stack) <= 0:
+            return stack.copy()
+        return self._insert_stack(self.fuel, stack)
+
+    def take_output(self, amount: int | None = None) -> ItemStack:
+        if amount is None:
+            amount = self.output.count
+        return self.output.split(amount)
+
     def can_smelt(self) -> bool:
         recipe = self.recipes.find_recipe(self.input)
         if recipe is None:
