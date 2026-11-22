@@ -133,6 +133,14 @@ class TestItemStack(unittest.TestCase):
         self.assertFalse(ItemStack(self.stone, 2).can_stack_with(ItemStack(self.dye, 2)))
         self.assertFalse(ItemStack(self.pickaxe, 1).can_stack_with(ItemStack(self.pickaxe, 1)))
 
+    def test_non_subtype_metadata_does_not_prevent_stacking(self):
+        plain = Item(4, "minecraft:plain_item")
+        first = ItemStack(plain, 2, metadata=0)
+        second = ItemStack(plain, 3, metadata=7)
+        self.assertTrue(first.can_stack_with(second))
+        self.assertEqual(first.merge_from(second), 3)
+        self.assertEqual(first.count, 5)
+
     def test_merge_respects_stack_limit(self):
         target = ItemStack(self.stone, 60)
         source = ItemStack(self.stone, 10)
