@@ -58,7 +58,8 @@ def resolve_vanilla_block_drops(
     if silk_touch and name in {
         "stone", "glass", "coal_ore", "iron_ore", "gold_ore",
         "lapis_ore", "diamond_ore", "redstone_ore", "lit_redstone_ore",
-        "emerald_ore", "quartz_ore",
+        "emerald_ore", "quartz_ore", "leaves", "leaves2", "ice",
+        "glowstone",
     }:
         item = block_items.get(block_id)
         return [ItemStack(item, 1)] if item is not None else []
