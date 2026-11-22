@@ -133,7 +133,7 @@ class TestPlaySession(unittest.TestCase):
         world = World()
         session = PlaySession(conn, world=world)
         section = PacketBuffer()
-        section.write(b"\\x04")
+        section.write(bytes((4,)))
         section.write_varint(1)
         section.write_varint(1)
         section.write_varint(256)
