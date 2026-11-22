@@ -32,6 +32,25 @@ void main() {
 """
 
 
+_HUD_VERTEX_SHADER = """#version 330 core
+layout (location = 0) in vec2 in_position;
+layout (location = 1) in vec3 in_color;
+out vec3 vertex_color;
+void main() {
+    gl_Position = vec4(in_position, 0.0, 1.0);
+    vertex_color = in_color;
+}
+"""
+
+_HUD_FRAGMENT_SHADER = """#version 330 core
+in vec3 vertex_color;
+out vec4 out_color;
+void main() {
+    out_color = vec4(vertex_color, 1.0);
+}
+"""
+
+
 @dataclass
 class _GPUChunk:
     vao: int
@@ -84,6 +103,18 @@ class OpenGLRenderer:
             self.gl.glCullFace(self.gl.GL_BACK)
             self.program = self._create_program(_VERTEX_SHADER, _FRAGMENT_SHADER)
             self._mvp_location = self.gl.glGetUniformLocation(self.program, "u_mvp")
+            self.hud_program = self._create_program(_HUD_VERTEX_SHADER, _HUD_FRAGMENT_SHADER)
+            self._hud_vao = int(self.gl.glGenVertexArrays(1))
+            self._hud_buffer = int(self.gl.glGenBuffers(1))
+            self.gl.glBindVertexArray(self._hud_vao)
+            self.gl.glBindBuffer(self.gl.GL_ARRAY_BUFFER, self._hud_buffer)
+            self.gl.glBufferData(self.gl.GL_ARRAY_BUFFER, 0, None, self.gl.GL_DYNAMIC_DRAW)
+            hud_stride = 5 * np.dtype(np.float32).itemsize
+            self.gl.glEnableVertexAttribArray(0)
+            self.gl.glVertexAttribPointer(0, 2, self.gl.GL_FLOAT, self.gl.GL_FALSE, hud_stride, ctypes.c_void_p(0))
+            self.gl.glEnableVertexAttribArray(1)
+            self.gl.glVertexAttribPointer(1, 3, self.gl.GL_FLOAT, self.gl.GL_FALSE, hud_stride, ctypes.c_void_p(2 * np.dtype(np.float32).itemsize))
+            self.gl.glBindVertexArray(0)
         except Exception:
             self.close()
             raise
@@ -167,7 +198,39 @@ class OpenGLRenderer:
         self.gl.glDeleteBuffers(1, [gpu.vertex_buffer, gpu.index_buffer])
         self.gl.glDeleteVertexArrays(1, [gpu.vao])
 
-    def render(self, mvp: np.ndarray, *, clear_color=(0.52, 0.72, 0.92, 1.0)) -> None:
+    @staticmethod
+    def _hud_vertices(selected_slot: int, health: float, food: int) -> np.ndarray:
+        vertices = []
+
+        def rect(x0, y0, x1, y1, color):
+            r, g, b = color
+            vertices.extend((
+                (x0, y0, r, g, b), (x1, y0, r, g, b), (x1, y1, r, g, b),
+                (x0, y0, r, g, b), (x1, y1, r, g, b), (x0, y1, r, g, b),
+            ))
+
+        # Center crosshair.
+        rect(-0.012, -0.0015, 0.012, 0.0015, (0.96, 0.96, 0.96))
+        rect(-0.0015, -0.018, 0.0015, 0.018, (0.96, 0.96, 0.96))
+
+        # Nine-slot hotbar with a clear selected-slot frame.
+        slot_w, gap = 0.075, 0.008
+        total = 9 * slot_w + 8 * gap
+        left = -total / 2
+        for index in range(9):
+            x0 = left + index * (slot_w + gap)
+            x1 = x0 + slot_w
+            border = (0.95, 0.72, 0.22) if index == selected_slot else (0.52, 0.55, 0.60)
+            rect(x0, -0.91, x1, -0.72, border)
+            rect(x0 + 0.006, -0.904, x1 - 0.006, -0.726, (0.12, 0.14, 0.18))
+
+        # Health and hunger indicators as compact bars.
+        rect(-0.88, -0.66, -0.88 + 0.16 * max(0.0, min(1.0, health / 20.0)), -0.635, (0.85, 0.12, 0.14))
+        rect(0.72, -0.66, 0.72 + 0.16 * max(0, min(20, food)) / 20.0, -0.635, (0.78, 0.48, 0.16))
+        return np.asarray(vertices, dtype=np.float32)
+
+    def render(self, mvp: np.ndarray, *, clear_color=(0.52, 0.72, 0.92, 1.0),
+               hud_state: dict | None = None) -> None:
         matrix = np.asarray(mvp, dtype=np.float32)
         if matrix.shape != (4, 4) or not np.isfinite(matrix).all():
             raise ValueError("mvp must be a finite 4x4 matrix")
@@ -181,6 +244,23 @@ class OpenGLRenderer:
             gl.glBindVertexArray(gpu.vao)
             gl.glDrawElements(gl.GL_TRIANGLES, gpu.index_count, gl.GL_UNSIGNED_INT, None)
         gl.glBindVertexArray(0)
+        if hud_state is not None:
+            selected = int(hud_state.get("selected_slot", 0))
+            health = float(hud_state.get("health", 20.0))
+            food = int(hud_state.get("food", 20))
+            if not 0 <= selected < 9:
+                raise ValueError("selected hotbar slot must be in [0, 8]")
+            hud = self._hud_vertices(selected, health, food)
+            gl.glDisable(gl.GL_DEPTH_TEST)
+            gl.glDisable(gl.GL_CULL_FACE)
+            gl.glUseProgram(self.hud_program)
+            gl.glBindVertexArray(self._hud_vao)
+            gl.glBindBuffer(gl.GL_ARRAY_BUFFER, self._hud_buffer)
+            gl.glBufferData(gl.GL_ARRAY_BUFFER, hud.nbytes, hud, gl.GL_DYNAMIC_DRAW)
+            gl.glDrawArrays(gl.GL_TRIANGLES, 0, len(hud))
+            gl.glBindVertexArray(0)
+            gl.glEnable(gl.GL_CULL_FACE)
+            gl.glEnable(gl.GL_DEPTH_TEST)
         self.glfw.swap_buffers(self.window)
         self.glfw.poll_events()
 
@@ -191,6 +271,15 @@ class OpenGLRenderer:
         if getattr(self, "gl", None) is not None:
             for key in tuple(getattr(self, "_chunks", {})):
                 self.remove_chunk(key)
+            if getattr(self, "_hud_buffer", 0):
+                self.gl.glDeleteBuffers(1, [self._hud_buffer])
+                self._hud_buffer = 0
+            if getattr(self, "_hud_vao", 0):
+                self.gl.glDeleteVertexArrays(1, [self._hud_vao])
+                self._hud_vao = 0
+            if getattr(self, "hud_program", 0):
+                self.gl.glDeleteProgram(self.hud_program)
+                self.hud_program = 0
             if getattr(self, "program", 0):
                 self.gl.glDeleteProgram(self.program)
                 self.program = 0
