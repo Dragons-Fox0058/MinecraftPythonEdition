@@ -110,6 +110,8 @@ class ShapelessRecipe:
             raise ValueError("a 3x3 crafting grid cannot hold more than 9 ingredients")
         if not isinstance(output, ItemStack) or output.is_empty:
             raise ValueError("recipe output must be a non-empty ItemStack")
+        if output.count > output.item.max_stack_size:
+            raise ValueError("recipe output exceeds max_stack_size")
         self.output = output.copy()
 
     def matches(self, grid: "CraftingGrid") -> bool:
