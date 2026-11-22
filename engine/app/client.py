@@ -9,6 +9,8 @@ from engine.render.camera import Camera
 from engine.render.mesh import ChunkMeshBuilder
 from engine.render.opengl import OpenGLRenderer
 from engine.worldgen.generator import ChunkGeneratorOverworld
+from engine.server.local import PythonEditionServer, ServerConfig
+from engine.network.python_edition import PythonEditionClient
 
 
 def main(*, seed: int = 0) -> None:
@@ -28,6 +30,8 @@ def main(*, seed: int = 0) -> None:
     mesh = ChunkMeshBuilder().build(chunk)
     camera = Camera(position=(8.0, 92.0, -12.0), yaw=0.0, pitch=28.0)
     input_state = InputState()
+    lan_server = None
+    lan_client = None
 
     with OpenGLRenderer(1280, 720) as renderer:
         window = renderer.window
@@ -38,6 +42,36 @@ def main(*, seed: int = 0) -> None:
                 input_state.key_down(key)
                 if key == glfw.KEY_ESCAPE:
                     glfw.set_window_should_close(window, True)
+                elif key == glfw.KEY_F6:
+                    nonlocal lan_server
+                    if lan_server is not None and lan_server.running:
+                        lan_server.stop()
+                        lan_server = None
+                        glfw.set_window_title(window, "Minecraft Python Edition")
+                    else:
+                        lan_server = PythonEditionServer(ServerConfig(host="0.0.0.0", port=25575))
+                        host, port = lan_server.start()
+                        glfw.set_window_title(window, f"Minecraft Python Edition — LAN HOST :{port}")
+                elif key == glfw.KEY_F7:
+                    nonlocal lan_client
+                    try:
+                        import tkinter as tk
+                        from tkinter import simpledialog
+                        dialog = tk.Tk()
+                        dialog.withdraw()
+                        address = simpledialog.askstring("Join Python Edition", "Server address (host:port):", parent=dialog)
+                        username = simpledialog.askstring("Player name", "Username (1-16 characters):", parent=dialog)
+                        dialog.destroy()
+                        if address and username:
+                            host, port_text = address.rsplit(":", 1)
+                            candidate = PythonEditionClient(host.strip(), int(port_text), username.strip())
+                            candidate.connect()
+                            if lan_client is not None:
+                                lan_client.close()
+                            lan_client = candidate
+                            glfw.set_window_title(window, f"Minecraft Python Edition — {host}:{port_text}")
+                    except Exception as exc:
+                        print(f"[LAN] {exc}")
             elif action == glfw.RELEASE:
                 input_state.key_up(key)
 
@@ -51,26 +85,35 @@ def main(*, seed: int = 0) -> None:
         glfw.set_cursor_pos_callback(window, on_mouse)
         renderer.upload_chunk_mesh((0, 0), mesh)
         previous = time.perf_counter()
-        while not renderer.should_close():
-            now = time.perf_counter()
-            dt = min(now - previous, 0.05)
-            previous = now
-            # GLFW callbacks from the previous event poll are consumed before reset.
-            speed = 18.0 if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else 6.0
-            right = float(input_state.is_key_down(glfw.KEY_D)) - float(input_state.is_key_down(glfw.KEY_A))
-            forward = float(input_state.is_key_down(glfw.KEY_W)) - float(input_state.is_key_down(glfw.KEY_S))
-            up = float(input_state.is_key_down(glfw.KEY_SPACE)) - float(input_state.is_key_down(glfw.KEY_LEFT_CONTROL))
-            length = math.hypot(right, forward)
-            if length > 0:
-                right, forward = right / length, forward / length
-            camera.move_local(right=right * speed * dt, up=up * speed * dt,
-                              forward=forward * speed * dt)
-            camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
-            input_state.begin_frame()
+        network_send_timer = 0.0
+        try:
+            while not renderer.should_close():
+                now = time.perf_counter()
+                    dt = min(now - previous, 0.05)
+                    previous = now
+                # GLFW callbacks from the previous event poll are consumed before reset.
+                speed = 18.0 if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else 6.0
+                right = float(input_state.is_key_down(glfw.KEY_D)) - float(input_state.is_key_down(glfw.KEY_A))
+                forward = float(input_state.is_key_down(glfw.KEY_W)) - float(input_state.is_key_down(glfw.KEY_S))
+                up = float(input_state.is_key_down(glfw.KEY_SPACE)) - float(input_state.is_key_down(glfw.KEY_LEFT_CONTROL))
+                length = math.hypot(right, forward)
+                if length > 0:
+                    right, forward = right / length, forward / length
+                camera.move_local(right=right * speed * dt, up=up * speed * dt,
+                                  forward=forward * speed * dt)
+                camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
+                input_state.begin_frame()
             width, height = glfw.get_framebuffer_size(window)
             if width > 0 and height > 0:
                 renderer.gl.glViewport(0, 0, width, height)
                 renderer.render(camera.view_projection_matrix(width / height))
+
+
+        finally:
+            if lan_client is not None:
+                lan_client.close()
+            if lan_server is not None:
+                lan_server.stop()
 
 
 if __name__ == "__main__":
