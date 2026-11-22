@@ -109,7 +109,8 @@ class PlayerController:
         if self.death_processed:
             return ()
         self.death_processed = True
-        if self.world.game_rules.get_bool("keepInventory"):
+        if (self.world.game_rules.get_bool("keepInventory")
+                or not self.world.game_rules.get_bool("doEntityDrops")):
             return ()
         spawned = []
         carried = list(self.inventory.slots) + list(self.inventory.armor) + [self.inventory.offhand]
