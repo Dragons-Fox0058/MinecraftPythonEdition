@@ -34,11 +34,11 @@ class TestPlaySession(unittest.TestCase):
         conn = FakeConnection()
         session = PlaySession(conn)
         body = PacketBuffer()
-        body.write_varint(7654)
+        body.write(struct.pack(">q", 7654))
         result = session.process_packet(CLIENTBOUND["keep_alive"], body.to_bytes())
         self.assertEqual(result, 7654)
         self.assertEqual(conn.sent[0][0], 0x0B)
-        self.assertEqual(PacketBuffer(conn.sent[0][1]).read_varint(), 7654)
+        self.assertEqual(struct.unpack(">q", conn.sent[0][1])[0], 7654)
 
     def test_block_change_updates_world(self):
         conn = FakeConnection()
@@ -83,6 +83,65 @@ class TestPlaySession(unittest.TestCase):
     def test_unknown_packet_is_preserved(self):
         session = PlaySession(FakeConnection())
         self.assertEqual(session.process_packet(0x7F, b"opaque"), (0x7F, b"opaque"))
+
+    def test_join_game_sends_client_settings(self):
+        conn = FakeConnection()
+        world = World()
+        session = PlaySession(conn, world=world)
+        body = PacketBuffer()
+        body.write(struct.pack(">iBiBB", 44, 1, -1, 2, 20))
+        body.write_string("default")
+        body.write(b"\\x00")
+        result = session.process_packet(CLIENTBOUND["join_game"], body.to_bytes())
+        self.assertEqual(result.entity_id, 44)
+        self.assertEqual(world.dimension, -1)
+        self.assertEqual(conn.sent[0][0], 0x04)
+
+    def test_teleport_applies_relative_coordinates(self):
+        conn = FakeConnection()
+        player = EntityPlayer(World())
+        player.set_position(10, 20, 30)
+        player.yaw, player.pitch = 15, 5
+        session = PlaySession(conn, player=player)
+        body = PacketBuffer()
+        body.write(struct.pack(">dddffB", 1, 2, 3, 10, 20, 0x1F))
+        body.write_varint(7)
+        session.process_packet(CLIENTBOUND["player_position_look"], body.to_bytes())
+        self.assertEqual((player.pos.x, player.pos.y, player.pos.z), (11, 22, 33))
+        self.assertEqual((player.yaw, player.pitch), (25, 25))
+        self.assertEqual(conn.sent[0][0], 0x00)
+
+    def test_health_and_time_are_applied(self):
+        conn = FakeConnection()
+        world = World()
+        player = EntityPlayer(world)
+        player.hunger = HungerManager()
+        session = PlaySession(conn, world=world, player=player)
+        food = PacketBuffer()
+        food.write_varint(13)
+        session.process_packet(CLIENTBOUND["update_health"],
+                               struct.pack(">f", 17.5) + food.to_bytes() + struct.pack(">f", 3.0))
+        self.assertEqual(player.health, 17.5)
+        self.assertEqual(player.hunger.food_level, 13)
+        self.assertEqual(player.hunger.saturation, 3.0)
+        session.process_packet(CLIENTBOUND["time_update"], struct.pack(">qq", 900, 12345))
+        self.assertEqual(world.world_time.total_time, 900)
+        self.assertEqual(world.world_time.day_time, 12345)
+
+    def test_send_player_state_selects_minimal_packet(self):
+        conn = FakeConnection()
+        player = EntityPlayer(World())
+        session = PlaySession(conn, player=player)
+        session.send_player_state(force=True)
+        self.assertEqual(conn.sent[-1][0], 0x0E)
+        player.set_position(1, 2, 3)
+        session.send_player_state()
+        self.assertEqual(conn.sent[-1][0], 0x0D)
+        player.yaw = 45
+        session.send_player_state()
+        self.assertEqual(conn.sent[-1][0], 0x0F)
+        session.send_player_state()
+        self.assertEqual(conn.sent[-1][0], 0x0C)
 
 
 if __name__ == "__main__":
