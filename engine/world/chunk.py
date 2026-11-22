@@ -2,8 +2,9 @@
 
 Layout:
   blocks: uint16 array of shape (16, 16, 256), index [x, z, y]
-          each element is a block state ID into a global palette
-          (we use block_id << 4 | meta for now; proper palette in phase 3.5)
+          each element stores the legacy 1.12.2 state value:
+          (block_id << 4) | metadata. Public *_block_state_id methods
+          intentionally expose the numeric block ID for gameplay callers.
   light:  uint8 array of shape (16, 16, 256)
           low nibble = block light (0..15), high nibble = sky light (0..15)
 
@@ -35,12 +36,30 @@ class Chunk:
         return world_z & 15
 
     # --- block access ---
-    def get_block_state_id(self, lx: int, ly: int, lz: int) -> int:
+    def get_packed_block_state(self, lx: int, ly: int, lz: int) -> int:
+        """Return the stored 1.12.2 value: (block ID << 4) | metadata."""
         return int(self.blocks[lx, lz, ly])
 
-    def set_block_state_id(self, lx: int, ly: int, lz: int, state_id: int) -> None:
-        self.blocks[lx, lz, ly] = state_id
+    def set_packed_block_state(self, lx: int, ly: int, lz: int, packed_state: int) -> None:
+        """Store a packed 1.12.2 block state without losing metadata."""
+        if isinstance(packed_state, bool) or not isinstance(packed_state, int):
+            raise TypeError("packed_state must be an integer")
+        if not 0 <= packed_state <= 0xFFFF:
+            raise ValueError("packed_state must fit in uint16")
+        self.blocks[lx, lz, ly] = packed_state
         self._dirty = True
+
+    def get_block_state_id(self, lx: int, ly: int, lz: int) -> int:
+        """Return the numeric block ID (metadata is intentionally omitted)."""
+        return self.get_packed_block_state(lx, ly, lz) >> 4
+
+    def set_block_state_id(self, lx: int, ly: int, lz: int, block_id: int) -> None:
+        """Set a block by numeric ID, using metadata zero."""
+        if isinstance(block_id, bool) or not isinstance(block_id, int):
+            raise TypeError("block_id must be an integer")
+        if not 0 <= block_id <= 0xFFF:
+            raise ValueError("block_id must fit in the 12-bit Anvil block ID range")
+        self.set_packed_block_state(lx, ly, lz, block_id << 4)
 
     # --- light access ---
     def get_sky_light(self, lx: int, ly: int, lz: int) -> int:
@@ -60,12 +79,16 @@ class Chunk:
         self.light[lx, lz, ly] = (cur & 0xF0) | level
 
     # --- fill helpers ---
-    def fill_layer(self, ly: int, state_id: int) -> None:
-        self.blocks[:, :, ly] = state_id
+    def fill_layer(self, ly: int, block_id: int) -> None:
+        if isinstance(block_id, bool) or not isinstance(block_id, int) or not 0 <= block_id <= 0xFFF:
+            raise ValueError("block_id must be an integer in the 12-bit range")
+        self.blocks[:, :, ly] = block_id << 4
         self._dirty = True
 
-    def fill_box(self, x0, y0, z0, x1, y1, z1, state_id: int) -> None:
-        self.blocks[x0:x1, z0:z1, y0:y1] = state_id
+    def fill_box(self, x0, y0, z0, x1, y1, z1, block_id: int) -> None:
+        if isinstance(block_id, bool) or not isinstance(block_id, int) or not 0 <= block_id <= 0xFFF:
+            raise ValueError("block_id must be an integer in the 12-bit range")
+        self.blocks[x0:x1, z0:z1, y0:y1] = block_id << 4
         self._dirty = True
 
     @property
