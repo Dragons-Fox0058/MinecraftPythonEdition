@@ -43,6 +43,8 @@ CLIENTBOUND = {
     "update_health": 0x41,
     "time_update": 0x47,
     "block_change": 0x0B,
+    "plugin_message": 0x18,
+    "change_game_state": 0x1E,
 }
 
 
@@ -127,6 +129,26 @@ class PlayerAbilities:
     walking_speed: float
 
 
+@dataclass(frozen=True)
+class Respawn:
+    dimension: int
+    difficulty: int
+    game_mode: int
+    level_type: str
+
+
+@dataclass(frozen=True)
+class PluginMessage:
+    channel: str
+    data: bytes
+
+
+@dataclass(frozen=True)
+class ChangeGameState:
+    reason: int
+    value: float
+
+
 def decode_block_change(payload: bytes) -> BlockChange:
     buf = PacketBuffer(payload)
     x, y, z = buf.read_position()
@@ -179,7 +201,36 @@ def decode_player_abilities(payload: bytes) -> PlayerAbilities:
     flags, flying, walking = struct.unpack(">Bff", payload)
     if flags & ~0x0F or not math.isfinite(flying) or not math.isfinite(walking):
         raise ProtocolError("invalid Player Abilities values")
+    if flying < 0 or walking < 0:
+        raise ProtocolError("player ability speeds cannot be negative")
     return PlayerAbilities(flags, flying, walking)
+
+
+def decode_respawn(payload: bytes) -> Respawn:
+    buf = PacketBuffer(payload)
+    dimension = struct.unpack(">i", buf.read(4))[0]
+    difficulty, game_mode = buf.read(2)
+    level_type = buf.read_string(max_chars=16)
+    if buf.remaining or difficulty > 3 or game_mode & 0x07 > 3:
+        raise ProtocolError("invalid Respawn payload")
+    return Respawn(dimension, difficulty, game_mode, level_type)
+
+
+def decode_plugin_message(payload: bytes) -> PluginMessage:
+    buf = PacketBuffer(payload)
+    channel = buf.read_string(max_chars=20)
+    if not channel:
+        raise ProtocolError("plugin message channel cannot be empty")
+    return PluginMessage(channel, buf.read_remaining())
+
+
+def decode_change_game_state(payload: bytes) -> ChangeGameState:
+    if len(payload) != 5:
+        raise ProtocolError("Change Game State payload must be exactly 5 bytes")
+    reason, value = struct.unpack(">Bf", payload)
+    if not math.isfinite(value):
+        raise ProtocolError("Change Game State value must be finite")
+    return ChangeGameState(reason, value)
 
 
 class PlayPacketDispatcher:
@@ -210,6 +261,9 @@ def create_clientbound_dispatcher() -> PlayPacketDispatcher:
     dispatcher.register(CLIENTBOUND["update_health"], decode_update_health)
     dispatcher.register(CLIENTBOUND["time_update"], decode_time_update)
     dispatcher.register(CLIENTBOUND["player_abilities"], decode_player_abilities)
+    dispatcher.register(CLIENTBOUND["respawn"], decode_respawn)
+    dispatcher.register(CLIENTBOUND["plugin_message"], decode_plugin_message)
+    dispatcher.register(CLIENTBOUND["change_game_state"], decode_change_game_state)
     return dispatcher
 
 
@@ -217,8 +271,10 @@ __all__ = [
     "SERVERBOUND", "CLIENTBOUND", "serverbound_teleport_confirm",
     "serverbound_client_status", "serverbound_client_settings", "BlockChange",
     "UnloadChunk", "Disconnect", "UpdateHealth", "TimeUpdate",
-    "PlayerAbilities", "decode_block_change", "decode_unload_chunk",
-    "decode_disconnect", "decode_update_health", "decode_time_update",
-    "decode_player_abilities", "PlayPacketDispatcher",
+    "PlayerAbilities", "Respawn", "PluginMessage", "ChangeGameState",
+    "decode_block_change", "decode_unload_chunk", "decode_disconnect",
+    "decode_update_health", "decode_time_update", "decode_player_abilities",
+    "decode_respawn", "decode_plugin_message", "decode_change_game_state",
+    "PlayPacketDispatcher",
     "create_clientbound_dispatcher",
 ]
