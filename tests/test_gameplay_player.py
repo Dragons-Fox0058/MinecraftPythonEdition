@@ -4,6 +4,8 @@ import unittest
 from engine.core import BlockPos, EnumFacing
 from engine.entities import EntityPlayer
 from engine.gameplay import FoodProperties, FoodRegistry, Item, ItemStack
+from engine.gameplay.crafting import CraftingGrid
+from engine.gameplay.vanilla_food_recipes import register_vanilla_food_recipes
 from engine.gameplay.player import PlayerController
 from engine.world import World
 import engine.blocks.vanilla_blocks as VB
@@ -64,6 +66,32 @@ class TestPlayerController(unittest.TestCase):
         self.assertTrue(self.controller.consume_food())
         self.assertEqual(self.controller.hunger.food_level, 14)
         self.assertEqual(self.controller.held_item.count, 1)
+
+    def test_craft_to_inventory_collects_food_result(self):
+        registry = __import__("engine.gameplay.items", fromlist=["ItemRegistry"]).ItemRegistry()
+        recipes = register_vanilla_food_recipes(registry)
+        wheat = registry.require_by_name("minecraft:wheat")
+        grid = CraftingGrid(3, 3)
+        for slot in range(3):
+            grid.set_slot(slot, ItemStack(wheat, 1))
+        result = self.controller.craft_to_inventory(grid, recipes)
+        self.assertEqual(result.item.name, "minecraft:bread")
+        self.assertEqual(self.controller.inventory.count_item(result.item), 1)
+        self.assertTrue(all(grid.get_slot(i).is_empty for i in range(3)))
+
+    def test_craft_to_inventory_drops_output_when_inventory_full(self):
+        registry = __import__("engine.gameplay.items", fromlist=["ItemRegistry"]).ItemRegistry()
+        recipes = register_vanilla_food_recipes(registry)
+        wheat = registry.require_by_name("minecraft:wheat")
+        bread = registry.require_by_name("minecraft:bread")
+        for slot in range(36):
+            self.controller.inventory.set_slot(slot, ItemStack(self.stone_item, 64))
+        grid = CraftingGrid(3, 3)
+        for slot in range(3):
+            grid.set_slot(slot, ItemStack(wheat, 1))
+        self.controller.craft_to_inventory(grid, recipes)
+        drops = [entity for entity in self.world.entities if hasattr(entity, "stack")]
+        self.assertEqual(sum(e.stack.count for e in drops if e.stack.item is bread), 1)
 
     def test_consuming_stew_returns_bowl_to_inventory(self):
         bowl = Item(502, "test:bowl")
