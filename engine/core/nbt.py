@@ -101,18 +101,35 @@ def _read_payload(stream: io.BytesIO, tag_type: int, depth: int, max_depth: int)
         return tuple(_unpack(stream, fmt) for _ in range(length))
     raise NBTError(f"unsupported NBT tag type: {tag_type}")
 
+def _decompress_bounded(data: bytes, wbits: int, max_bytes: int) -> bytes:
+    decompressor = zlib.decompressobj(wbits)
+    try:
+        raw = decompressor.decompress(data, max_bytes + 1)
+        if len(raw) > max_bytes or decompressor.unconsumed_tail:
+            raise NBTError("decompressed NBT exceeds size limit")
+        remaining = max_bytes + 1 - len(raw)
+        raw += decompressor.flush(remaining)
+    except zlib.error as exc:
+        raise NBTError("invalid compressed NBT data") from exc
+    if len(raw) > max_bytes:
+        raise NBTError("decompressed NBT exceeds size limit")
+    if not decompressor.eof or decompressor.unused_data:
+        raise NBTError("truncated or trailing compressed NBT data")
+    return raw
+
+
 def read_nbt(data: bytes, *, compression: str = "none",
              max_bytes: int = 64 *  1024 * 1024, max_depth: int = 512) -> NBTDocument:
     if not isinstance(data, (bytes, bytearray, memoryview)):
         raise TypeError("data must be bytes-like")
     raw = bytes(data)
     if len(raw) > max_bytes: raise NBTError("NBT input exceeds size limit")
-    try:
-        if compression == "gzip": raw = gzip.decompress(raw)
-        elif compression == "zlib": raw = zlib.decompress(raw)
-        elif compression != "none": raise ValueError("compression must be none, gzip, or zlib")
-    except (OSError, zlib.error) as exc:
-        raise NBTError("invalid compressed NBT data") from exc
+    if compression == "gzip":
+        raw = _decompress_bounded(raw, 16 + zlib.MAX_WBITS, max_bytes)
+    elif compression == "zlib":
+        raw = _decompress_bounded(raw, zlib.MAX_WBITS, max_bytes)
+    elif compression != "none":
+        raise ValueError("compression must be none, gzip, or zlib")
     if len(raw) > max_bytes: raise NBTError("decompressed NBT exceeds size limit")
     stream = io.BytesIO(raw)
     root_type = _unpack(stream, ">B")
