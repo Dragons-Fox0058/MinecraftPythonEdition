@@ -26,6 +26,7 @@ TICK_RATE = 20.0
 PLAYER_WALK_SPEED = 4.3
 PLAYER_SPRINT_SPEED = 5.6
 PLAYER_JUMP_VELOCITY = 0.42
+RENDER_DISTANCE_CHUNKS = 2
 
 
 def _surface_y(chunk, local_x: int, local_z: int) -> int:
@@ -195,6 +196,28 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         for key, mesh in meshes.items():
             renderer.upload_chunk_mesh(key, mesh)
 
+        last_render_center = (center_cx, center_cz)
+
+        def sync_render_distance(center_x, center_z):
+            desired = {
+                (center_x + dx, center_z + dz)
+                for dz in range(-RENDER_DISTANCE_CHUNKS, RENDER_DISTANCE_CHUNKS + 1)
+                for dx in range(-RENDER_DISTANCE_CHUNKS, RENDER_DISTANCE_CHUNKS + 1)
+            }
+            for key in tuple(chunks):
+                if key not in desired:
+                    renderer.remove_chunk(key)
+                    del chunks[key]
+            for cx, cz in desired:
+                if (cx, cz) not in chunks:
+                    chunks[(cx, cz)] = world.chunk_provider.get_or_create(cx, cz)
+            for cx, cz in desired:
+                chunk = chunks[(cx, cz)]
+                neighbors = {(cx + dx, cz + dz): chunks[(cx + dx, cz + dz)]
+                             for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                             if (cx + dx, cz + dz) in chunks}
+                renderer.upload_chunk_mesh((cx, cz), mesh_builder.build(chunk, neighbors=neighbors))
+
         previous = time.perf_counter()
         tick_accumulator = 0.0
         tick_duration = 1.0 / TICK_RATE
@@ -253,6 +276,10 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     (player.pos.x, player.pos.y + player.eye_height, player.pos.z),
                     dtype=np.float64,
                 )
+                current_render_center = (math.floor(player.pos.x) >> 4, math.floor(player.pos.z) >> 4)
+                if current_render_center != last_render_center:
+                    sync_render_distance(*current_render_center)
+                    last_render_center = current_render_center
 
                 if lan_client is not None:
                     for message in lan_client.poll():
