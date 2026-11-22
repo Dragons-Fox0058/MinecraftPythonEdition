@@ -297,7 +297,7 @@ class OpenGLRenderer:
             text_label("GAME MENU", -0.14, 0.205, 0.006, (1.0, 1.0, 1.0))
             text_label("RESUME", -0.105, 0.125, 0.004, (1.0, 1.0, 1.0))
             text_label("OPTIONS", -0.105, 0.035, 0.004, (0.90, 0.92, 0.96))
-            text_label("SAVE AND QUIT", -0.16, -0.065, 0.0035, (0.90, 0.92, 0.96))
+            text_label("PRESS Q TO SAVE AND QUIT", -0.235, -0.065, 0.0028, (0.90, 0.92, 0.96))
         if inventory_slots is not None:
             rect(-0.43, -0.36, 0.43, 0.36, (0.10, 0.12, 0.16))
             text_label("INVENTORY", -0.12, 0.315, 0.005, (1.0, 1.0, 1.0))
