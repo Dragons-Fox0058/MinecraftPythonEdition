@@ -126,7 +126,7 @@ class TestChunkProviderOverworld(unittest.TestCase):
         c = p.get_or_create(0, 0)
         self.assertEqual(c.pos, ChunkPos(0, 0))
         # Should have terrain, not just air
-        self.assertTrue((c.blocks == 1).any())
+        self.assertTrue((c.blocks == (1 << 4)).any())
 
     def test_caches_chunks(self):
         p = ChunkProviderOverworld(0)
