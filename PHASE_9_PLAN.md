@@ -55,7 +55,7 @@ Known parity gaps (not marked complete):
 - Current terrain generator is explicitly simplified; its caves, ores, terrain noise, biome blending, structures, and feature population are not byte-for-byte Java 1.12.2.
 - Desktop movement still uses a simplified direct horizontal velocity model rather than the full vanilla movement-input/attribute/friction pipeline.
 - Block placement is still limited to the small starter block catalogue and does not yet implement all ItemBlock callbacks, metadata/orientation, replaceability, tile entities, and all collision shapes.
-- Drop resolver only maps a small starter set; block-specific loot tables and correct item IDs/drops need broader catalogue coverage.
+- Drop resolver now covers the current ore subset, but plant, leaf, slab, metadata-variant, mob, and many other 1.12.2 loot rules remain incomplete. Fortune/Silk Touch parameters are implemented for supported ores but are not yet read from held-item enchantment NBT.
 - Current client has no full vanilla creative/survival mode selector, recipe-book equivalent, full crafting/furnace screen flow, mob spawn loop, or full world tick integration.
 
 
@@ -67,3 +67,17 @@ Known parity gaps (not marked complete):
 - Added grass block item ID 2 to the temporary placement palette.
 - Added regression tests for stone, grass, glass/Silk Touch, and gravel/Fortune.
 - This is not a complete loot-table implementation: ores, plants, metadata variants, Silk Touch/enchanted tool integration, and many other block drops still need full coverage.
+
+
+## Java 1.12.2 ore drops and tool inventory — 2026-11-22
+
+- [x] Added supported ore drops: coal, diamond, emerald, lapis lazuli (dye metadata 4), redstone, and nether quartz.
+- [x] Iron and gold ore drop their own block items; Fortune does not multiply these drops.
+- [x] Silk Touch resolver path returns supported ore blocks instead of their normal ore drops.
+- [x] Fortune quantity multiplier uses the 1.12.2 random multiplier rule; lapis/redstone base quantities and random-call order are covered by deterministic tests.
+- [x] Registered the 15 legacy 1.12.2 pickaxe, axe, and shovel items with source-era numeric IDs and material durability.
+- [x] Desktop survival now uses the actual tool definitions for mining speed, harvest tier, and durability damage.
+- [x] New local player files receive a temporary wooden pickaxe/axe/shovel bootstrap loadout so the mining loop can be exercised. This is explicitly a development convenience, not vanilla's empty starting inventory.
+- [ ] Fortune and Silk Touch are not yet extracted from held ItemStack enchantment NBT; the drop resolver supports explicit levels/flags only.
+- [ ] Crafting recipes and UI are not yet connected, so players cannot yet craft replacement tools through the desktop interface.
+- [ ] Full block/plant/mob loot tables and metadata-aware ItemBlock behavior remain incomplete.
