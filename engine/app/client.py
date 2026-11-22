@@ -105,6 +105,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         spawn_y = _surface_y(spawn_chunk, local_x, local_z) + 1
     else:
         spawn_y = spawn.y
+    world.spawn_point = BlockPos(spawn.x, spawn_y, spawn.z)
     player = DesktopPlayer(world, spawn.x + 0.5, float(spawn_y), spawn.z + 0.5)
     world.add_entity(player)
     camera = Camera(position=(player.pos.x, spawn_y + player.eye_height, player.pos.z), yaw=0.0, pitch=0.0)
@@ -319,13 +320,15 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     jump_requested = False
                     player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
                     player.on_update()
+                    if speed == PLAYER_SPRINT_SPEED and move_length > 0:
+                        controller.add_exhaustion(0.001)
                     controller.tick()
                     if player.dead:
                         controller.on_death()
                         player.dead = False
                         player.health = player.max_health
                         player.set_position(
-                            world.spawn_point.x + 0.5, world.spawn_point.y + 1.0,
+                            world.spawn_point.x + 0.5, world.spawn_point.y,
                             world.spawn_point.z + 0.5,
                         )
                         player.motion = Vec3d(0.0, 0.0, 0.0)
