@@ -35,6 +35,7 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 - [x] Player controller joining inventory, block interaction, food consumption, crafting, item drops, pickup, death handling, and armor-aware damage.
 - [x] Damage-source flags, armor/toughness reduction, armor durability wear, and player-controller integration.
 - [x] Source-backed 1.12.2 armor material/slot catalogue factory for leather, chainmail, iron, golden, and diamond armor; numeric item IDs remain caller-supplied.
+- [x] Living-entity 20-tick hurt-resistance window, weaker-hit rejection, stronger-hit difference handling, and validated damage amounts.
 - [x] keepInventory, doEntityDrops, and doTileDrops handling in the implemented paths.
 - [x] GitHub Actions unittest workflow.
 
@@ -52,7 +53,7 @@ This is repository CI evidence, not a claim that the game has been tested agains
 - [ ] Build and verify the complete 1.12.2 item/block-item catalogue and properties; the global item registry is intentionally not auto-populated.
 - [ ] Add vanilla block loot tables and correct tool/harvest-level rules.
 - [ ] Populate the complete vanilla tool classes/materials and block effectiveness/harvest-level mappings; enchantment modifiers are still pending.
-- [ ] Complete vanilla invulnerability-frame rules, status effects, potion effects, and source-specific damage behavior.
+- [ ] Complete vanilla status effects, potion effects, and remaining source-specific damage behavior.
 - [ ] Complete item entity motion, pickup events/sounds, and vanilla collision/merge behavior.
 - [ ] Complete block placement state orientation, entity collision, and tile-entity placement.
 - [ ] Complete crafting/furnace recipe coverage beyond the explicitly registered safe subset.
