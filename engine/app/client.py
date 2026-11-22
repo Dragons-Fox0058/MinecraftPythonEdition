@@ -211,6 +211,18 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     inventory_open = False
     crafting_open = False
 
+    def return_crafting_grid(grid):
+        for index, stack in enumerate(tuple(grid.slots)):
+            if stack.is_empty:
+                continue
+            remainder = inventory.insert(stack)
+            if not remainder.is_empty:
+                world.add_entity(EntityItem(
+                    world, player.pos.x, player.pos.y + 0.25, player.pos.z,
+                    remainder,
+                ))
+            grid.slots[index] = ItemStack.empty()
+
     mesh_builder = ChunkMeshBuilder()
     meshes = {}
     for (cx, cz), chunk in chunks.items():
@@ -241,6 +253,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     glfw.set_window_should_close(window, True)
                 if key == glfw.KEY_ESCAPE:
                     if inventory_open:
+                        return_crafting_grid(crafting_grid)
                         inventory_open = False
                         crafting_open = False
                         crafting_grid = personal_crafting_grid
@@ -257,6 +270,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     title = ("Minecraft Python Edition — CRAFTING" if crafting_open else "Minecraft Python Edition — INVENTORY") if inventory_open else ("Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}")
                     glfw.set_window_title(window, title)
                 elif key == glfw.KEY_E and not paused:
+                    if inventory_open:
+                        return_crafting_grid(crafting_grid)
                     inventory_open = not inventory_open
                     crafting_open = inventory_open
                     crafting_grid = personal_crafting_grid
@@ -567,6 +582,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         },
                     )
         finally:
+            if inventory_open:
+                return_crafting_grid(crafting_grid)
             world.spawn_point = BlockPos(
                 math.floor(player.pos.x), math.floor(player.pos.y), math.floor(player.pos.z)
             )
