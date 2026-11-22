@@ -13,6 +13,8 @@ from engine.gameplay.items import Item, ItemStack
 
 _SAME_ID_DROPS = frozenset({
     "dirt", "cobblestone", "planks", "sand", "sandstone", "obsidian",
+    "log", "log2", "sapling", "dandelion", "poppy", "brown_mushroom",
+    "red_mushroom", "pumpkin", "lit_pumpkin", "melon_block",
 })
 
 
@@ -72,6 +74,26 @@ def resolve_vanilla_block_drops(
         if rng.randrange(10 - fortune * 3) == 0:
             return [ItemStack(flint_item, 1)] if flint_item is not None else []
         drop_id, count, metadata = 13, 1, 0
+    elif name == "tallgrass":
+        # Tall grass has a 1-in-8 seed drop chance in 1.12.2.
+        return [ItemStack(block_items[295], 1)] if rng.randrange(8) == 0 and 295 in block_items else []
+    elif name == "deadbush":
+        count = rng.randrange(3)
+        return [ItemStack(block_items[280], count)] if count and 280 in block_items else []
+    elif name in ("leaves", "leaves2"):
+        # Leaves use Fortune to improve the sapling drop probability.
+        chance = max(1, 20 - fortune * 2)
+        return [ItemStack(block_items[6], 1)] if rng.randrange(chance) == 0 and 6 in block_items else []
+    elif name == "clay":
+        return [ItemStack(block_items[337], 4)] if 337 in block_items else []
+    elif name == "snow_layer":
+        return [ItemStack(block_items[332], 1)] if 332 in block_items else []
+    elif name == "snow":
+        return [ItemStack(block_items[332], 4)] if 332 in block_items else []
+    elif name == "glowstone":
+        count = 2 + rng.randrange(3)
+        count = min(4, count + (rng.randrange(fortune + 1) if fortune else 0))
+        return [ItemStack(block_items[348], count)] if 348 in block_items else []
     elif name == "coal_ore":
         drop_id, count, metadata = 263, _fortune_multiplier(rng, fortune), 0
     elif name == "diamond_ore":
