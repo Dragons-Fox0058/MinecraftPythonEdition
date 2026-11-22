@@ -623,8 +623,8 @@ class PlaySession:
     def process_next(self, *, timeout: float = 20.0):
         if not self.connected:
             raise RuntimeError("play session is disconnected")
-        if self.receiver_running:
-            raise RuntimeError("process_next cannot be used while the background receiver is running")
+        if self._receiver_thread is not None:
+            raise RuntimeError("process_next cannot be used after the background receiver has been started")
         if not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("timeout must be positive and finite")
         if hasattr(self.connection, "set_timeout"):
