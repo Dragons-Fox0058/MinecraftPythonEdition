@@ -7,7 +7,7 @@ from pathlib import Path
 
 import numpy as np
 
-from engine.core import Vec3d, BlockPos, EnumFacing
+from engine.core import Vec3d, BlockPos
 from engine.entities.entity import Entity
 from engine.gameplay.breaking import BlockBreaking
 from engine.gameplay.interaction import InteractionManager
@@ -75,7 +75,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         spawn_y = spawn.y
     player = Entity(world, spawn.x + 0.5, float(spawn_y), spawn.z + 0.5)
     world.add_entity(player)
-    camera = Camera(position=(8.5, spawn_y + player.eye_height, 8.5), yaw=0.0, pitch=0.0)
+    camera = Camera(position=(player.pos.x, spawn_y + player.eye_height, player.pos.z), yaw=0.0, pitch=0.0)
     input_state = InputState()
     lan_server = None
     lan_client = None
@@ -148,14 +148,15 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
 
 
         def refresh_chunk_mesh(cx, cz):
-            key = (cx, cz)
-            chunk = chunks.get(key)
-            if chunk is None:
-                return
-            neighbors = {(cx + dx, cz + dz): chunks[(cx + dx, cz + dz)]
-                         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))
-                         if (cx + dx, cz + dz) in chunks}
-            renderer.upload_chunk_mesh(key, mesh_builder.build(chunk, neighbors=neighbors))
+            for tx, tz in ((cx, cz), (cx - 1, cz), (cx + 1, cz), (cx, cz - 1), (cx, cz + 1)):
+                key = (tx, tz)
+                chunk = chunks.get(key)
+                if chunk is None:
+                    continue
+                neighbors = {(tx + dx, tz + dz): chunks[(tx + dx, tz + dz)]
+                             for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                             if (tx + dx, tz + dz) in chunks}
+                renderer.upload_chunk_mesh(key, mesh_builder.build(chunk, neighbors=neighbors))
 
         def on_mouse_button(_window, button, action, _mods):
             nonlocal mouse_left_down
@@ -259,18 +260,19 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     jump_requested = False
                     player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
                     player.on_update()
+                    if mouse_left_down:
+                        hit = interaction.ray_trace_blocks(
+                            Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
+                        )
+                        if hit is None:
+                            block_breaking.reset()
+                        else:
+                            result = block_breaking.damage_block(
+                                hit.pos, dig_speed=1.0, can_harvest=True
+                            )
+                            if result.broken:
+                                refresh_chunk_mesh(hit.pos.chunk_x, hit.pos.chunk_z)
                     tick_accumulator -= tick_duration
-
-                if mouse_left_down:
-                    hit = interaction.ray_trace_blocks(
-                        Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
-                    )
-                    if hit is None:
-                        block_breaking.reset()
-                    else:
-                        result = block_breaking.damage_block(hit.pos, dig_speed=1.0, can_harvest=True)
-                        if result.broken:
-                            refresh_chunk_mesh(hit.pos.chunk_x, hit.pos.chunk_z)
 
                 camera.position = np.asarray(
                     (player.pos.x, player.pos.y + player.eye_height, player.pos.z),
