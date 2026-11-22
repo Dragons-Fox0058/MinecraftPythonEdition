@@ -27,6 +27,32 @@ class TestFurnace(unittest.TestCase):
         with self.assertRaises(ValueError):
             SmeltingRecipe(Ingredient(self.ore), ItemStack(self.ingot, 65))
 
+    def test_insert_input_and_fuel(self):
+        ore_remainder = self.furnace.insert_input(ItemStack(self.ore, 3))
+        fuel_remainder = self.furnace.insert_fuel(ItemStack(self.coal, 2))
+        self.assertTrue(ore_remainder.is_empty)
+        self.assertTrue(fuel_remainder.is_empty)
+        self.assertEqual(self.furnace.input.count, 3)
+        self.assertEqual(self.furnace.fuel.count, 2)
+
+    def test_non_fuel_is_not_inserted(self):
+        remainder = self.furnace.insert_fuel(ItemStack(self.ore, 1))
+        self.assertEqual(remainder.count, 1)
+        self.assertTrue(self.furnace.fuel.is_empty)
+
+    def test_take_output_splits_stack(self):
+        self.furnace.output = ItemStack(self.ingot, 5)
+        taken = self.furnace.take_output(2)
+        self.assertEqual(taken.count, 2)
+        self.assertEqual(self.furnace.output.count, 3)
+
+    def test_progress_properties(self):
+        self.furnace.input = ItemStack(self.ore, 1)
+        self.furnace.fuel = ItemStack(self.coal, 1)
+        self.furnace.update()
+        self.assertGreater(self.furnace.burn_progress, 0)
+        self.assertAlmostEqual(self.furnace.cook_progress, 1 / 3)
+
     def test_fuel_registry(self):
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.coal, 1)), 1600)
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.ore, 1)), 0)
