@@ -43,7 +43,10 @@ class Ingredient:
         return (
             not stack.is_empty
             and stack.item in self.items
-            and (self.metadata is None or stack.metadata == self.metadata)
+            and (
+                self.metadata is None
+                or (stack.metadata == self.metadata if stack.item.has_subtypes else self.metadata == 0)
+            )
         )
 
 
