@@ -302,3 +302,38 @@ GPT2 — PHASE 7 PERSISTENCE / DENETİM BAŞLANGICI
 - GPT1'in sahip olduğu dosyalara müdahale edilmeyecek; bu aşamadaki değişiklikler Phase 7 kapsamıyla sınırlı tutulacak.
 - Bu kayıt yalnızca ekip günlüğüne eklendi.
 
+
+
+============================================================
+GPT1 — GRUP MESAJI / SOCKET KAPANIŞ GÜVENLİĞİ
+============================================================
+
+İkinci teknik adım:
+- engine/network/connection.py içindeki MinecraftConnection.close() güncellendi. Socket kapanmadan önce shutdown(SHUT_RDWR) çağrısı yapılıyor; böylece background receiver thread'inde bloklanan recv() çağrısının uyanması sağlanıyor. shutdown desteklemeyen fake socket nesneleri için getattr/callable kontrolü var; shutdown OSError üretirse normal close yine çalışıyor.
+- tests/test_network_protocol.py içine socket shutdown sırasını doğrulayan regresyon testi eklendi.
+
+Commit:
+- 66556163f8d2116e3ff53757bbe7e0c613172097 — socket shutdown davranışı.
+- 3fd55addade83773b28a9a0145182c5bec7291fd — socket shutdown testi.
+
+CI:
+- Protocol 340 network workflow run #11 (45019714036), commit 3fd55addade83773b28a9a0145182c5bec7291fd: SUCCESS, 51 test geçti.
+- Genel Python workflow run #358 (45019714033): FAILURE, 424 testten 2'si başarısız. Aynı iki test: test_worldgen.TestChunkGenerator.test_different_seeds_differ ve test_terrain_has_air_at_top. Network testleri yeşil; genel CI'nin kırmızı kalma nedeni WorldGen alanındaki bu iki test.
+- Phase 7/WorldGen dosyalarına müdahale edilmedi.
+
+Etkilenen kod/test dosyaları:
+- engine/network/session.py
+- engine/app/runtime.py
+- engine/network/connection.py
+- tests/test_network_session.py
+- tests/test_network_protocol.py
+
+GPT1 mevcut durum:
+- Ağ alımı arka plan thread'inde, paketlerin oyun dünyasına uygulanması ana thread'de.
+- GameApplication isteğe bağlı PlaySession'i sabit tick akışına bağlıyor.
+- Socket kapanışı alıcı thread'ini durduracak şekilde güçlendirildi.
+- 51 ağ testi geçti; bu, gerçek vanilla sunucu ile uçtan uca uyumluluk kanıtı değildir.
+
+Sıradaki:
+- GPT2, protocol 340 paket/decoder incelemesine ve kendi alanındaki düzeltmelere devam etsin.
+- GPT1, bağlantı hatası ve keep-alive sonrasında oyun uygulamasının durumunu; ayrıca graceful disconnect ve movement packet davranışını inceleyecek.
