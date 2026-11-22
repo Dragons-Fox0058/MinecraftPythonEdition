@@ -89,6 +89,7 @@ class Furnace:
         self.cook_time = 0
         self.total_cook_time = cook_time
         self.container_returns: list[ItemStack] = []
+        self.experience_pending = 0.0
 
     @property
     def is_burning(self) -> bool:
@@ -138,10 +139,31 @@ class Furnace:
         self.container_returns.clear()
         return returned
 
+    def collect_experience(self, fraction_roll: float = 0.0) -> int:
+        """Collect stored smelting XP using vanilla's fractional rounding rule."""
+        if (isinstance(fraction_roll, bool)
+                or not isinstance(fraction_roll, (int, float))
+                or not math.isfinite(fraction_roll)
+                or not 0.0 <= fraction_roll < 1.0):
+            raise ValueError("fraction_roll must be in [0.0, 1.0)")
+        whole = math.floor(self.experience_pending)
+        fraction = self.experience_pending - whole
+        amount = whole + (1 if fraction_roll < fraction else 0)
+        self.experience_pending = 0.0
+        return amount
+
     def take_output(self, amount: int | None = None) -> ItemStack:
         if amount is None:
             amount = self.output.count
         return self.output.split(amount)
+
+    def take_output_with_experience(
+        self, amount: int | None = None, fraction_roll: float = 0.0
+    ) -> tuple[ItemStack, int]:
+        """Extract output and collect all XP accumulated since the last collection."""
+        extracted = self.take_output(amount)
+        experience = self.collect_experience(fraction_roll) if not extracted.is_empty else 0
+        return extracted, experience
 
     def can_smelt(self) -> bool:
         recipe = self.recipes.find_recipe(self.input)
@@ -181,6 +203,7 @@ class Furnace:
         else:
             self.output.count += recipe.output.count
         self.input.shrink(1)
+        self.experience_pending += recipe.experience
         return True
 
     def update(self) -> bool:
