@@ -65,6 +65,7 @@ DEADBUSH      = _reg('deadbush',      32,  Material.PLANT,  hardness=0.0,
 PISTON        = _reg('piston',        33,  Material.PISTON, hardness=0.5)
 PISTON_HEAD   = _reg('piston_head',   34,  Material.PISTON, hardness=0.5)
 WOOL          = _reg('wool',          35,  Material.CLOTH,  hardness=0.8)
+PISTON_EXTENSION = _reg('piston_extension', 36, Material.PISTON, hardness=-1.0, is_full_cube=False, is_opaque=False)
 
 # Stone & friends
 DANDELION     = _reg('dandelion',     37,  Material.PLANT,  hardness=0.0, is_full_cube=False, is_opaque=False)
@@ -129,6 +130,7 @@ UNPOWERED_REPEATER = _reg('unpowered_repeater', 93, Material.CIRCUIT, hardness=0
 POWERED_REPEATER   = _reg('powered_repeater',   94, Material.CIRCUIT, hardness=0.0, is_full_cube=False, is_opaque=False, light_level=7)
 STAINED_GLASS     = _reg('stained_glass',     95, Material.GLASS,   hardness=0.3, opacity=0, is_opaque=False)
 TRAPDOOR          = _reg('trapdoor',          96, Material.WOOD,    hardness=3.0, is_full_cube=False, is_opaque=False)
+MONSTER_EGG = _reg('monster_egg', 97, Material.ROCK, hardness=0.75)
 
 # 97-255 (silverfish, stone bricks, mushrooms, nether, end, etc.)
 # Full table added in later phases. Representative additions:
@@ -138,6 +140,8 @@ RED_MUSHROOM_BLOCK   = _reg('red_mushroom_block',  100, Material.WOOD, hardness=
 IRON_BARS        = _reg('iron_bars',       101,  Material.IRON,   hardness=5.0, is_full_cube=False, is_opaque=False)
 GLASS_PANE       = _reg('glass_pane',      102,  Material.GLASS,  hardness=0.3, is_full_cube=False, is_opaque=False, opacity=0)
 MELON_BLOCK      = _reg('melon_block',     103,  Material.GOURD,  hardness=1.0)
+PUMPKIN_STEM = _reg('pumpkin_stem', 104, Material.PLANT, hardness=0.0, is_full_cube=False, is_opaque=False)
+MELON_STEM = _reg('melon_stem', 105, Material.PLANT, hardness=0.0, is_full_cube=False, is_opaque=False)
 VINE             = _reg('vine',            106,  Material.PLANT,  hardness=0.2, is_full_cube=False, is_opaque=False)
 FENCE_GATE       = _reg('fence_gate',      107,  Material.WOOD,   hardness=2.0, is_full_cube=False, is_opaque=False)
 BRICK_STAIRS     = _reg('brick_stairs',    108,  Material.ROCK,   hardness=2.0, is_full_cube=False)
@@ -147,7 +151,10 @@ WATERLILY        = _reg('waterlily',       111,  Material.PLANT,  hardness=0.0, 
 NETHER_BRICK     = _reg('nether_brick',    112,  Material.ROCK,   hardness=2.0, resistance=10.0)
 NETHER_BRICK_FENCE = _reg('nether_brick_fence', 113, Material.ROCK, hardness=2.0, is_full_cube=False, is_opaque=False)
 NETHER_BRICK_STAIRS = _reg('nether_brick_stairs', 114, Material.ROCK, hardness=2.0, is_full_cube=False)
-ENCHANTING_TABLE = _reg('enchanting_table',115,  Material.ROCK,   hardness=5.0, resistance=6000.0, is_full_cube=False, is_opaque=False)
+ENCHANTING_TABLE = _reg('enchanting_table',116,  Material.ROCK,   hardness=5.0, resistance=6000.0, is_full_cube=False, is_opaque=False)
+NETHER_WART = _reg('nether_wart', 115, Material.PLANT, hardness=0.0, is_full_cube=False, is_opaque=False)
+BREWING_STAND = _reg('brewing_stand', 117, Material.IRON, hardness=0.5, is_full_cube=False, is_opaque=False)
+CAULDRON = _reg('cauldron', 118, Material.IRON, hardness=2.0, is_full_cube=False, is_opaque=False)
 END_PORTAL       = _reg('end_portal',      119,  Material.PORTAL, hardness=-1.0, is_full_cube=False, is_opaque=False, light_level=15)
 END_PORTAL_FRAME = _reg('end_portal_frame',120,  Material.ROCK,   hardness=-1.0, resistance=18000000.0, is_full_cube=False)
 END_STONE        = _reg('end_stone',       121,  Material.ROCK,   hardness=3.0, resistance=15.0)

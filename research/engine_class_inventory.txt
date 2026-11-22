@@ -1,0 +1,3390 @@
+# Minecraft 1.12.2 — Refined Engine Class Inventory v2
+# Source: research/mapping_index.json (MCP Stable 39)
+# Tier: CORE / SUPPORT / CLIENT / SKIP
+
+
+===== BIOME =====
+[CORE   ] net/minecraft/world/biome/Biome
+[CORE   ] net/minecraft/world/biome/Biome$1
+[CORE   ] net/minecraft/world/biome/Biome$BiomeProperties
+[CORE   ] net/minecraft/world/biome/Biome$SpawnListEntry
+[CORE   ] net/minecraft/world/biome/Biome$TempCategory
+[CORE   ] net/minecraft/world/biome/BiomeBeach
+[CORE   ] net/minecraft/world/biome/BiomeCache
+[CORE   ] net/minecraft/world/biome/BiomeCache$Block
+[CORE   ] net/minecraft/world/biome/BiomeColorHelper
+[CORE   ] net/minecraft/world/biome/BiomeColorHelper$1
+[CORE   ] net/minecraft/world/biome/BiomeColorHelper$2
+[CORE   ] net/minecraft/world/biome/BiomeColorHelper$3
+[CORE   ] net/minecraft/world/biome/BiomeColorHelper$ColorResolver
+[CORE   ] net/minecraft/world/biome/BiomeDecorator
+[CORE   ] net/minecraft/world/biome/BiomeDesert
+[CORE   ] net/minecraft/world/biome/BiomeEnd
+[CORE   ] net/minecraft/world/biome/BiomeEndDecorator
+[CORE   ] net/minecraft/world/biome/BiomeEndDecorator$1
+[CORE   ] net/minecraft/world/biome/BiomeEndDecorator$SpikeCacheLoader
+[CORE   ] net/minecraft/world/biome/BiomeForest
+[CORE   ] net/minecraft/world/biome/BiomeForest$Type
+[CORE   ] net/minecraft/world/biome/BiomeForestMutated
+[CORE   ] net/minecraft/world/biome/BiomeHell
+[CORE   ] net/minecraft/world/biome/BiomeHellDecorator
+[CORE   ] net/minecraft/world/biome/BiomeHills
+[CORE   ] net/minecraft/world/biome/BiomeHills$Type
+[CORE   ] net/minecraft/world/biome/BiomeJungle
+[CORE   ] net/minecraft/world/biome/BiomeMesa
+[CORE   ] net/minecraft/world/biome/BiomeMesa$1
+[CORE   ] net/minecraft/world/biome/BiomeMesa$Decorator
+[CORE   ] net/minecraft/world/biome/BiomeMushroomIsland
+[CORE   ] net/minecraft/world/biome/BiomeOcean
+[CORE   ] net/minecraft/world/biome/BiomePlains
+[CORE   ] net/minecraft/world/biome/BiomeProvider
+[CORE   ] net/minecraft/world/biome/BiomeProviderSingle
+[CORE   ] net/minecraft/world/biome/BiomeRiver
+[CORE   ] net/minecraft/world/biome/BiomeSavanna
+[CORE   ] net/minecraft/world/biome/BiomeSavannaMutated
+[CORE   ] net/minecraft/world/biome/BiomeSnow
+[CORE   ] net/minecraft/world/biome/BiomeStoneBeach
+[CORE   ] net/minecraft/world/biome/BiomeSwamp
+[CORE   ] net/minecraft/world/biome/BiomeTaiga
+[CORE   ] net/minecraft/world/biome/BiomeTaiga$Type
+[CORE   ] net/minecraft/world/biome/BiomeVoid
+[CORE   ] net/minecraft/world/biome/BiomeVoidDecorator
+
+===== BLOCK =====
+[CORE   ] net/minecraft/block/Block
+[CORE   ] net/minecraft/block/Block$1
+[CORE   ] net/minecraft/block/Block$EnumOffsetType
+[CORE   ] net/minecraft/block/BlockAir
+[CORE   ] net/minecraft/block/BlockAnvil
+[CORE   ] net/minecraft/block/BlockAnvil$Anvil
+[CORE   ] net/minecraft/block/BlockBanner
+[CORE   ] net/minecraft/block/BlockBanner$1
+[CORE   ] net/minecraft/block/BlockBanner$BlockBannerHanging
+[CORE   ] net/minecraft/block/BlockBanner$BlockBannerStanding
+[CORE   ] net/minecraft/block/BlockBarrier
+[CORE   ] net/minecraft/block/BlockBasePressurePlate
+[CORE   ] net/minecraft/block/BlockBeacon
+[CORE   ] net/minecraft/block/BlockBeacon$1
+[CORE   ] net/minecraft/block/BlockBeacon$1$1
+[CORE   ] net/minecraft/block/BlockBed
+[CORE   ] net/minecraft/block/BlockBed$EnumPartType
+[CORE   ] net/minecraft/block/BlockBeetroot
+[CORE   ] net/minecraft/block/BlockBone
+[CORE   ] net/minecraft/block/BlockBookshelf
+[CORE   ] net/minecraft/block/BlockBreakable
+[CORE   ] net/minecraft/block/BlockBrewingStand
+[CORE   ] net/minecraft/block/BlockBush
+[CORE   ] net/minecraft/block/BlockButton
+[CORE   ] net/minecraft/block/BlockButton$1
+[CORE   ] net/minecraft/block/BlockButtonStone
+[CORE   ] net/minecraft/block/BlockButtonWood
+[CORE   ] net/minecraft/block/BlockCactus
+[CORE   ] net/minecraft/block/BlockCake
+[CORE   ] net/minecraft/block/BlockCarpet
+[CORE   ] net/minecraft/block/BlockCarrot
+[CORE   ] net/minecraft/block/BlockCauldron
+[CORE   ] net/minecraft/block/BlockChest
+[CORE   ] net/minecraft/block/BlockChest$Type
+[CORE   ] net/minecraft/block/BlockChorusFlower
+[CORE   ] net/minecraft/block/BlockChorusPlant
+[CORE   ] net/minecraft/block/BlockClay
+[CORE   ] net/minecraft/block/BlockCocoa
+[CORE   ] net/minecraft/block/BlockCocoa$1
+[CORE   ] net/minecraft/block/BlockColored
+[CORE   ] net/minecraft/block/BlockCommandBlock
+[CORE   ] net/minecraft/block/BlockCompressedPowered
+[CORE   ] net/minecraft/block/BlockConcretePowder
+[CORE   ] net/minecraft/block/BlockContainer
+[CORE   ] net/minecraft/block/BlockCrops
+[CORE   ] net/minecraft/block/BlockDaylightDetector
+[CORE   ] net/minecraft/block/BlockDeadBush
+[CORE   ] net/minecraft/block/BlockDirectional
+[CORE   ] net/minecraft/block/BlockDirt
+[CORE   ] net/minecraft/block/BlockDirt$DirtType
+[CORE   ] net/minecraft/block/BlockDoor
+[CORE   ] net/minecraft/block/BlockDoor$1
+[CORE   ] net/minecraft/block/BlockDoor$EnumDoorHalf
+[CORE   ] net/minecraft/block/BlockDoor$EnumHingePosition
+[CORE   ] net/minecraft/block/BlockDoublePlant
+[CORE   ] net/minecraft/block/BlockDoublePlant$EnumBlockHalf
+[CORE   ] net/minecraft/block/BlockDoublePlant$EnumPlantType
+[CORE   ] net/minecraft/block/BlockDoubleStoneSlab
+[CORE   ] net/minecraft/block/BlockDoubleStoneSlabNew
+[CORE   ] net/minecraft/block/BlockDoubleWoodSlab
+[CORE   ] net/minecraft/block/BlockDragonEgg
+[CORE   ] net/minecraft/block/BlockEmptyDrops
+[CORE   ] net/minecraft/block/BlockEnchantmentTable
+[CORE   ] net/minecraft/block/BlockEndGateway
+[CORE   ] net/minecraft/block/BlockEndPortal
+[CORE   ] net/minecraft/block/BlockEndPortalFrame
+[CORE   ] net/minecraft/block/BlockEndRod
+[CORE   ] net/minecraft/block/BlockEndRod$1
+[CORE   ] net/minecraft/block/BlockEnderChest
+[CORE   ] net/minecraft/block/BlockEventData
+[CORE   ] net/minecraft/block/BlockFalling
+[CORE   ] net/minecraft/block/BlockFarmland
+[CORE   ] net/minecraft/block/BlockFarmland$1
+[CORE   ] net/minecraft/block/BlockFence
+[CORE   ] net/minecraft/block/BlockFence$1
+[CORE   ] net/minecraft/block/BlockFenceGate
+[CORE   ] net/minecraft/block/BlockFire
+[CORE   ] net/minecraft/block/BlockFlower
+[CORE   ] net/minecraft/block/BlockFlower$1
+[CORE   ] net/minecraft/block/BlockFlower$EnumFlowerColor
+[CORE   ] net/minecraft/block/BlockFlower$EnumFlowerType
+[CORE   ] net/minecraft/block/BlockFlower$EnumFlowerType$1
+[CORE   ] net/minecraft/block/BlockFlowerPot
+[CORE   ] net/minecraft/block/BlockFlowerPot$1
+[CORE   ] net/minecraft/block/BlockFlowerPot$EnumFlowerType
+[CORE   ] net/minecraft/block/BlockFrostedIce
+[CORE   ] net/minecraft/block/BlockFurnace
+[CORE   ] net/minecraft/block/BlockFurnace$1
+[CORE   ] net/minecraft/block/BlockGlazedTerracotta
+[CORE   ] net/minecraft/block/BlockGrass
+[CORE   ] net/minecraft/block/BlockGrassPath
+[CORE   ] net/minecraft/block/BlockGrassPath$1
+[CORE   ] net/minecraft/block/BlockGravel
+[CORE   ] net/minecraft/block/BlockHalfStoneSlab
+[CORE   ] net/minecraft/block/BlockHalfStoneSlabNew
+[CORE   ] net/minecraft/block/BlockHalfWoodSlab
+[CORE   ] net/minecraft/block/BlockHardenedClay
+[CORE   ] net/minecraft/block/BlockHay
+[CORE   ] net/minecraft/block/BlockHorizontal
+[CORE   ] net/minecraft/block/BlockHugeMushroom
+[CORE   ] net/minecraft/block/BlockHugeMushroom$1
+[CORE   ] net/minecraft/block/BlockHugeMushroom$EnumType
+[CORE   ] net/minecraft/block/BlockIce
+[CORE   ] net/minecraft/block/BlockJukebox
+[CORE   ] net/minecraft/block/BlockJukebox$TileEntityJukebox
+[CORE   ] net/minecraft/block/BlockLadder
+[CORE   ] net/minecraft/block/BlockLadder$1
+[CORE   ] net/minecraft/block/BlockLeaves
+[CORE   ] net/minecraft/block/BlockLever
+[CORE   ] net/minecraft/block/BlockLever$1
+[CORE   ] net/minecraft/block/BlockLever$EnumOrientation
+[CORE   ] net/minecraft/block/BlockLilyPad
+[CORE   ] net/minecraft/block/BlockLog
+[CORE   ] net/minecraft/block/BlockLog$1
+[CORE   ] net/minecraft/block/BlockLog$EnumAxis
+[CORE   ] net/minecraft/block/BlockMagma
+[CORE   ] net/minecraft/block/BlockMelon
+[CORE   ] net/minecraft/block/BlockMobSpawner
+[CORE   ] net/minecraft/block/BlockMushroom
+[CORE   ] net/minecraft/block/BlockMycelium
+[CORE   ] net/minecraft/block/BlockNetherBrick
+[CORE   ] net/minecraft/block/BlockNetherWart
+[CORE   ] net/minecraft/block/BlockNetherrack
+[CORE   ] net/minecraft/block/BlockNewLeaf
+[CORE   ] net/minecraft/block/BlockNewLeaf$1
+[CORE   ] net/minecraft/block/BlockNewLog
+[CORE   ] net/minecraft/block/BlockNewLog$1
+[CORE   ] net/minecraft/block/BlockNewLog$2
+[CORE   ] net/minecraft/block/BlockNote
+[CORE   ] net/minecraft/block/BlockObsidian
+[CORE   ] net/minecraft/block/BlockOldLeaf
+[CORE   ] net/minecraft/block/BlockOldLeaf$1
+[CORE   ] net/minecraft/block/BlockOldLog
+[CORE   ] net/minecraft/block/BlockOldLog$1
+[CORE   ] net/minecraft/block/BlockOldLog$2
+[CORE   ] net/minecraft/block/BlockOre
+[CORE   ] net/minecraft/block/BlockPackedIce
+[CORE   ] net/minecraft/block/BlockPane
+[CORE   ] net/minecraft/block/BlockPane$1
+[CORE   ] net/minecraft/block/BlockPlanks
+[CORE   ] net/minecraft/block/BlockPlanks$EnumType
+[CORE   ] net/minecraft/block/BlockPortal
+[CORE   ] net/minecraft/block/BlockPortal$1
+[CORE   ] net/minecraft/block/BlockPortal$Size
+[CORE   ] net/minecraft/block/BlockPotato
+[CORE   ] net/minecraft/block/BlockPressurePlate
+[CORE   ] net/minecraft/block/BlockPressurePlate$1
+[CORE   ] net/minecraft/block/BlockPressurePlate$Sensitivity
+[CORE   ] net/minecraft/block/BlockPressurePlateWeighted
+[CORE   ] net/minecraft/block/BlockPrismarine
+[CORE   ] net/minecraft/block/BlockPrismarine$EnumType
+[CORE   ] net/minecraft/block/BlockPumpkin
+[CORE   ] net/minecraft/block/BlockPumpkin$1
+[CORE   ] net/minecraft/block/BlockPurpurSlab
+[CORE   ] net/minecraft/block/BlockPurpurSlab$Double
+[CORE   ] net/minecraft/block/BlockPurpurSlab$Half
+[CORE   ] net/minecraft/block/BlockPurpurSlab$Variant
+[CORE   ] net/minecraft/block/BlockQuartz
+[CORE   ] net/minecraft/block/BlockQuartz$1
+[CORE   ] net/minecraft/block/BlockQuartz$EnumType
+[CORE   ] net/minecraft/block/BlockRail
+[CORE   ] net/minecraft/block/BlockRail$1
+[CORE   ] net/minecraft/block/BlockRailBase
+[CORE   ] net/minecraft/block/BlockRailBase$1
+[CORE   ] net/minecraft/block/BlockRailBase$EnumRailDirection
+[CORE   ] net/minecraft/block/BlockRailBase$Rail
+[CORE   ] net/minecraft/block/BlockRailDetector
+[CORE   ] net/minecraft/block/BlockRailDetector$1
+[CORE   ] net/minecraft/block/BlockRailDetector$2
+[CORE   ] net/minecraft/block/BlockRailPowered
+[CORE   ] net/minecraft/block/BlockRailPowered$1
+[CORE   ] net/minecraft/block/BlockRailPowered$2
+[CORE   ] net/minecraft/block/BlockRedFlower
+[CORE   ] net/minecraft/block/BlockRedSandstone
+[CORE   ] net/minecraft/block/BlockRedSandstone$EnumType
+[CORE   ] net/minecraft/block/BlockReed
+[CORE   ] net/minecraft/block/BlockRotatedPillar
+[CORE   ] net/minecraft/block/BlockRotatedPillar$1
+[CORE   ] net/minecraft/block/BlockSand
+[CORE   ] net/minecraft/block/BlockSand$EnumType
+[CORE   ] net/minecraft/block/BlockSandStone
+[CORE   ] net/minecraft/block/BlockSandStone$EnumType
+[CORE   ] net/minecraft/block/BlockSapling
+[CORE   ] net/minecraft/block/BlockSapling$1
+[CORE   ] net/minecraft/block/BlockSeaLantern
+[CORE   ] net/minecraft/block/BlockShulkerBox
+[CORE   ] net/minecraft/block/BlockShulkerBox$1
+[CORE   ] net/minecraft/block/BlockSign
+[CORE   ] net/minecraft/block/BlockSilverfish
+[CORE   ] net/minecraft/block/BlockSilverfish$1
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType$1
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType$2
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType$3
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType$4
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType$5
+[CORE   ] net/minecraft/block/BlockSilverfish$EnumType$6
+[CORE   ] net/minecraft/block/BlockSkull
+[CORE   ] net/minecraft/block/BlockSkull$1
+[CORE   ] net/minecraft/block/BlockSkull$2
+[CORE   ] net/minecraft/block/BlockSlab
+[CORE   ] net/minecraft/block/BlockSlab$EnumBlockHalf
+[CORE   ] net/minecraft/block/BlockSlime
+[CORE   ] net/minecraft/block/BlockSnow
+[CORE   ] net/minecraft/block/BlockSnowBlock
+[CORE   ] net/minecraft/block/BlockSoulSand
+[CORE   ] net/minecraft/block/BlockSourceImpl
+[CORE   ] net/minecraft/block/BlockSponge
+[CORE   ] net/minecraft/block/BlockStainedHardenedClay
+[CORE   ] net/minecraft/block/BlockStairs
+[CORE   ] net/minecraft/block/BlockStairs$1
+[CORE   ] net/minecraft/block/BlockStairs$EnumHalf
+[CORE   ] net/minecraft/block/BlockStairs$EnumShape
+[CORE   ] net/minecraft/block/BlockStandingSign
+[CORE   ] net/minecraft/block/BlockStem
+[CORE   ] net/minecraft/block/BlockStone
+[CORE   ] net/minecraft/block/BlockStone$EnumType
+[CORE   ] net/minecraft/block/BlockStoneBrick
+[CORE   ] net/minecraft/block/BlockStoneBrick$EnumType
+[CORE   ] net/minecraft/block/BlockStoneSlab
+[CORE   ] net/minecraft/block/BlockStoneSlab$EnumType
+[CORE   ] net/minecraft/block/BlockStoneSlabNew
+[CORE   ] net/minecraft/block/BlockStoneSlabNew$EnumType
+[CORE   ] net/minecraft/block/BlockStructure
+[CORE   ] net/minecraft/block/BlockStructure$1
+[CORE   ] net/minecraft/block/BlockStructureVoid
+[CORE   ] net/minecraft/block/BlockTNT
+[CORE   ] net/minecraft/block/BlockTallGrass
+[CORE   ] net/minecraft/block/BlockTallGrass$EnumType
+[CORE   ] net/minecraft/block/BlockTrapDoor
+[CORE   ] net/minecraft/block/BlockTrapDoor$1
+[CORE   ] net/minecraft/block/BlockTrapDoor$DoorHalf
+[CORE   ] net/minecraft/block/BlockTripWire
+[CORE   ] net/minecraft/block/BlockTripWire$1
+[CORE   ] net/minecraft/block/BlockTripWireHook
+[CORE   ] net/minecraft/block/BlockTripWireHook$1
+[CORE   ] net/minecraft/block/BlockVine
+[CORE   ] net/minecraft/block/BlockVine$1
+[CORE   ] net/minecraft/block/BlockWall
+[CORE   ] net/minecraft/block/BlockWall$EnumType
+[CORE   ] net/minecraft/block/BlockWallSign
+[CORE   ] net/minecraft/block/BlockWallSign$1
+[CORE   ] net/minecraft/block/BlockWeb
+[CORE   ] net/minecraft/block/BlockWoodSlab
+[CORE   ] net/minecraft/block/BlockWorkbench
+[CORE   ] net/minecraft/block/BlockWorkbench$InterfaceCraftingTable
+[CORE   ] net/minecraft/block/BlockYellowFlower
+[CORE   ] net/minecraft/block/IGrowable
+[CORE   ] net/minecraft/block/ITileEntityProvider
+[CORE   ] net/minecraft/block/SoundType
+[CORE   ] net/minecraft/block/properties/IProperty
+[CORE   ] net/minecraft/block/properties/PropertyBool
+[CORE   ] net/minecraft/block/properties/PropertyDirection
+[CORE   ] net/minecraft/block/properties/PropertyEnum
+[CORE   ] net/minecraft/block/properties/PropertyHelper
+[CORE   ] net/minecraft/block/properties/PropertyInteger
+
+===== BLOCK_STATE =====
+[CORE   ] net/minecraft/block/state/BlockFaceShape
+[CORE   ] net/minecraft/block/state/BlockStateBase
+[CORE   ] net/minecraft/block/state/BlockStateBase$1
+[CORE   ] net/minecraft/block/state/BlockStateContainer
+[CORE   ] net/minecraft/block/state/BlockStateContainer$1
+[CORE   ] net/minecraft/block/state/BlockStateContainer$StateImplementation
+[CORE   ] net/minecraft/block/state/BlockWorldState
+[CORE   ] net/minecraft/block/state/BlockWorldState$1
+[CORE   ] net/minecraft/block/state/IBlockBehaviors
+[CORE   ] net/minecraft/block/state/IBlockProperties
+[CORE   ] net/minecraft/block/state/IBlockState
+[CORE   ] net/minecraft/block/state/pattern/BlockMatcher
+[CORE   ] net/minecraft/block/state/pattern/BlockMaterialMatcher
+[CORE   ] net/minecraft/block/state/pattern/BlockPattern
+[CORE   ] net/minecraft/block/state/pattern/BlockPattern$CacheLoader
+[CORE   ] net/minecraft/block/state/pattern/BlockPattern$PatternHelper
+[CORE   ] net/minecraft/block/state/pattern/BlockStateMatcher
+[CORE   ] net/minecraft/block/state/pattern/BlockStateMatcher$1
+[CORE   ] net/minecraft/block/state/pattern/FactoryBlockPattern
+
+===== COMMAND =====
+[SUPPORT] net/minecraft/command/AdvancementCommand
+[SUPPORT] net/minecraft/command/AdvancementCommand$1
+[SUPPORT] net/minecraft/command/AdvancementCommand$ActionType
+[SUPPORT] net/minecraft/command/AdvancementCommand$ActionType$1
+[SUPPORT] net/minecraft/command/AdvancementCommand$ActionType$2
+[SUPPORT] net/minecraft/command/AdvancementCommand$Mode
+[SUPPORT] net/minecraft/command/CommandBase
+[SUPPORT] net/minecraft/command/CommandBase$1
+[SUPPORT] net/minecraft/command/CommandBase$2
+[SUPPORT] net/minecraft/command/CommandBase$CoordinateArg
+[SUPPORT] net/minecraft/command/CommandBlockData
+[SUPPORT] net/minecraft/command/CommandClearInventory
+[SUPPORT] net/minecraft/command/CommandClone
+[SUPPORT] net/minecraft/command/CommandClone$StaticCloneData
+[SUPPORT] net/minecraft/command/CommandCompare
+[SUPPORT] net/minecraft/command/CommandDebug
+[SUPPORT] net/minecraft/command/CommandDefaultGameMode
+[SUPPORT] net/minecraft/command/CommandDifficulty
+[SUPPORT] net/minecraft/command/CommandEffect
+[SUPPORT] net/minecraft/command/CommandEnchant
+[SUPPORT] net/minecraft/command/CommandEntityData
+[SUPPORT] net/minecraft/command/CommandException
+[SUPPORT] net/minecraft/command/CommandExecuteAt
+[SUPPORT] net/minecraft/command/CommandFill
+[SUPPORT] net/minecraft/command/CommandFunction
+[SUPPORT] net/minecraft/command/CommandGameMode
+[SUPPORT] net/minecraft/command/CommandGameRule
+[SUPPORT] net/minecraft/command/CommandGive
+[SUPPORT] net/minecraft/command/CommandHandler
+[SUPPORT] net/minecraft/command/CommandHelp
+[SUPPORT] net/minecraft/command/CommandKill
+[SUPPORT] net/minecraft/command/CommandLocate
+[SUPPORT] net/minecraft/command/CommandNotFoundException
+[SUPPORT] net/minecraft/command/CommandParticle
+[SUPPORT] net/minecraft/command/CommandPlaySound
+[SUPPORT] net/minecraft/command/CommandReload
+[SUPPORT] net/minecraft/command/CommandReplaceItem
+[SUPPORT] net/minecraft/command/CommandResultStats
+[SUPPORT] net/minecraft/command/CommandResultStats$1
+[SUPPORT] net/minecraft/command/CommandResultStats$Type
+[SUPPORT] net/minecraft/command/CommandSenderWrapper
+[SUPPORT] net/minecraft/command/CommandServerKick
+[SUPPORT] net/minecraft/command/CommandSetPlayerTimeout
+[SUPPORT] net/minecraft/command/CommandSetSpawnpoint
+[SUPPORT] net/minecraft/command/CommandShowSeed
+[SUPPORT] net/minecraft/command/CommandSpreadPlayers
+[SUPPORT] net/minecraft/command/CommandSpreadPlayers$Position
+[SUPPORT] net/minecraft/command/CommandStats
+[SUPPORT] net/minecraft/command/CommandStopSound
+[SUPPORT] net/minecraft/command/CommandTP
+[SUPPORT] net/minecraft/command/CommandTime
+[SUPPORT] net/minecraft/command/CommandTitle
+[SUPPORT] net/minecraft/command/CommandToggleDownfall
+[SUPPORT] net/minecraft/command/CommandTrigger
+[SUPPORT] net/minecraft/command/CommandWeather
+[SUPPORT] net/minecraft/command/CommandWorldBorder
+[SUPPORT] net/minecraft/command/CommandXP
+[SUPPORT] net/minecraft/command/EntityNotFoundException
+[SUPPORT] net/minecraft/command/EntitySelector
+[SUPPORT] net/minecraft/command/EntitySelector$1
+[SUPPORT] net/minecraft/command/EntitySelector$10
+[SUPPORT] net/minecraft/command/EntitySelector$11
+[SUPPORT] net/minecraft/command/EntitySelector$12
+[SUPPORT] net/minecraft/command/EntitySelector$13
+[SUPPORT] net/minecraft/command/EntitySelector$14
+[SUPPORT] net/minecraft/command/EntitySelector$2
+[SUPPORT] net/minecraft/command/EntitySelector$3
+[SUPPORT] net/minecraft/command/EntitySelector$4
+[SUPPORT] net/minecraft/command/EntitySelector$5
+[SUPPORT] net/minecraft/command/EntitySelector$6
+[SUPPORT] net/minecraft/command/EntitySelector$7
+[SUPPORT] net/minecraft/command/EntitySelector$8
+[SUPPORT] net/minecraft/command/EntitySelector$9
+[SUPPORT] net/minecraft/command/FunctionObject
+[SUPPORT] net/minecraft/command/FunctionObject$CacheableFunction
+[SUPPORT] net/minecraft/command/FunctionObject$CommandEntry
+[SUPPORT] net/minecraft/command/FunctionObject$Entry
+[SUPPORT] net/minecraft/command/FunctionObject$FunctionEntry
+[SUPPORT] net/minecraft/command/ICommand
+[SUPPORT] net/minecraft/command/ICommandListener
+[SUPPORT] net/minecraft/command/ICommandManager
+[SUPPORT] net/minecraft/command/ICommandSender
+[SUPPORT] net/minecraft/command/InvalidBlockStateException
+[SUPPORT] net/minecraft/command/NumberInvalidException
+[SUPPORT] net/minecraft/command/PlayerNotFoundException
+[SUPPORT] net/minecraft/command/RecipeCommand
+[SUPPORT] net/minecraft/command/ServerCommandManager
+[SUPPORT] net/minecraft/command/SyntaxErrorException
+[SUPPORT] net/minecraft/command/WrongUsageException
+[SUPPORT] net/minecraft/command/server/CommandBanIp
+[SUPPORT] net/minecraft/command/server/CommandBanPlayer
+[SUPPORT] net/minecraft/command/server/CommandBroadcast
+[SUPPORT] net/minecraft/command/server/CommandDeOp
+[SUPPORT] net/minecraft/command/server/CommandEmote
+[SUPPORT] net/minecraft/command/server/CommandListBans
+[SUPPORT] net/minecraft/command/server/CommandListPlayers
+[SUPPORT] net/minecraft/command/server/CommandMessage
+[SUPPORT] net/minecraft/command/server/CommandMessageRaw
+[SUPPORT] net/minecraft/command/server/CommandOp
+[SUPPORT] net/minecraft/command/server/CommandPardonIp
+[SUPPORT] net/minecraft/command/server/CommandPardonPlayer
+[SUPPORT] net/minecraft/command/server/CommandPublishLocalServer
+[SUPPORT] net/minecraft/command/server/CommandSaveAll
+[SUPPORT] net/minecraft/command/server/CommandSaveOff
+[SUPPORT] net/minecraft/command/server/CommandSaveOn
+[SUPPORT] net/minecraft/command/server/CommandScoreboard
+[SUPPORT] net/minecraft/command/server/CommandSetBlock
+[SUPPORT] net/minecraft/command/server/CommandSetDefaultSpawnpoint
+[SUPPORT] net/minecraft/command/server/CommandStop
+[SUPPORT] net/minecraft/command/server/CommandSummon
+[SUPPORT] net/minecraft/command/server/CommandTeleport
+[SUPPORT] net/minecraft/command/server/CommandTestFor
+[SUPPORT] net/minecraft/command/server/CommandTestForBlock
+[SUPPORT] net/minecraft/command/server/CommandWhitelist
+
+===== CORE_MISC =====
+[SUPPORT] net/minecraft/client/AnvilConverterException
+[SUPPORT] net/minecraft/client/ClientBrandRetriever
+[SUPPORT] net/minecraft/client/LoadingScreenRenderer
+[SUPPORT] net/minecraft/client/Minecraft
+[SUPPORT] net/minecraft/client/Minecraft$1
+[SUPPORT] net/minecraft/client/Minecraft$10
+[SUPPORT] net/minecraft/client/Minecraft$11
+[SUPPORT] net/minecraft/client/Minecraft$12
+[SUPPORT] net/minecraft/client/Minecraft$13
+[SUPPORT] net/minecraft/client/Minecraft$14
+[SUPPORT] net/minecraft/client/Minecraft$15
+[SUPPORT] net/minecraft/client/Minecraft$16
+[SUPPORT] net/minecraft/client/Minecraft$2
+[SUPPORT] net/minecraft/client/Minecraft$3
+[SUPPORT] net/minecraft/client/Minecraft$4
+[SUPPORT] net/minecraft/client/Minecraft$5
+[SUPPORT] net/minecraft/client/Minecraft$6
+[SUPPORT] net/minecraft/client/Minecraft$7
+[SUPPORT] net/minecraft/client/Minecraft$8
+[SUPPORT] net/minecraft/client/Minecraft$9
+[SUPPORT] net/minecraft/client/entity/AbstractClientPlayer
+[SUPPORT] net/minecraft/client/entity/EntityOtherPlayerMP
+[SUPPORT] net/minecraft/client/entity/EntityPlayerSP
+[SUPPORT] net/minecraft/client/model/IMultipassModel
+[SUPPORT] net/minecraft/client/model/ModelArmorStand
+[SUPPORT] net/minecraft/client/model/ModelArmorStandArmor
+[SUPPORT] net/minecraft/client/model/ModelBanner
+[SUPPORT] net/minecraft/client/model/ModelBase
+[SUPPORT] net/minecraft/client/model/ModelBat
+[SUPPORT] net/minecraft/client/model/ModelBed
+[SUPPORT] net/minecraft/client/model/ModelBiped
+[SUPPORT] net/minecraft/client/model/ModelBiped$1
+[SUPPORT] net/minecraft/client/model/ModelBiped$ArmPose
+[SUPPORT] net/minecraft/client/model/ModelBlaze
+[SUPPORT] net/minecraft/client/model/ModelBoat
+[SUPPORT] net/minecraft/client/model/ModelBook
+[SUPPORT] net/minecraft/client/model/ModelBox
+[SUPPORT] net/minecraft/client/model/ModelChest
+[SUPPORT] net/minecraft/client/model/ModelChicken
+[SUPPORT] net/minecraft/client/model/ModelCow
+[SUPPORT] net/minecraft/client/model/ModelCreeper
+[SUPPORT] net/minecraft/client/model/ModelDragon
+[SUPPORT] net/minecraft/client/model/ModelDragonHead
+[SUPPORT] net/minecraft/client/model/ModelElytra
+[SUPPORT] net/minecraft/client/model/ModelEnderCrystal
+[SUPPORT] net/minecraft/client/model/ModelEnderMite
+[SUPPORT] net/minecraft/client/model/ModelEnderman
+[SUPPORT] net/minecraft/client/model/ModelEvokerFangs
+[SUPPORT] net/minecraft/client/model/ModelGhast
+[SUPPORT] net/minecraft/client/model/ModelGuardian
+[SUPPORT] net/minecraft/client/model/ModelHorse
+[SUPPORT] net/minecraft/client/model/ModelHumanoidHead
+[SUPPORT] net/minecraft/client/model/ModelIllager
+[SUPPORT] net/minecraft/client/model/ModelIronGolem
+[SUPPORT] net/minecraft/client/model/ModelLargeChest
+[SUPPORT] net/minecraft/client/model/ModelLeashKnot
+[SUPPORT] net/minecraft/client/model/ModelLlama
+[SUPPORT] net/minecraft/client/model/ModelLlamaSpit
+[SUPPORT] net/minecraft/client/model/ModelMagmaCube
+[SUPPORT] net/minecraft/client/model/ModelMinecart
+[SUPPORT] net/minecraft/client/model/ModelOcelot
+[SUPPORT] net/minecraft/client/model/ModelParrot
+[SUPPORT] net/minecraft/client/model/ModelParrot$State
+[SUPPORT] net/minecraft/client/model/ModelPig
+[SUPPORT] net/minecraft/client/model/ModelPlayer
+[SUPPORT] net/minecraft/client/model/ModelPolarBear
+[SUPPORT] net/minecraft/client/model/ModelQuadruped
+[SUPPORT] net/minecraft/client/model/ModelRabbit
+[SUPPORT] net/minecraft/client/model/ModelRenderer
+[SUPPORT] net/minecraft/client/model/ModelSheep1
+[SUPPORT] net/minecraft/client/model/ModelSheep2
+[SUPPORT] net/minecraft/client/model/ModelShield
+[SUPPORT] net/minecraft/client/model/ModelShulker
+[SUPPORT] net/minecraft/client/model/ModelShulkerBullet
+[SUPPORT] net/minecraft/client/model/ModelSign
+[SUPPORT] net/minecraft/client/model/ModelSilverfish
+[SUPPORT] net/minecraft/client/model/ModelSkeleton
+[SUPPORT] net/minecraft/client/model/ModelSkeletonHead
+[SUPPORT] net/minecraft/client/model/ModelSlime
+[SUPPORT] net/minecraft/client/model/ModelSnowMan
+[SUPPORT] net/minecraft/client/model/ModelSpider
+[SUPPORT] net/minecraft/client/model/ModelSquid
+[SUPPORT] net/minecraft/client/model/ModelVex
+[SUPPORT] net/minecraft/client/model/ModelVillager
+[SUPPORT] net/minecraft/client/model/ModelWitch
+[SUPPORT] net/minecraft/client/model/ModelWither
+[SUPPORT] net/minecraft/client/model/ModelWolf
+[SUPPORT] net/minecraft/client/model/ModelZombie
+[SUPPORT] net/minecraft/client/model/ModelZombieVillager
+[SUPPORT] net/minecraft/client/model/PositionTextureVertex
+[SUPPORT] net/minecraft/client/model/TextureOffset
+[SUPPORT] net/minecraft/client/model/TexturedQuad
+[SUPPORT] net/minecraft/client/network/LanServerDetector
+[SUPPORT] net/minecraft/client/network/LanServerDetector$LanServerList
+[SUPPORT] net/minecraft/client/network/LanServerDetector$ThreadLanServerFind
+[SUPPORT] net/minecraft/client/network/LanServerInfo
+[SUPPORT] net/minecraft/client/network/NetHandlerHandshakeMemory
+[SUPPORT] net/minecraft/client/network/NetHandlerLoginClient
+[SUPPORT] net/minecraft/client/network/NetHandlerLoginClient$1
+[SUPPORT] net/minecraft/client/network/NetHandlerPlayClient
+[SUPPORT] net/minecraft/client/network/NetHandlerPlayClient$1
+[SUPPORT] net/minecraft/client/network/NetHandlerPlayClient$1$1
+[SUPPORT] net/minecraft/client/network/NetHandlerPlayClient$2
+[SUPPORT] net/minecraft/client/network/NetHandlerPlayClient$3
+[SUPPORT] net/minecraft/client/network/NetworkPlayerInfo
+[SUPPORT] net/minecraft/client/network/NetworkPlayerInfo$1
+[SUPPORT] net/minecraft/client/network/NetworkPlayerInfo$2
+[SUPPORT] net/minecraft/client/network/ServerPinger
+[SUPPORT] net/minecraft/client/network/ServerPinger$1
+[SUPPORT] net/minecraft/client/network/ServerPinger$2
+[SUPPORT] net/minecraft/client/network/ServerPinger$2$1
+[SUPPORT] net/minecraft/client/particle/Barrier
+[SUPPORT] net/minecraft/client/particle/Barrier$Factory
+[SUPPORT] net/minecraft/client/particle/IParticleFactory
+[SUPPORT] net/minecraft/client/particle/Particle
+[SUPPORT] net/minecraft/client/particle/ParticleBlockDust
+[SUPPORT] net/minecraft/client/particle/ParticleBlockDust$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleBreaking
+[SUPPORT] net/minecraft/client/particle/ParticleBreaking$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleBreaking$SlimeFactory
+[SUPPORT] net/minecraft/client/particle/ParticleBreaking$SnowballFactory
+[SUPPORT] net/minecraft/client/particle/ParticleBubble
+[SUPPORT] net/minecraft/client/particle/ParticleBubble$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleCloud
+[SUPPORT] net/minecraft/client/particle/ParticleCloud$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleCrit
+[SUPPORT] net/minecraft/client/particle/ParticleCrit$DamageIndicatorFactory
+[SUPPORT] net/minecraft/client/particle/ParticleCrit$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleCrit$MagicFactory
+[SUPPORT] net/minecraft/client/particle/ParticleDigging
+[SUPPORT] net/minecraft/client/particle/ParticleDigging$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleDragonBreath
+[SUPPORT] net/minecraft/client/particle/ParticleDragonBreath$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleDrip
+[SUPPORT] net/minecraft/client/particle/ParticleDrip$LavaFactory
+[SUPPORT] net/minecraft/client/particle/ParticleDrip$WaterFactory
+[SUPPORT] net/minecraft/client/particle/ParticleEmitter
+[SUPPORT] net/minecraft/client/particle/ParticleEnchantmentTable
+[SUPPORT] net/minecraft/client/particle/ParticleEnchantmentTable$EnchantmentTable
+[SUPPORT] net/minecraft/client/particle/ParticleEndRod
+[SUPPORT] net/minecraft/client/particle/ParticleEndRod$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleExplosion
+[SUPPORT] net/minecraft/client/particle/ParticleExplosion$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleExplosionHuge
+[SUPPORT] net/minecraft/client/particle/ParticleExplosionHuge$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleExplosionLarge
+[SUPPORT] net/minecraft/client/particle/ParticleExplosionLarge$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleFallingDust
+[SUPPORT] net/minecraft/client/particle/ParticleFallingDust$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleFirework
+[SUPPORT] net/minecraft/client/particle/ParticleFirework$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleFirework$Overlay
+[SUPPORT] net/minecraft/client/particle/ParticleFirework$Spark
+[SUPPORT] net/minecraft/client/particle/ParticleFirework$Starter
+[SUPPORT] net/minecraft/client/particle/ParticleFlame
+[SUPPORT] net/minecraft/client/particle/ParticleFlame$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleFootStep
+[SUPPORT] net/minecraft/client/particle/ParticleFootStep$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleHeart
+[SUPPORT] net/minecraft/client/particle/ParticleHeart$AngryVillagerFactory
+[SUPPORT] net/minecraft/client/particle/ParticleHeart$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleItemPickup
+[SUPPORT] net/minecraft/client/particle/ParticleLava
+[SUPPORT] net/minecraft/client/particle/ParticleLava$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleManager
+[SUPPORT] net/minecraft/client/particle/ParticleManager$1
+[SUPPORT] net/minecraft/client/particle/ParticleManager$2
+[SUPPORT] net/minecraft/client/particle/ParticleManager$3
+[SUPPORT] net/minecraft/client/particle/ParticleManager$4
+[SUPPORT] net/minecraft/client/particle/ParticleMobAppearance
+[SUPPORT] net/minecraft/client/particle/ParticleMobAppearance$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleNote
+[SUPPORT] net/minecraft/client/particle/ParticleNote$Factory
+[SUPPORT] net/minecraft/client/particle/ParticlePortal
+[SUPPORT] net/minecraft/client/particle/ParticlePortal$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleRain
+[SUPPORT] net/minecraft/client/particle/ParticleRain$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleRedstone
+[SUPPORT] net/minecraft/client/particle/ParticleRedstone$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSimpleAnimated
+[SUPPORT] net/minecraft/client/particle/ParticleSmokeLarge
+[SUPPORT] net/minecraft/client/particle/ParticleSmokeLarge$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSmokeNormal
+[SUPPORT] net/minecraft/client/particle/ParticleSmokeNormal$1
+[SUPPORT] net/minecraft/client/particle/ParticleSmokeNormal$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSnowShovel
+[SUPPORT] net/minecraft/client/particle/ParticleSnowShovel$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSpell
+[SUPPORT] net/minecraft/client/particle/ParticleSpell$AmbientMobFactory
+[SUPPORT] net/minecraft/client/particle/ParticleSpell$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSpell$InstantFactory
+[SUPPORT] net/minecraft/client/particle/ParticleSpell$MobFactory
+[SUPPORT] net/minecraft/client/particle/ParticleSpell$WitchFactory
+[SUPPORT] net/minecraft/client/particle/ParticleSpit
+[SUPPORT] net/minecraft/client/particle/ParticleSpit$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSplash
+[SUPPORT] net/minecraft/client/particle/ParticleSplash$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSuspend
+[SUPPORT] net/minecraft/client/particle/ParticleSuspend$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSuspendedTown
+[SUPPORT] net/minecraft/client/particle/ParticleSuspendedTown$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleSuspendedTown$HappyVillagerFactory
+[SUPPORT] net/minecraft/client/particle/ParticleSweepAttack
+[SUPPORT] net/minecraft/client/particle/ParticleSweepAttack$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleTotem
+[SUPPORT] net/minecraft/client/particle/ParticleTotem$Factory
+[SUPPORT] net/minecraft/client/particle/ParticleWaterWake
+[SUPPORT] net/minecraft/client/particle/ParticleWaterWake$Factory
+[SUPPORT] net/minecraft/client/player/inventory/ContainerLocalMenu
+[SUPPORT] net/minecraft/client/player/inventory/LocalBlockIntercommunication
+[SUPPORT] net/minecraft/client/settings/CreativeSettings
+[SUPPORT] net/minecraft/client/settings/GameSettings
+[SUPPORT] net/minecraft/client/settings/GameSettings$1
+[SUPPORT] net/minecraft/client/settings/GameSettings$2
+[SUPPORT] net/minecraft/client/settings/GameSettings$Options
+[SUPPORT] net/minecraft/client/settings/HotbarSnapshot
+[SUPPORT] net/minecraft/client/settings/KeyBinding
+[SUPPORT] net/minecraft/client/shader/Framebuffer
+[SUPPORT] net/minecraft/client/shader/Shader
+[SUPPORT] net/minecraft/client/shader/ShaderDefault
+[SUPPORT] net/minecraft/client/shader/ShaderGroup
+[SUPPORT] net/minecraft/client/shader/ShaderLinkHelper
+[SUPPORT] net/minecraft/client/shader/ShaderLoader
+[SUPPORT] net/minecraft/client/shader/ShaderLoader$ShaderType
+[SUPPORT] net/minecraft/client/shader/ShaderManager
+[SUPPORT] net/minecraft/client/shader/ShaderUniform
+[SUPPORT] net/minecraft/client/tutorial/CompletedTutorialStep
+[SUPPORT] net/minecraft/client/tutorial/CraftPlanksStep
+[SUPPORT] net/minecraft/client/tutorial/FindTreeStep
+[SUPPORT] net/minecraft/client/tutorial/ITutorialStep
+[SUPPORT] net/minecraft/client/tutorial/MovementStep
+[SUPPORT] net/minecraft/client/tutorial/OpenInventoryStep
+[SUPPORT] net/minecraft/client/tutorial/PunchTreeStep
+[SUPPORT] net/minecraft/client/tutorial/Tutorial
+[SUPPORT] net/minecraft/client/tutorial/TutorialSteps
+[SUPPORT] net/minecraft/client/util/ISearchTree
+[SUPPORT] net/minecraft/client/util/ITooltipFlag
+[SUPPORT] net/minecraft/client/util/ITooltipFlag$TooltipFlags
+[SUPPORT] net/minecraft/client/util/JsonBlendingMode
+[SUPPORT] net/minecraft/client/util/JsonException
+[SUPPORT] net/minecraft/client/util/JsonException$1
+[SUPPORT] net/minecraft/client/util/JsonException$Entry
+[SUPPORT] net/minecraft/client/util/RecipeBookClient
+[SUPPORT] net/minecraft/client/util/RecipeItemHelper
+[SUPPORT] net/minecraft/client/util/RecipeItemHelper$RecipePicker
+[SUPPORT] net/minecraft/client/util/SearchTree
+[SUPPORT] net/minecraft/client/util/SearchTree$MergingIterator
+[SUPPORT] net/minecraft/client/util/SearchTreeManager
+[SUPPORT] net/minecraft/client/util/SearchTreeManager$Key
+[SUPPORT] net/minecraft/client/util/SuffixArray
+[SUPPORT] net/minecraft/client/util/SuffixArray$1
+[SUPPORT] net/minecraft/creativetab/CreativeTabs
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$1
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$10
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$11
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$12
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$2
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$3
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$4
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$5
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$6
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$7
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$8
+[SUPPORT] net/minecraft/creativetab/CreativeTabs$9
+[SUPPORT] net/minecraft/dispenser/BehaviorDefaultDispenseItem
+[SUPPORT] net/minecraft/dispenser/BehaviorProjectileDispense
+[SUPPORT] net/minecraft/dispenser/IBehaviorDispenseItem
+[SUPPORT] net/minecraft/dispenser/IBehaviorDispenseItem$1
+[SUPPORT] net/minecraft/dispenser/IBlockSource
+[SUPPORT] net/minecraft/dispenser/ILocatableSource
+[SUPPORT] net/minecraft/dispenser/ILocation
+[SUPPORT] net/minecraft/dispenser/IPosition
+[SUPPORT] net/minecraft/dispenser/PositionImpl
+[SUPPORT] net/minecraft/init/Biomes
+[SUPPORT] net/minecraft/init/Blocks
+[SUPPORT] net/minecraft/init/Bootstrap
+[SUPPORT] net/minecraft/init/Bootstrap$1
+[SUPPORT] net/minecraft/init/Bootstrap$10
+[SUPPORT] net/minecraft/init/Bootstrap$11
+[SUPPORT] net/minecraft/init/Bootstrap$12
+[SUPPORT] net/minecraft/init/Bootstrap$13
+[SUPPORT] net/minecraft/init/Bootstrap$14
+[SUPPORT] net/minecraft/init/Bootstrap$15
+[SUPPORT] net/minecraft/init/Bootstrap$16
+[SUPPORT] net/minecraft/init/Bootstrap$17
+[SUPPORT] net/minecraft/init/Bootstrap$18
+[SUPPORT] net/minecraft/init/Bootstrap$2
+[SUPPORT] net/minecraft/init/Bootstrap$3
+[SUPPORT] net/minecraft/init/Bootstrap$4
+[SUPPORT] net/minecraft/init/Bootstrap$5
+[SUPPORT] net/minecraft/init/Bootstrap$6
+[SUPPORT] net/minecraft/init/Bootstrap$7
+[SUPPORT] net/minecraft/init/Bootstrap$7$1
+[SUPPORT] net/minecraft/init/Bootstrap$8
+[SUPPORT] net/minecraft/init/Bootstrap$8$1
+[SUPPORT] net/minecraft/init/Bootstrap$9
+[SUPPORT] net/minecraft/init/Bootstrap$BehaviorDispenseBoat
+[SUPPORT] net/minecraft/init/Bootstrap$BehaviorDispenseOptional
+[SUPPORT] net/minecraft/init/Bootstrap$BehaviorDispenseShulkerBox
+[SUPPORT] net/minecraft/init/Enchantments
+[SUPPORT] net/minecraft/init/Items
+[SUPPORT] net/minecraft/init/MobEffects
+[SUPPORT] net/minecraft/init/PotionTypes
+[SUPPORT] net/minecraft/init/SoundEvents
+[SUPPORT] net/minecraft/profiler/ISnooperInfo
+[SUPPORT] net/minecraft/profiler/Profiler
+[SUPPORT] net/minecraft/profiler/Profiler$Result
+[SUPPORT] net/minecraft/profiler/Snooper
+[SUPPORT] net/minecraft/profiler/Snooper$1
+[SUPPORT] net/minecraft/realms/DisconnectedRealmsScreen
+[SUPPORT] net/minecraft/realms/Realms
+[SUPPORT] net/minecraft/realms/RealmsAnvilLevelStorageSource
+[SUPPORT] net/minecraft/realms/RealmsBridge
+[SUPPORT] net/minecraft/realms/RealmsBufferBuilder
+[SUPPORT] net/minecraft/realms/RealmsButton
+[SUPPORT] net/minecraft/realms/RealmsClickableScrolledSelectionList
+[SUPPORT] net/minecraft/realms/RealmsConnect
+[SUPPORT] net/minecraft/realms/RealmsConnect$1
+[SUPPORT] net/minecraft/realms/RealmsDefaultVertexFormat
+[SUPPORT] net/minecraft/realms/RealmsEditBox
+[SUPPORT] net/minecraft/realms/RealmsLevelSummary
+[SUPPORT] net/minecraft/realms/RealmsMth
+[SUPPORT] net/minecraft/realms/RealmsScreen
+[SUPPORT] net/minecraft/realms/RealmsScrolledSelectionList
+[SUPPORT] net/minecraft/realms/RealmsServerAddress
+[SUPPORT] net/minecraft/realms/RealmsSharedConstants
+[SUPPORT] net/minecraft/realms/RealmsSimpleScrolledSelectionList
+[SUPPORT] net/minecraft/realms/RealmsSliderButton
+[SUPPORT] net/minecraft/realms/RealmsVertexFormat
+[SUPPORT] net/minecraft/realms/RealmsVertexFormatElement
+[SUPPORT] net/minecraft/realms/Tezzelator
+[SUPPORT] net/minecraft/tileentity/BannerPattern
+[SUPPORT] net/minecraft/tileentity/CommandBlockBaseLogic
+[SUPPORT] net/minecraft/tileentity/CommandBlockBaseLogic$1
+[SUPPORT] net/minecraft/tileentity/CommandBlockBaseLogic$2
+[SUPPORT] net/minecraft/tileentity/IHopper
+[SUPPORT] net/minecraft/tileentity/MobSpawnerBaseLogic
+[SUPPORT] net/minecraft/tileentity/TileEntity
+[SUPPORT] net/minecraft/tileentity/TileEntity$1
+[SUPPORT] net/minecraft/tileentity/TileEntity$2
+[SUPPORT] net/minecraft/tileentity/TileEntity$3
+[SUPPORT] net/minecraft/tileentity/TileEntityBanner
+[SUPPORT] net/minecraft/tileentity/TileEntityBeacon
+[SUPPORT] net/minecraft/tileentity/TileEntityBeacon$BeamSegment
+[SUPPORT] net/minecraft/tileentity/TileEntityBed
+[SUPPORT] net/minecraft/tileentity/TileEntityBrewingStand
+[SUPPORT] net/minecraft/tileentity/TileEntityCommandBlock
+[SUPPORT] net/minecraft/tileentity/TileEntityCommandBlock$1
+[SUPPORT] net/minecraft/tileentity/TileEntityCommandBlock$Mode
+[SUPPORT] net/minecraft/tileentity/TileEntityComparator
+[SUPPORT] net/minecraft/tileentity/TileEntityDaylightDetector
+[SUPPORT] net/minecraft/tileentity/TileEntityDispenser
+[SUPPORT] net/minecraft/tileentity/TileEntityDropper
+[SUPPORT] net/minecraft/tileentity/TileEntityEnchantmentTable
+[SUPPORT] net/minecraft/tileentity/TileEntityEndGateway
+[SUPPORT] net/minecraft/tileentity/TileEntityEndPortal
+[SUPPORT] net/minecraft/tileentity/TileEntityEnderChest
+[SUPPORT] net/minecraft/tileentity/TileEntityFlowerPot
+[SUPPORT] net/minecraft/tileentity/TileEntityLockable
+[SUPPORT] net/minecraft/tileentity/TileEntityLockableLoot
+[SUPPORT] net/minecraft/tileentity/TileEntityMobSpawner
+[SUPPORT] net/minecraft/tileentity/TileEntityMobSpawner$1
+[SUPPORT] net/minecraft/tileentity/TileEntityMobSpawner$2
+[SUPPORT] net/minecraft/tileentity/TileEntityNote
+[SUPPORT] net/minecraft/tileentity/TileEntityShulkerBox
+[SUPPORT] net/minecraft/tileentity/TileEntityShulkerBox$1
+[SUPPORT] net/minecraft/tileentity/TileEntityShulkerBox$AnimationStatus
+[SUPPORT] net/minecraft/tileentity/TileEntitySign
+[SUPPORT] net/minecraft/tileentity/TileEntitySign$1
+[SUPPORT] net/minecraft/tileentity/TileEntitySign$2
+[SUPPORT] net/minecraft/tileentity/TileEntitySkull
+[SUPPORT] net/minecraft/tileentity/TileEntityStructure
+[SUPPORT] net/minecraft/tileentity/TileEntityStructure$1
+[SUPPORT] net/minecraft/tileentity/TileEntityStructure$2
+[SUPPORT] net/minecraft/tileentity/TileEntityStructure$Mode
+[SUPPORT] net/minecraft/village/MerchantRecipe
+[SUPPORT] net/minecraft/village/MerchantRecipeList
+[SUPPORT] net/minecraft/village/Village
+[SUPPORT] net/minecraft/village/Village$VillageAggressor
+[SUPPORT] net/minecraft/village/VillageCollection
+[SUPPORT] net/minecraft/village/VillageDoorInfo
+[SUPPORT] net/minecraft/village/VillageSiege
+[SUPPORT] net/minecraft/world/BossInfo
+[SUPPORT] net/minecraft/world/BossInfo$Color
+[SUPPORT] net/minecraft/world/BossInfo$Overlay
+[SUPPORT] net/minecraft/world/BossInfoServer
+[SUPPORT] net/minecraft/world/ChunkCache
+[SUPPORT] net/minecraft/world/ColorizerFoliage
+[SUPPORT] net/minecraft/world/ColorizerGrass
+[SUPPORT] net/minecraft/world/DifficultyInstance
+[SUPPORT] net/minecraft/world/DimensionType
+[SUPPORT] net/minecraft/world/EnumDifficulty
+[SUPPORT] net/minecraft/world/Explosion
+[SUPPORT] net/minecraft/world/GameRules
+[SUPPORT] net/minecraft/world/GameRules$Value
+[SUPPORT] net/minecraft/world/GameRules$ValueType
+[SUPPORT] net/minecraft/world/GameType
+[SUPPORT] net/minecraft/world/IBlockAccess
+[SUPPORT] net/minecraft/world/IInteractionObject
+[SUPPORT] net/minecraft/world/ILockableContainer
+[SUPPORT] net/minecraft/world/IWorldEventListener
+[SUPPORT] net/minecraft/world/IWorldNameable
+[SUPPORT] net/minecraft/world/LockCode
+[SUPPORT] net/minecraft/world/MinecraftException
+[SUPPORT] net/minecraft/world/NextTickListEntry
+[SUPPORT] net/minecraft/world/ServerWorldEventHandler
+[SUPPORT] net/minecraft/world/Teleporter
+[SUPPORT] net/minecraft/world/Teleporter$PortalPosition
+[SUPPORT] net/minecraft/world/border/EnumBorderStatus
+[SUPPORT] net/minecraft/world/border/IBorderListener
+[SUPPORT] net/minecraft/world/border/WorldBorder
+[SUPPORT] net/minecraft/world/end/DragonFightManager
+[SUPPORT] net/minecraft/world/end/DragonSpawnManager
+[SUPPORT] net/minecraft/world/end/DragonSpawnManager$1
+[SUPPORT] net/minecraft/world/end/DragonSpawnManager$2
+[SUPPORT] net/minecraft/world/end/DragonSpawnManager$3
+[SUPPORT] net/minecraft/world/end/DragonSpawnManager$4
+[SUPPORT] net/minecraft/world/end/DragonSpawnManager$5
+
+===== ENCHANT =====
+[SUPPORT] net/minecraft/enchantment/Enchantment
+[SUPPORT] net/minecraft/enchantment/Enchantment$Rarity
+[SUPPORT] net/minecraft/enchantment/EnchantmentArrowDamage
+[SUPPORT] net/minecraft/enchantment/EnchantmentArrowFire
+[SUPPORT] net/minecraft/enchantment/EnchantmentArrowInfinite
+[SUPPORT] net/minecraft/enchantment/EnchantmentArrowKnockback
+[SUPPORT] net/minecraft/enchantment/EnchantmentBindingCurse
+[SUPPORT] net/minecraft/enchantment/EnchantmentDamage
+[SUPPORT] net/minecraft/enchantment/EnchantmentData
+[SUPPORT] net/minecraft/enchantment/EnchantmentDigging
+[SUPPORT] net/minecraft/enchantment/EnchantmentDurability
+[SUPPORT] net/minecraft/enchantment/EnchantmentFireAspect
+[SUPPORT] net/minecraft/enchantment/EnchantmentFishingSpeed
+[SUPPORT] net/minecraft/enchantment/EnchantmentFrostWalker
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper$1
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper$DamageIterator
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper$HurtIterator
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper$IModifier
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper$ModifierDamage
+[SUPPORT] net/minecraft/enchantment/EnchantmentHelper$ModifierLiving
+[SUPPORT] net/minecraft/enchantment/EnchantmentKnockback
+[SUPPORT] net/minecraft/enchantment/EnchantmentLootBonus
+[SUPPORT] net/minecraft/enchantment/EnchantmentMending
+[SUPPORT] net/minecraft/enchantment/EnchantmentOxygen
+[SUPPORT] net/minecraft/enchantment/EnchantmentProtection
+[SUPPORT] net/minecraft/enchantment/EnchantmentProtection$Type
+[SUPPORT] net/minecraft/enchantment/EnchantmentSweepingEdge
+[SUPPORT] net/minecraft/enchantment/EnchantmentThorns
+[SUPPORT] net/minecraft/enchantment/EnchantmentUntouching
+[SUPPORT] net/minecraft/enchantment/EnchantmentVanishingCurse
+[SUPPORT] net/minecraft/enchantment/EnchantmentWaterWalker
+[SUPPORT] net/minecraft/enchantment/EnchantmentWaterWorker
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$1
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$10
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$11
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$12
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$2
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$3
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$4
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$5
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$6
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$7
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$8
+[SUPPORT] net/minecraft/enchantment/EnumEnchantmentType$9
+
+===== ENTITY =====
+[CORE   ] net/minecraft/entity/Entity
+[CORE   ] net/minecraft/entity/Entity$1
+[CORE   ] net/minecraft/entity/Entity$2
+[CORE   ] net/minecraft/entity/Entity$3
+[CORE   ] net/minecraft/entity/Entity$4
+[CORE   ] net/minecraft/entity/Entity$5
+[CORE   ] net/minecraft/entity/Entity$6
+[CORE   ] net/minecraft/entity/EntityAgeable
+[CORE   ] net/minecraft/entity/EntityAreaEffectCloud
+[CORE   ] net/minecraft/entity/EntityBodyHelper
+[CORE   ] net/minecraft/entity/EntityCreature
+[CORE   ] net/minecraft/entity/EntityFlying
+[CORE   ] net/minecraft/entity/EntityHanging
+[CORE   ] net/minecraft/entity/EntityHanging$1
+[CORE   ] net/minecraft/entity/EntityHanging$2
+[CORE   ] net/minecraft/entity/EntityLeashKnot
+[CORE   ] net/minecraft/entity/EntityList
+[CORE   ] net/minecraft/entity/EntityList$EntityEggInfo
+[CORE   ] net/minecraft/entity/EntityLiving
+[CORE   ] net/minecraft/entity/EntityLiving$1
+[CORE   ] net/minecraft/entity/EntityLiving$SpawnPlacementType
+[CORE   ] net/minecraft/entity/EntityLivingBase
+[CORE   ] net/minecraft/entity/EntityLivingBase$1
+[CORE   ] net/minecraft/entity/EntitySpawnPlacementRegistry
+[CORE   ] net/minecraft/entity/EntityTracker
+[CORE   ] net/minecraft/entity/EntityTracker$1
+[CORE   ] net/minecraft/entity/EntityTrackerEntry
+[CORE   ] net/minecraft/entity/EnumCreatureAttribute
+[CORE   ] net/minecraft/entity/EnumCreatureType
+[CORE   ] net/minecraft/entity/IEntityLivingData
+[CORE   ] net/minecraft/entity/IEntityMultiPart
+[CORE   ] net/minecraft/entity/IEntityOwnable
+[CORE   ] net/minecraft/entity/IJumpingMount
+[CORE   ] net/minecraft/entity/IMerchant
+[CORE   ] net/minecraft/entity/INpc
+[CORE   ] net/minecraft/entity/IProjectile
+[CORE   ] net/minecraft/entity/IRangedAttackMob
+[CORE   ] net/minecraft/entity/MultiPartEntityPart
+[CORE   ] net/minecraft/entity/NpcMerchant
+[CORE   ] net/minecraft/entity/SharedMonsterAttributes
+[CORE   ] net/minecraft/entity/boss/EntityDragon
+[CORE   ] net/minecraft/entity/boss/EntityWither
+[CORE   ] net/minecraft/entity/boss/EntityWither$1
+[CORE   ] net/minecraft/entity/boss/EntityWither$AIDoNothing
+[CORE   ] net/minecraft/entity/boss/dragon/phase/IPhase
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseBase
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseChargingPlayer
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseDying
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseHoldingPattern
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseHover
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseLanding
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseLandingApproach
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseList
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseManager
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseSittingAttacking
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseSittingBase
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseSittingFlaming
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseSittingScanning
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseStrafePlayer
+[CORE   ] net/minecraft/entity/boss/dragon/phase/PhaseTakeoff
+[CORE   ] net/minecraft/entity/effect/EntityLightningBolt
+[CORE   ] net/minecraft/entity/effect/EntityWeatherEffect
+[CORE   ] net/minecraft/entity/item/EntityArmorStand
+[CORE   ] net/minecraft/entity/item/EntityArmorStand$1
+[CORE   ] net/minecraft/entity/item/EntityArmorStand$2
+[CORE   ] net/minecraft/entity/item/EntityBoat
+[CORE   ] net/minecraft/entity/item/EntityBoat$1
+[CORE   ] net/minecraft/entity/item/EntityBoat$Status
+[CORE   ] net/minecraft/entity/item/EntityBoat$Type
+[CORE   ] net/minecraft/entity/item/EntityEnderCrystal
+[CORE   ] net/minecraft/entity/item/EntityEnderEye
+[CORE   ] net/minecraft/entity/item/EntityEnderPearl
+[CORE   ] net/minecraft/entity/item/EntityExpBottle
+[CORE   ] net/minecraft/entity/item/EntityFallingBlock
+[CORE   ] net/minecraft/entity/item/EntityFireworkRocket
+[CORE   ] net/minecraft/entity/item/EntityItem
+[CORE   ] net/minecraft/entity/item/EntityItemFrame
+[CORE   ] net/minecraft/entity/item/EntityMinecart
+[CORE   ] net/minecraft/entity/item/EntityMinecart$1
+[CORE   ] net/minecraft/entity/item/EntityMinecart$Type
+[CORE   ] net/minecraft/entity/item/EntityMinecartChest
+[CORE   ] net/minecraft/entity/item/EntityMinecartCommandBlock
+[CORE   ] net/minecraft/entity/item/EntityMinecartCommandBlock$1
+[CORE   ] net/minecraft/entity/item/EntityMinecartCommandBlock$2
+[CORE   ] net/minecraft/entity/item/EntityMinecartContainer
+[CORE   ] net/minecraft/entity/item/EntityMinecartEmpty
+[CORE   ] net/minecraft/entity/item/EntityMinecartFurnace
+[CORE   ] net/minecraft/entity/item/EntityMinecartHopper
+[CORE   ] net/minecraft/entity/item/EntityMinecartMobSpawner
+[CORE   ] net/minecraft/entity/item/EntityMinecartMobSpawner$1
+[CORE   ] net/minecraft/entity/item/EntityMinecartMobSpawner$2
+[CORE   ] net/minecraft/entity/item/EntityMinecartTNT
+[CORE   ] net/minecraft/entity/item/EntityPainting
+[CORE   ] net/minecraft/entity/item/EntityPainting$EnumArt
+[CORE   ] net/minecraft/entity/item/EntityTNTPrimed
+[CORE   ] net/minecraft/entity/item/EntityXPOrb
+[CORE   ] net/minecraft/entity/monster/AbstractIllager
+[CORE   ] net/minecraft/entity/monster/AbstractIllager$IllagerArmPose
+[CORE   ] net/minecraft/entity/monster/AbstractSkeleton
+[CORE   ] net/minecraft/entity/monster/AbstractSkeleton$1
+[CORE   ] net/minecraft/entity/monster/EntityBlaze
+[CORE   ] net/minecraft/entity/monster/EntityBlaze$AIFireballAttack
+[CORE   ] net/minecraft/entity/monster/EntityCaveSpider
+[CORE   ] net/minecraft/entity/monster/EntityCreeper
+[CORE   ] net/minecraft/entity/monster/EntityElderGuardian
+[CORE   ] net/minecraft/entity/monster/EntityElderGuardian$1
+[CORE   ] net/minecraft/entity/monster/EntityEnderman
+[CORE   ] net/minecraft/entity/monster/EntityEnderman$1
+[CORE   ] net/minecraft/entity/monster/EntityEnderman$AIFindPlayer
+[CORE   ] net/minecraft/entity/monster/EntityEnderman$AIFindPlayer$1
+[CORE   ] net/minecraft/entity/monster/EntityEnderman$AIPlaceBlock
+[CORE   ] net/minecraft/entity/monster/EntityEnderman$AITakeBlock
+[CORE   ] net/minecraft/entity/monster/EntityEndermite
+[CORE   ] net/minecraft/entity/monster/EntityEvoker
+[CORE   ] net/minecraft/entity/monster/EntityEvoker$1
+[CORE   ] net/minecraft/entity/monster/EntityEvoker$AIAttackSpell
+[CORE   ] net/minecraft/entity/monster/EntityEvoker$AICastingSpell
+[CORE   ] net/minecraft/entity/monster/EntityEvoker$AISummonSpell
+[CORE   ] net/minecraft/entity/monster/EntityEvoker$AIWololoSpell
+[CORE   ] net/minecraft/entity/monster/EntityEvoker$AIWololoSpell$1
+[CORE   ] net/minecraft/entity/monster/EntityGhast
+[CORE   ] net/minecraft/entity/monster/EntityGhast$AIFireballAttack
+[CORE   ] net/minecraft/entity/monster/EntityGhast$AILookAround
+[CORE   ] net/minecraft/entity/monster/EntityGhast$AIRandomFly
+[CORE   ] net/minecraft/entity/monster/EntityGhast$GhastMoveHelper
+[CORE   ] net/minecraft/entity/monster/EntityGiantZombie
+[CORE   ] net/minecraft/entity/monster/EntityGolem
+[CORE   ] net/minecraft/entity/monster/EntityGuardian
+[CORE   ] net/minecraft/entity/monster/EntityGuardian$AIGuardianAttack
+[CORE   ] net/minecraft/entity/monster/EntityGuardian$GuardianMoveHelper
+[CORE   ] net/minecraft/entity/monster/EntityGuardian$GuardianTargetSelector
+[CORE   ] net/minecraft/entity/monster/EntityHusk
+[CORE   ] net/minecraft/entity/monster/EntityIllusionIllager
+[CORE   ] net/minecraft/entity/monster/EntityIllusionIllager$1
+[CORE   ] net/minecraft/entity/monster/EntityIllusionIllager$AIBlindnessSpell
+[CORE   ] net/minecraft/entity/monster/EntityIllusionIllager$AIMirriorSpell
+[CORE   ] net/minecraft/entity/monster/EntityIronGolem
+[CORE   ] net/minecraft/entity/monster/EntityIronGolem$1
+[CORE   ] net/minecraft/entity/monster/EntityMagmaCube
+[CORE   ] net/minecraft/entity/monster/EntityMob
+[CORE   ] net/minecraft/entity/monster/EntityPigZombie
+[CORE   ] net/minecraft/entity/monster/EntityPigZombie$AIHurtByAggressor
+[CORE   ] net/minecraft/entity/monster/EntityPigZombie$AITargetAggressor
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear$1
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear$AIAttackPlayer
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear$AIHurtByTarget
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear$AIMeleeAttack
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear$AIPanic
+[CORE   ] net/minecraft/entity/monster/EntityPolarBear$GroupData
+[CORE   ] net/minecraft/entity/monster/EntityShulker
+[CORE   ] net/minecraft/entity/monster/EntityShulker$1
+[CORE   ] net/minecraft/entity/monster/EntityShulker$AIAttack
+[CORE   ] net/minecraft/entity/monster/EntityShulker$AIAttackNearest
+[CORE   ] net/minecraft/entity/monster/EntityShulker$AIDefenseAttack
+[CORE   ] net/minecraft/entity/monster/EntityShulker$AIDefenseAttack$1
+[CORE   ] net/minecraft/entity/monster/EntityShulker$AIPeek
+[CORE   ] net/minecraft/entity/monster/EntityShulker$BodyHelper
+[CORE   ] net/minecraft/entity/monster/EntitySilverfish
+[CORE   ] net/minecraft/entity/monster/EntitySilverfish$AIHideInStone
+[CORE   ] net/minecraft/entity/monster/EntitySilverfish$AISummonSilverfish
+[CORE   ] net/minecraft/entity/monster/EntitySkeleton
+[CORE   ] net/minecraft/entity/monster/EntitySlime
+[CORE   ] net/minecraft/entity/monster/EntitySlime$AISlimeAttack
+[CORE   ] net/minecraft/entity/monster/EntitySlime$AISlimeFaceRandom
+[CORE   ] net/minecraft/entity/monster/EntitySlime$AISlimeFloat
+[CORE   ] net/minecraft/entity/monster/EntitySlime$AISlimeHop
+[CORE   ] net/minecraft/entity/monster/EntitySlime$SlimeMoveHelper
+[CORE   ] net/minecraft/entity/monster/EntitySnowman
+[CORE   ] net/minecraft/entity/monster/EntitySpellcasterIllager
+[CORE   ] net/minecraft/entity/monster/EntitySpellcasterIllager$AICastingApell
+[CORE   ] net/minecraft/entity/monster/EntitySpellcasterIllager$AIUseSpell
+[CORE   ] net/minecraft/entity/monster/EntitySpellcasterIllager$SpellType
+[CORE   ] net/minecraft/entity/monster/EntitySpider
+[CORE   ] net/minecraft/entity/monster/EntitySpider$AISpiderAttack
+[CORE   ] net/minecraft/entity/monster/EntitySpider$AISpiderTarget
+[CORE   ] net/minecraft/entity/monster/EntitySpider$GroupData
+[CORE   ] net/minecraft/entity/monster/EntityStray
+[CORE   ] net/minecraft/entity/monster/EntityVex
+[CORE   ] net/minecraft/entity/monster/EntityVex$AIChargeAttack
+[CORE   ] net/minecraft/entity/monster/EntityVex$AICopyOwnerTarget
+[CORE   ] net/minecraft/entity/monster/EntityVex$AIMoveControl
+[CORE   ] net/minecraft/entity/monster/EntityVex$AIMoveRandom
+[CORE   ] net/minecraft/entity/monster/EntityVindicator
+[CORE   ] net/minecraft/entity/monster/EntityVindicator$1
+[CORE   ] net/minecraft/entity/monster/EntityVindicator$AIJohnnyAttack
+[CORE   ] net/minecraft/entity/monster/EntityWitch
+[CORE   ] net/minecraft/entity/monster/EntityWitherSkeleton
+[CORE   ] net/minecraft/entity/monster/EntityZombie
+[CORE   ] net/minecraft/entity/monster/EntityZombie$1
+[CORE   ] net/minecraft/entity/monster/EntityZombie$GroupData
+[CORE   ] net/minecraft/entity/monster/EntityZombieVillager
+[CORE   ] net/minecraft/entity/monster/IMob
+[CORE   ] net/minecraft/entity/monster/IMob$1
+[CORE   ] net/minecraft/entity/monster/IMob$2
+[CORE   ] net/minecraft/entity/passive/AbstractChestHorse
+[CORE   ] net/minecraft/entity/passive/AbstractHorse
+[CORE   ] net/minecraft/entity/passive/AbstractHorse$1
+[CORE   ] net/minecraft/entity/passive/EntityAmbientCreature
+[CORE   ] net/minecraft/entity/passive/EntityAnimal
+[CORE   ] net/minecraft/entity/passive/EntityBat
+[CORE   ] net/minecraft/entity/passive/EntityChicken
+[CORE   ] net/minecraft/entity/passive/EntityCow
+[CORE   ] net/minecraft/entity/passive/EntityDonkey
+[CORE   ] net/minecraft/entity/passive/EntityFlying
+[CORE   ] net/minecraft/entity/passive/EntityHorse
+[CORE   ] net/minecraft/entity/passive/EntityHorse$GroupData
+[CORE   ] net/minecraft/entity/passive/EntityLlama
+[CORE   ] net/minecraft/entity/passive/EntityLlama$1
+[CORE   ] net/minecraft/entity/passive/EntityLlama$AIDefendTarget
+[CORE   ] net/minecraft/entity/passive/EntityLlama$AIHurtByTarget
+[CORE   ] net/minecraft/entity/passive/EntityLlama$GroupData
+[CORE   ] net/minecraft/entity/passive/EntityMooshroom
+[CORE   ] net/minecraft/entity/passive/EntityMule
+[CORE   ] net/minecraft/entity/passive/EntityOcelot
+[CORE   ] net/minecraft/entity/passive/EntityParrot
+[CORE   ] net/minecraft/entity/passive/EntityParrot$1
+[CORE   ] net/minecraft/entity/passive/EntityPig
+[CORE   ] net/minecraft/entity/passive/EntityRabbit
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$AIAvoidEntity
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$AIEvilAttack
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$AIPanic
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$AIRaidFarm
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$RabbitJumpHelper
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$RabbitMoveHelper
+[CORE   ] net/minecraft/entity/passive/EntityRabbit$RabbitTypeData
+[CORE   ] net/minecraft/entity/passive/EntitySheep
+[CORE   ] net/minecraft/entity/passive/EntitySheep$1
+[CORE   ] net/minecraft/entity/passive/EntitySheep$2
+[CORE   ] net/minecraft/entity/passive/EntityShoulderRiding
+[CORE   ] net/minecraft/entity/passive/EntitySkeletonHorse
+[CORE   ] net/minecraft/entity/passive/EntitySquid
+[CORE   ] net/minecraft/entity/passive/EntitySquid$AIMoveRandom
+[CORE   ] net/minecraft/entity/passive/EntityTameable
+[CORE   ] net/minecraft/entity/passive/EntityVillager
+[CORE   ] net/minecraft/entity/passive/EntityVillager$1
+[CORE   ] net/minecraft/entity/passive/EntityVillager$EmeraldForItems
+[CORE   ] net/minecraft/entity/passive/EntityVillager$ITradeList
+[CORE   ] net/minecraft/entity/passive/EntityVillager$ItemAndEmeraldToItem
+[CORE   ] net/minecraft/entity/passive/EntityVillager$ListEnchantedBookForEmeralds
+[CORE   ] net/minecraft/entity/passive/EntityVillager$ListEnchantedItemForEmeralds
+[CORE   ] net/minecraft/entity/passive/EntityVillager$ListItemForEmeralds
+[CORE   ] net/minecraft/entity/passive/EntityVillager$PriceInfo
+[CORE   ] net/minecraft/entity/passive/EntityVillager$TreasureMapForEmeralds
+[CORE   ] net/minecraft/entity/passive/EntityWaterMob
+[CORE   ] net/minecraft/entity/passive/EntityWolf
+[CORE   ] net/minecraft/entity/passive/EntityWolf$1
+[CORE   ] net/minecraft/entity/passive/EntityWolf$AIAvoidEntity
+[CORE   ] net/minecraft/entity/passive/EntityZombieHorse
+[CORE   ] net/minecraft/entity/passive/HorseArmorType
+[CORE   ] net/minecraft/entity/passive/IAnimals
+[CORE   ] net/minecraft/entity/player/EntityPlayer
+[CORE   ] net/minecraft/entity/player/EntityPlayer$1
+[CORE   ] net/minecraft/entity/player/EntityPlayer$2
+[CORE   ] net/minecraft/entity/player/EntityPlayer$EnumChatVisibility
+[CORE   ] net/minecraft/entity/player/EntityPlayer$SleepEnemyPredicate
+[CORE   ] net/minecraft/entity/player/EntityPlayer$SleepResult
+[CORE   ] net/minecraft/entity/player/EntityPlayerMP
+[CORE   ] net/minecraft/entity/player/EntityPlayerMP$1
+[CORE   ] net/minecraft/entity/player/EnumPlayerModelParts
+[CORE   ] net/minecraft/entity/player/InventoryPlayer
+[CORE   ] net/minecraft/entity/player/InventoryPlayer$1
+[CORE   ] net/minecraft/entity/player/PlayerCapabilities
+[CORE   ] net/minecraft/entity/projectile/EntityArrow
+[CORE   ] net/minecraft/entity/projectile/EntityArrow$1
+[CORE   ] net/minecraft/entity/projectile/EntityArrow$PickupStatus
+[CORE   ] net/minecraft/entity/projectile/EntityDragonFireball
+[CORE   ] net/minecraft/entity/projectile/EntityEgg
+[CORE   ] net/minecraft/entity/projectile/EntityEvokerFangs
+[CORE   ] net/minecraft/entity/projectile/EntityFireball
+[CORE   ] net/minecraft/entity/projectile/EntityFishHook
+[CORE   ] net/minecraft/entity/projectile/EntityFishHook$State
+[CORE   ] net/minecraft/entity/projectile/EntityLargeFireball
+[CORE   ] net/minecraft/entity/projectile/EntityLlamaSpit
+[CORE   ] net/minecraft/entity/projectile/EntityPotion
+[CORE   ] net/minecraft/entity/projectile/EntityPotion$1
+[CORE   ] net/minecraft/entity/projectile/EntityShulkerBullet
+[CORE   ] net/minecraft/entity/projectile/EntitySmallFireball
+[CORE   ] net/minecraft/entity/projectile/EntitySnowball
+[CORE   ] net/minecraft/entity/projectile/EntitySpectralArrow
+[CORE   ] net/minecraft/entity/projectile/EntityThrowable
+[CORE   ] net/minecraft/entity/projectile/EntityTippedArrow
+[CORE   ] net/minecraft/entity/projectile/EntityWitherSkull
+[CORE   ] net/minecraft/entity/projectile/ProjectileHelper
+
+===== FLUID =====
+[CORE   ] net/minecraft/block/BlockDynamicLiquid
+[CORE   ] net/minecraft/block/BlockLiquid
+[CORE   ] net/minecraft/block/BlockStaticLiquid
+[CORE   ] net/minecraft/block/material/EnumPushReaction
+[CORE   ] net/minecraft/block/material/MapColor
+[CORE   ] net/minecraft/block/material/Material
+[CORE   ] net/minecraft/block/material/Material$1
+[CORE   ] net/minecraft/block/material/MaterialLiquid
+[CORE   ] net/minecraft/block/material/MaterialLogic
+[CORE   ] net/minecraft/block/material/MaterialPortal
+[CORE   ] net/minecraft/block/material/MaterialTransparent
+
+===== INVENTORY =====
+[CORE   ] net/minecraft/inventory/ClickType
+[CORE   ] net/minecraft/inventory/Container
+[CORE   ] net/minecraft/inventory/ContainerBeacon
+[CORE   ] net/minecraft/inventory/ContainerBeacon$BeaconSlot
+[CORE   ] net/minecraft/inventory/ContainerBrewingStand
+[CORE   ] net/minecraft/inventory/ContainerBrewingStand$Fuel
+[CORE   ] net/minecraft/inventory/ContainerBrewingStand$Ingredient
+[CORE   ] net/minecraft/inventory/ContainerBrewingStand$Potion
+[CORE   ] net/minecraft/inventory/ContainerChest
+[CORE   ] net/minecraft/inventory/ContainerDispenser
+[CORE   ] net/minecraft/inventory/ContainerEnchantment
+[CORE   ] net/minecraft/inventory/ContainerEnchantment$1
+[CORE   ] net/minecraft/inventory/ContainerEnchantment$2
+[CORE   ] net/minecraft/inventory/ContainerEnchantment$3
+[CORE   ] net/minecraft/inventory/ContainerFurnace
+[CORE   ] net/minecraft/inventory/ContainerHopper
+[CORE   ] net/minecraft/inventory/ContainerHorseChest
+[CORE   ] net/minecraft/inventory/ContainerHorseInventory
+[CORE   ] net/minecraft/inventory/ContainerHorseInventory$1
+[CORE   ] net/minecraft/inventory/ContainerHorseInventory$2
+[CORE   ] net/minecraft/inventory/ContainerMerchant
+[CORE   ] net/minecraft/inventory/ContainerPlayer
+[CORE   ] net/minecraft/inventory/ContainerPlayer$1
+[CORE   ] net/minecraft/inventory/ContainerPlayer$2
+[CORE   ] net/minecraft/inventory/ContainerRepair
+[CORE   ] net/minecraft/inventory/ContainerRepair$1
+[CORE   ] net/minecraft/inventory/ContainerRepair$2
+[CORE   ] net/minecraft/inventory/ContainerRepair$3
+[CORE   ] net/minecraft/inventory/ContainerShulkerBox
+[CORE   ] net/minecraft/inventory/ContainerWorkbench
+[CORE   ] net/minecraft/inventory/EntityEquipmentSlot
+[CORE   ] net/minecraft/inventory/EntityEquipmentSlot$Type
+[CORE   ] net/minecraft/inventory/IContainerListener
+[CORE   ] net/minecraft/inventory/IInventory
+[CORE   ] net/minecraft/inventory/IInventoryChangedListener
+[CORE   ] net/minecraft/inventory/ISidedInventory
+[CORE   ] net/minecraft/inventory/InventoryBasic
+[CORE   ] net/minecraft/inventory/InventoryCraftResult
+[CORE   ] net/minecraft/inventory/InventoryCrafting
+[CORE   ] net/minecraft/inventory/InventoryEnderChest
+[CORE   ] net/minecraft/inventory/InventoryHelper
+[CORE   ] net/minecraft/inventory/InventoryLargeChest
+[CORE   ] net/minecraft/inventory/InventoryMerchant
+[CORE   ] net/minecraft/inventory/ItemStackHelper
+[CORE   ] net/minecraft/inventory/Slot
+[CORE   ] net/minecraft/inventory/SlotCrafting
+[CORE   ] net/minecraft/inventory/SlotFurnaceFuel
+[CORE   ] net/minecraft/inventory/SlotFurnaceOutput
+[CORE   ] net/minecraft/inventory/SlotMerchantResult
+[CORE   ] net/minecraft/inventory/SlotShulkerBox
+[CORE   ] net/minecraft/tileentity/TileEntityChest
+[CORE   ] net/minecraft/tileentity/TileEntityChest$1
+[CORE   ] net/minecraft/tileentity/TileEntityFurnace
+[CORE   ] net/minecraft/tileentity/TileEntityHopper
+
+===== ITEM =====
+[CORE   ] net/minecraft/item/EnumAction
+[CORE   ] net/minecraft/item/EnumDyeColor
+[CORE   ] net/minecraft/item/EnumRarity
+[CORE   ] net/minecraft/item/IItemPropertyGetter
+[CORE   ] net/minecraft/item/Item
+[CORE   ] net/minecraft/item/Item$1
+[CORE   ] net/minecraft/item/Item$10
+[CORE   ] net/minecraft/item/Item$11
+[CORE   ] net/minecraft/item/Item$12
+[CORE   ] net/minecraft/item/Item$13
+[CORE   ] net/minecraft/item/Item$14
+[CORE   ] net/minecraft/item/Item$15
+[CORE   ] net/minecraft/item/Item$16
+[CORE   ] net/minecraft/item/Item$17
+[CORE   ] net/minecraft/item/Item$18
+[CORE   ] net/minecraft/item/Item$19
+[CORE   ] net/minecraft/item/Item$2
+[CORE   ] net/minecraft/item/Item$20
+[CORE   ] net/minecraft/item/Item$21
+[CORE   ] net/minecraft/item/Item$3
+[CORE   ] net/minecraft/item/Item$4
+[CORE   ] net/minecraft/item/Item$5
+[CORE   ] net/minecraft/item/Item$6
+[CORE   ] net/minecraft/item/Item$7
+[CORE   ] net/minecraft/item/Item$8
+[CORE   ] net/minecraft/item/Item$9
+[CORE   ] net/minecraft/item/Item$ToolMaterial
+[CORE   ] net/minecraft/item/ItemAir
+[CORE   ] net/minecraft/item/ItemAnvilBlock
+[CORE   ] net/minecraft/item/ItemAppleGold
+[CORE   ] net/minecraft/item/ItemArmor
+[CORE   ] net/minecraft/item/ItemArmor$1
+[CORE   ] net/minecraft/item/ItemArmor$ArmorMaterial
+[CORE   ] net/minecraft/item/ItemArmorStand
+[CORE   ] net/minecraft/item/ItemArrow
+[CORE   ] net/minecraft/item/ItemAxe
+[CORE   ] net/minecraft/item/ItemBanner
+[CORE   ] net/minecraft/item/ItemBed
+[CORE   ] net/minecraft/item/ItemBlock
+[CORE   ] net/minecraft/item/ItemBlockSpecial
+[CORE   ] net/minecraft/item/ItemBoat
+[CORE   ] net/minecraft/item/ItemBook
+[CORE   ] net/minecraft/item/ItemBow
+[CORE   ] net/minecraft/item/ItemBow$1
+[CORE   ] net/minecraft/item/ItemBow$2
+[CORE   ] net/minecraft/item/ItemBucket
+[CORE   ] net/minecraft/item/ItemBucketMilk
+[CORE   ] net/minecraft/item/ItemCarrotOnAStick
+[CORE   ] net/minecraft/item/ItemChorusFruit
+[CORE   ] net/minecraft/item/ItemClock
+[CORE   ] net/minecraft/item/ItemClock$1
+[CORE   ] net/minecraft/item/ItemCloth
+[CORE   ] net/minecraft/item/ItemCoal
+[CORE   ] net/minecraft/item/ItemColored
+[CORE   ] net/minecraft/item/ItemCompass
+[CORE   ] net/minecraft/item/ItemCompass$1
+[CORE   ] net/minecraft/item/ItemDoor
+[CORE   ] net/minecraft/item/ItemDye
+[CORE   ] net/minecraft/item/ItemEgg
+[CORE   ] net/minecraft/item/ItemElytra
+[CORE   ] net/minecraft/item/ItemElytra$1
+[CORE   ] net/minecraft/item/ItemEmptyMap
+[CORE   ] net/minecraft/item/ItemEnchantedBook
+[CORE   ] net/minecraft/item/ItemEndCrystal
+[CORE   ] net/minecraft/item/ItemEnderEye
+[CORE   ] net/minecraft/item/ItemEnderPearl
+[CORE   ] net/minecraft/item/ItemExpBottle
+[CORE   ] net/minecraft/item/ItemFireball
+[CORE   ] net/minecraft/item/ItemFirework
+[CORE   ] net/minecraft/item/ItemFireworkCharge
+[CORE   ] net/minecraft/item/ItemFishFood
+[CORE   ] net/minecraft/item/ItemFishFood$FishType
+[CORE   ] net/minecraft/item/ItemFishingRod
+[CORE   ] net/minecraft/item/ItemFishingRod$1
+[CORE   ] net/minecraft/item/ItemFlintAndSteel
+[CORE   ] net/minecraft/item/ItemFood
+[CORE   ] net/minecraft/item/ItemGlassBottle
+[CORE   ] net/minecraft/item/ItemGlassBottle$1
+[CORE   ] net/minecraft/item/ItemHangingEntity
+[CORE   ] net/minecraft/item/ItemHoe
+[CORE   ] net/minecraft/item/ItemHoe$1
+[CORE   ] net/minecraft/item/ItemKnowledgeBook
+[CORE   ] net/minecraft/item/ItemLead
+[CORE   ] net/minecraft/item/ItemLeaves
+[CORE   ] net/minecraft/item/ItemLilyPad
+[CORE   ] net/minecraft/item/ItemLingeringPotion
+[CORE   ] net/minecraft/item/ItemMap
+[CORE   ] net/minecraft/item/ItemMapBase
+[CORE   ] net/minecraft/item/ItemMinecart
+[CORE   ] net/minecraft/item/ItemMinecart$1
+[CORE   ] net/minecraft/item/ItemMonsterPlacer
+[CORE   ] net/minecraft/item/ItemMultiTexture
+[CORE   ] net/minecraft/item/ItemMultiTexture$1
+[CORE   ] net/minecraft/item/ItemMultiTexture$Mapper
+[CORE   ] net/minecraft/item/ItemNameTag
+[CORE   ] net/minecraft/item/ItemPickaxe
+[CORE   ] net/minecraft/item/ItemPiston
+[CORE   ] net/minecraft/item/ItemPotion
+[CORE   ] net/minecraft/item/ItemRecord
+[CORE   ] net/minecraft/item/ItemRedstone
+[CORE   ] net/minecraft/item/ItemSaddle
+[CORE   ] net/minecraft/item/ItemSeedFood
+[CORE   ] net/minecraft/item/ItemSeeds
+[CORE   ] net/minecraft/item/ItemShears
+[CORE   ] net/minecraft/item/ItemShield
+[CORE   ] net/minecraft/item/ItemShield$1
+[CORE   ] net/minecraft/item/ItemShulkerBox
+[CORE   ] net/minecraft/item/ItemSign
+[CORE   ] net/minecraft/item/ItemSimpleFoiled
+[CORE   ] net/minecraft/item/ItemSkull
+[CORE   ] net/minecraft/item/ItemSlab
+[CORE   ] net/minecraft/item/ItemSnow
+[CORE   ] net/minecraft/item/ItemSnowball
+[CORE   ] net/minecraft/item/ItemSoup
+[CORE   ] net/minecraft/item/ItemSpade
+[CORE   ] net/minecraft/item/ItemSpectralArrow
+[CORE   ] net/minecraft/item/ItemSplashPotion
+[CORE   ] net/minecraft/item/ItemStack
+[CORE   ] net/minecraft/item/ItemSword
+[CORE   ] net/minecraft/item/ItemTippedArrow
+[CORE   ] net/minecraft/item/ItemTool
+[CORE   ] net/minecraft/item/ItemWritableBook
+[CORE   ] net/minecraft/item/ItemWrittenBook
+[CORE   ] net/minecraft/item/crafting/CraftingManager
+[CORE   ] net/minecraft/item/crafting/FurnaceRecipes
+[CORE   ] net/minecraft/item/crafting/IRecipe
+[CORE   ] net/minecraft/item/crafting/Ingredient
+[CORE   ] net/minecraft/item/crafting/Ingredient$1
+[CORE   ] net/minecraft/item/crafting/RecipeBookCloning
+[CORE   ] net/minecraft/item/crafting/RecipeFireworks
+[CORE   ] net/minecraft/item/crafting/RecipeRepairItem
+[CORE   ] net/minecraft/item/crafting/RecipeTippedArrow
+[CORE   ] net/minecraft/item/crafting/RecipesArmorDyes
+[CORE   ] net/minecraft/item/crafting/RecipesBanners
+[CORE   ] net/minecraft/item/crafting/RecipesBanners$RecipeAddPattern
+[CORE   ] net/minecraft/item/crafting/RecipesBanners$RecipeDuplicatePattern
+[CORE   ] net/minecraft/item/crafting/RecipesMapCloning
+[CORE   ] net/minecraft/item/crafting/RecipesMapExtending
+[CORE   ] net/minecraft/item/crafting/ShapedRecipes
+[CORE   ] net/minecraft/item/crafting/ShapelessRecipes
+[CORE   ] net/minecraft/item/crafting/ShieldRecipes
+[CORE   ] net/minecraft/item/crafting/ShieldRecipes$Decoration
+[CORE   ] net/minecraft/item/crafting/ShulkerBoxRecipes
+[CORE   ] net/minecraft/item/crafting/ShulkerBoxRecipes$ShulkerBoxColoring
+
+===== LIGHTING =====
+[CORE   ] net/minecraft/block/BlockGlass
+[CORE   ] net/minecraft/block/BlockGlowstone
+[CORE   ] net/minecraft/block/BlockStainedGlass
+[CORE   ] net/minecraft/block/BlockStainedGlassPane
+[CORE   ] net/minecraft/block/BlockStainedGlassPane$1
+[CORE   ] net/minecraft/block/BlockTorch
+[CORE   ] net/minecraft/block/BlockTorch$1
+[CORE   ] net/minecraft/block/BlockTorch$2
+[CORE   ] net/minecraft/world/EnumSkyBlock
+[CORE   ] net/minecraft/world/World$1
+[CORE   ] net/minecraft/world/World$2
+[CORE   ] net/minecraft/world/World$3
+[CORE   ] net/minecraft/world/World$4
+[CORE   ] net/minecraft/world/World$5
+
+===== MOB_AI =====
+[CORE   ] net/minecraft/entity/ai/EntityAIAttackMelee
+[CORE   ] net/minecraft/entity/ai/EntityAIAttackRanged
+[CORE   ] net/minecraft/entity/ai/EntityAIAttackRangedBow
+[CORE   ] net/minecraft/entity/ai/EntityAIAvoidEntity
+[CORE   ] net/minecraft/entity/ai/EntityAIAvoidEntity$1
+[CORE   ] net/minecraft/entity/ai/EntityAIBase
+[CORE   ] net/minecraft/entity/ai/EntityAIBeg
+[CORE   ] net/minecraft/entity/ai/EntityAIBreakDoor
+[CORE   ] net/minecraft/entity/ai/EntityAICreeperSwell
+[CORE   ] net/minecraft/entity/ai/EntityAIDefendVillage
+[CORE   ] net/minecraft/entity/ai/EntityAIDoorInteract
+[CORE   ] net/minecraft/entity/ai/EntityAIEatGrass
+[CORE   ] net/minecraft/entity/ai/EntityAIFindEntityNearest
+[CORE   ] net/minecraft/entity/ai/EntityAIFindEntityNearest$1
+[CORE   ] net/minecraft/entity/ai/EntityAIFindEntityNearestPlayer
+[CORE   ] net/minecraft/entity/ai/EntityAIFindEntityNearestPlayer$1
+[CORE   ] net/minecraft/entity/ai/EntityAIFleeSun
+[CORE   ] net/minecraft/entity/ai/EntityAIFollow
+[CORE   ] net/minecraft/entity/ai/EntityAIFollow$1
+[CORE   ] net/minecraft/entity/ai/EntityAIFollowGolem
+[CORE   ] net/minecraft/entity/ai/EntityAIFollowOwner
+[CORE   ] net/minecraft/entity/ai/EntityAIFollowOwnerFlying
+[CORE   ] net/minecraft/entity/ai/EntityAIFollowParent
+[CORE   ] net/minecraft/entity/ai/EntityAIHarvestFarmland
+[CORE   ] net/minecraft/entity/ai/EntityAIHurtByTarget
+[CORE   ] net/minecraft/entity/ai/EntityAILandOnOwnersShoulder
+[CORE   ] net/minecraft/entity/ai/EntityAILeapAtTarget
+[CORE   ] net/minecraft/entity/ai/EntityAILlamaFollowCaravan
+[CORE   ] net/minecraft/entity/ai/EntityAILookAtTradePlayer
+[CORE   ] net/minecraft/entity/ai/EntityAILookAtVillager
+[CORE   ] net/minecraft/entity/ai/EntityAILookIdle
+[CORE   ] net/minecraft/entity/ai/EntityAIMate
+[CORE   ] net/minecraft/entity/ai/EntityAIMoveIndoors
+[CORE   ] net/minecraft/entity/ai/EntityAIMoveThroughVillage
+[CORE   ] net/minecraft/entity/ai/EntityAIMoveToBlock
+[CORE   ] net/minecraft/entity/ai/EntityAIMoveTowardsRestriction
+[CORE   ] net/minecraft/entity/ai/EntityAIMoveTowardsTarget
+[CORE   ] net/minecraft/entity/ai/EntityAINearestAttackableTarget
+[CORE   ] net/minecraft/entity/ai/EntityAINearestAttackableTarget$1
+[CORE   ] net/minecraft/entity/ai/EntityAINearestAttackableTarget$2
+[CORE   ] net/minecraft/entity/ai/EntityAINearestAttackableTarget$Sorter
+[CORE   ] net/minecraft/entity/ai/EntityAIOcelotAttack
+[CORE   ] net/minecraft/entity/ai/EntityAIOcelotSit
+[CORE   ] net/minecraft/entity/ai/EntityAIOpenDoor
+[CORE   ] net/minecraft/entity/ai/EntityAIOwnerHurtByTarget
+[CORE   ] net/minecraft/entity/ai/EntityAIOwnerHurtTarget
+[CORE   ] net/minecraft/entity/ai/EntityAIPanic
+[CORE   ] net/minecraft/entity/ai/EntityAIPlay
+[CORE   ] net/minecraft/entity/ai/EntityAIRestrictOpenDoor
+[CORE   ] net/minecraft/entity/ai/EntityAIRestrictSun
+[CORE   ] net/minecraft/entity/ai/EntityAIRunAroundLikeCrazy
+[CORE   ] net/minecraft/entity/ai/EntityAISit
+[CORE   ] net/minecraft/entity/ai/EntityAISkeletonRiders
+[CORE   ] net/minecraft/entity/ai/EntityAISwimming
+[CORE   ] net/minecraft/entity/ai/EntityAITarget
+[CORE   ] net/minecraft/entity/ai/EntityAITargetNonTamed
+[CORE   ] net/minecraft/entity/ai/EntityAITasks
+[CORE   ] net/minecraft/entity/ai/EntityAITasks$EntityAITaskEntry
+[CORE   ] net/minecraft/entity/ai/EntityAITempt
+[CORE   ] net/minecraft/entity/ai/EntityAITradePlayer
+[CORE   ] net/minecraft/entity/ai/EntityAIVillagerInteract
+[CORE   ] net/minecraft/entity/ai/EntityAIVillagerMate
+[CORE   ] net/minecraft/entity/ai/EntityAIWander
+[CORE   ] net/minecraft/entity/ai/EntityAIWanderAvoidWater
+[CORE   ] net/minecraft/entity/ai/EntityAIWanderAvoidWaterFlying
+[CORE   ] net/minecraft/entity/ai/EntityAIWatchClosest
+[CORE   ] net/minecraft/entity/ai/EntityAIWatchClosest2
+[CORE   ] net/minecraft/entity/ai/EntityAIZombieAttack
+[CORE   ] net/minecraft/entity/ai/EntityFlyHelper
+[CORE   ] net/minecraft/entity/ai/EntityJumpHelper
+[CORE   ] net/minecraft/entity/ai/EntityLookHelper
+[CORE   ] net/minecraft/entity/ai/EntityMoveHelper
+[CORE   ] net/minecraft/entity/ai/EntityMoveHelper$Action
+[CORE   ] net/minecraft/entity/ai/EntitySenses
+[CORE   ] net/minecraft/entity/ai/RandomPositionGenerator
+[CORE   ] net/minecraft/entity/ai/attributes/AbstractAttributeMap
+[CORE   ] net/minecraft/entity/ai/attributes/AttributeMap
+[CORE   ] net/minecraft/entity/ai/attributes/AttributeModifier
+[CORE   ] net/minecraft/entity/ai/attributes/BaseAttribute
+[CORE   ] net/minecraft/entity/ai/attributes/IAttribute
+[CORE   ] net/minecraft/entity/ai/attributes/IAttributeInstance
+[CORE   ] net/minecraft/entity/ai/attributes/ModifiableAttributeInstance
+[CORE   ] net/minecraft/entity/ai/attributes/RangedAttribute
+[CORE   ] net/minecraft/pathfinding/FlyingNodeProcessor
+[CORE   ] net/minecraft/pathfinding/NodeProcessor
+[CORE   ] net/minecraft/pathfinding/Path
+[CORE   ] net/minecraft/pathfinding/PathFinder
+[CORE   ] net/minecraft/pathfinding/PathHeap
+[CORE   ] net/minecraft/pathfinding/PathNavigate
+[CORE   ] net/minecraft/pathfinding/PathNavigateClimber
+[CORE   ] net/minecraft/pathfinding/PathNavigateFlying
+[CORE   ] net/minecraft/pathfinding/PathNavigateGround
+[CORE   ] net/minecraft/pathfinding/PathNavigateSwimmer
+[CORE   ] net/minecraft/pathfinding/PathNodeType
+[CORE   ] net/minecraft/pathfinding/PathPoint
+[CORE   ] net/minecraft/pathfinding/PathWorldListener
+[CORE   ] net/minecraft/pathfinding/SwimNodeProcessor
+[CORE   ] net/minecraft/pathfinding/WalkNodeProcessor
+
+===== NBT =====
+[CORE   ] net/minecraft/nbt/CompressedStreamTools
+[CORE   ] net/minecraft/nbt/JsonToNBT
+[CORE   ] net/minecraft/nbt/NBTBase
+[CORE   ] net/minecraft/nbt/NBTException
+[CORE   ] net/minecraft/nbt/NBTPrimitive
+[CORE   ] net/minecraft/nbt/NBTSizeTracker
+[CORE   ] net/minecraft/nbt/NBTSizeTracker$1
+[CORE   ] net/minecraft/nbt/NBTTagByte
+[CORE   ] net/minecraft/nbt/NBTTagByteArray
+[CORE   ] net/minecraft/nbt/NBTTagCompound
+[CORE   ] net/minecraft/nbt/NBTTagCompound$1
+[CORE   ] net/minecraft/nbt/NBTTagCompound$2
+[CORE   ] net/minecraft/nbt/NBTTagDouble
+[CORE   ] net/minecraft/nbt/NBTTagEnd
+[CORE   ] net/minecraft/nbt/NBTTagFloat
+[CORE   ] net/minecraft/nbt/NBTTagInt
+[CORE   ] net/minecraft/nbt/NBTTagIntArray
+[CORE   ] net/minecraft/nbt/NBTTagList
+[CORE   ] net/minecraft/nbt/NBTTagLong
+[CORE   ] net/minecraft/nbt/NBTTagLongArray
+[CORE   ] net/minecraft/nbt/NBTTagShort
+[CORE   ] net/minecraft/nbt/NBTTagString
+[CORE   ] net/minecraft/nbt/NBTUtil
+
+===== NETWORK =====
+[SUPPORT] net/minecraft/network/EnumConnectionState
+[SUPPORT] net/minecraft/network/EnumConnectionState$1
+[SUPPORT] net/minecraft/network/EnumConnectionState$2
+[SUPPORT] net/minecraft/network/EnumConnectionState$3
+[SUPPORT] net/minecraft/network/EnumConnectionState$4
+[SUPPORT] net/minecraft/network/EnumPacketDirection
+[SUPPORT] net/minecraft/network/INetHandler
+[SUPPORT] net/minecraft/network/LegacyPingHandler
+[SUPPORT] net/minecraft/network/NetHandlerPlayServer
+[SUPPORT] net/minecraft/network/NetHandlerPlayServer$1
+[SUPPORT] net/minecraft/network/NetHandlerPlayServer$2
+[SUPPORT] net/minecraft/network/NetHandlerPlayServer$3
+[SUPPORT] net/minecraft/network/NetHandlerPlayServer$4
+[SUPPORT] net/minecraft/network/NettyCompressionDecoder
+[SUPPORT] net/minecraft/network/NettyCompressionEncoder
+[SUPPORT] net/minecraft/network/NettyEncryptingDecoder
+[SUPPORT] net/minecraft/network/NettyEncryptingEncoder
+[SUPPORT] net/minecraft/network/NettyEncryptionTranslator
+[SUPPORT] net/minecraft/network/NettyPacketDecoder
+[SUPPORT] net/minecraft/network/NettyPacketEncoder
+[SUPPORT] net/minecraft/network/NettyVarint21FrameDecoder
+[SUPPORT] net/minecraft/network/NettyVarint21FrameEncoder
+[SUPPORT] net/minecraft/network/NetworkManager
+[SUPPORT] net/minecraft/network/NetworkManager$1
+[SUPPORT] net/minecraft/network/NetworkManager$2
+[SUPPORT] net/minecraft/network/NetworkManager$3
+[SUPPORT] net/minecraft/network/NetworkManager$4
+[SUPPORT] net/minecraft/network/NetworkManager$5
+[SUPPORT] net/minecraft/network/NetworkManager$6
+[SUPPORT] net/minecraft/network/NetworkManager$InboundHandlerTuplePacketListener
+[SUPPORT] net/minecraft/network/NetworkSystem
+[SUPPORT] net/minecraft/network/NetworkSystem$1
+[SUPPORT] net/minecraft/network/NetworkSystem$2
+[SUPPORT] net/minecraft/network/NetworkSystem$3
+[SUPPORT] net/minecraft/network/NetworkSystem$4
+[SUPPORT] net/minecraft/network/NetworkSystem$5
+[SUPPORT] net/minecraft/network/NetworkSystem$6
+[SUPPORT] net/minecraft/network/NetworkSystem$7
+[SUPPORT] net/minecraft/network/Packet
+[SUPPORT] net/minecraft/network/PacketBuffer
+[SUPPORT] net/minecraft/network/PacketThreadUtil
+[SUPPORT] net/minecraft/network/PacketThreadUtil$1
+[SUPPORT] net/minecraft/network/ServerStatusResponse
+[SUPPORT] net/minecraft/network/ServerStatusResponse$Players
+[SUPPORT] net/minecraft/network/ServerStatusResponse$Players$Serializer
+[SUPPORT] net/minecraft/network/ServerStatusResponse$Serializer
+[SUPPORT] net/minecraft/network/ServerStatusResponse$Version
+[SUPPORT] net/minecraft/network/ServerStatusResponse$Version$Serializer
+[SUPPORT] net/minecraft/network/ThreadQuickExitException
+[SUPPORT] net/minecraft/network/datasync/DataParameter
+[SUPPORT] net/minecraft/network/datasync/DataSerializer
+[SUPPORT] net/minecraft/network/datasync/DataSerializers
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$1
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$10
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$11
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$12
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$13
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$14
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$2
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$3
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$4
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$5
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$6
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$7
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$8
+[SUPPORT] net/minecraft/network/datasync/DataSerializers$9
+[SUPPORT] net/minecraft/network/datasync/EntityDataManager
+[SUPPORT] net/minecraft/network/datasync/EntityDataManager$DataEntry
+[SUPPORT] net/minecraft/network/handshake/INetHandlerHandshakeServer
+[SUPPORT] net/minecraft/network/handshake/client/C00Handshake
+[SUPPORT] net/minecraft/network/login/INetHandlerLoginClient
+[SUPPORT] net/minecraft/network/login/INetHandlerLoginServer
+[SUPPORT] net/minecraft/network/login/client/CPacketEncryptionResponse
+[SUPPORT] net/minecraft/network/login/client/CPacketLoginStart
+[SUPPORT] net/minecraft/network/login/server/SPacketDisconnect
+[SUPPORT] net/minecraft/network/login/server/SPacketEnableCompression
+[SUPPORT] net/minecraft/network/login/server/SPacketEncryptionRequest
+[SUPPORT] net/minecraft/network/login/server/SPacketLoginSuccess
+[SUPPORT] net/minecraft/network/play/INetHandlerPlayClient
+[SUPPORT] net/minecraft/network/play/INetHandlerPlayServer
+[SUPPORT] net/minecraft/network/play/client/CPacketAnimation
+[SUPPORT] net/minecraft/network/play/client/CPacketChatMessage
+[SUPPORT] net/minecraft/network/play/client/CPacketClickWindow
+[SUPPORT] net/minecraft/network/play/client/CPacketClientSettings
+[SUPPORT] net/minecraft/network/play/client/CPacketClientStatus
+[SUPPORT] net/minecraft/network/play/client/CPacketClientStatus$State
+[SUPPORT] net/minecraft/network/play/client/CPacketCloseWindow
+[SUPPORT] net/minecraft/network/play/client/CPacketConfirmTeleport
+[SUPPORT] net/minecraft/network/play/client/CPacketConfirmTransaction
+[SUPPORT] net/minecraft/network/play/client/CPacketCreativeInventoryAction
+[SUPPORT] net/minecraft/network/play/client/CPacketCustomPayload
+[SUPPORT] net/minecraft/network/play/client/CPacketEnchantItem
+[SUPPORT] net/minecraft/network/play/client/CPacketEntityAction
+[SUPPORT] net/minecraft/network/play/client/CPacketEntityAction$Action
+[SUPPORT] net/minecraft/network/play/client/CPacketHeldItemChange
+[SUPPORT] net/minecraft/network/play/client/CPacketInput
+[SUPPORT] net/minecraft/network/play/client/CPacketKeepAlive
+[SUPPORT] net/minecraft/network/play/client/CPacketPlaceRecipe
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayer
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayer$Position
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayer$PositionRotation
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayer$Rotation
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayerAbilities
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayerDigging
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayerDigging$Action
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayerTryUseItem
+[SUPPORT] net/minecraft/network/play/client/CPacketPlayerTryUseItemOnBlock
+[SUPPORT] net/minecraft/network/play/client/CPacketRecipeInfo
+[SUPPORT] net/minecraft/network/play/client/CPacketRecipeInfo$Purpose
+[SUPPORT] net/minecraft/network/play/client/CPacketResourcePackStatus
+[SUPPORT] net/minecraft/network/play/client/CPacketResourcePackStatus$Action
+[SUPPORT] net/minecraft/network/play/client/CPacketSeenAdvancements
+[SUPPORT] net/minecraft/network/play/client/CPacketSeenAdvancements$Action
+[SUPPORT] net/minecraft/network/play/client/CPacketSpectate
+[SUPPORT] net/minecraft/network/play/client/CPacketSteerBoat
+[SUPPORT] net/minecraft/network/play/client/CPacketTabComplete
+[SUPPORT] net/minecraft/network/play/client/CPacketUpdateSign
+[SUPPORT] net/minecraft/network/play/client/CPacketUseEntity
+[SUPPORT] net/minecraft/network/play/client/CPacketUseEntity$Action
+[SUPPORT] net/minecraft/network/play/client/CPacketVehicleMove
+[SUPPORT] net/minecraft/network/play/server/SPacketAdvancementInfo
+[SUPPORT] net/minecraft/network/play/server/SPacketAnimation
+[SUPPORT] net/minecraft/network/play/server/SPacketBlockAction
+[SUPPORT] net/minecraft/network/play/server/SPacketBlockBreakAnim
+[SUPPORT] net/minecraft/network/play/server/SPacketBlockChange
+[SUPPORT] net/minecraft/network/play/server/SPacketCamera
+[SUPPORT] net/minecraft/network/play/server/SPacketChangeGameState
+[SUPPORT] net/minecraft/network/play/server/SPacketChat
+[SUPPORT] net/minecraft/network/play/server/SPacketChunkData
+[SUPPORT] net/minecraft/network/play/server/SPacketCloseWindow
+[SUPPORT] net/minecraft/network/play/server/SPacketCollectItem
+[SUPPORT] net/minecraft/network/play/server/SPacketCombatEvent
+[SUPPORT] net/minecraft/network/play/server/SPacketCombatEvent$1
+[SUPPORT] net/minecraft/network/play/server/SPacketCombatEvent$Event
+[SUPPORT] net/minecraft/network/play/server/SPacketConfirmTransaction
+[SUPPORT] net/minecraft/network/play/server/SPacketCooldown
+[SUPPORT] net/minecraft/network/play/server/SPacketCustomPayload
+[SUPPORT] net/minecraft/network/play/server/SPacketCustomSound
+[SUPPORT] net/minecraft/network/play/server/SPacketDestroyEntities
+[SUPPORT] net/minecraft/network/play/server/SPacketDisconnect
+[SUPPORT] net/minecraft/network/play/server/SPacketDisplayObjective
+[SUPPORT] net/minecraft/network/play/server/SPacketEffect
+[SUPPORT] net/minecraft/network/play/server/SPacketEntity
+[SUPPORT] net/minecraft/network/play/server/SPacketEntity$S15PacketEntityRelMove
+[SUPPORT] net/minecraft/network/play/server/SPacketEntity$S16PacketEntityLook
+[SUPPORT] net/minecraft/network/play/server/SPacketEntity$S17PacketEntityLookMove
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityAttach
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityEffect
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityEquipment
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityHeadLook
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityMetadata
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityProperties
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityProperties$Snapshot
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityStatus
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityTeleport
+[SUPPORT] net/minecraft/network/play/server/SPacketEntityVelocity
+[SUPPORT] net/minecraft/network/play/server/SPacketExplosion
+[SUPPORT] net/minecraft/network/play/server/SPacketHeldItemChange
+[SUPPORT] net/minecraft/network/play/server/SPacketJoinGame
+[SUPPORT] net/minecraft/network/play/server/SPacketKeepAlive
+[SUPPORT] net/minecraft/network/play/server/SPacketMaps
+[SUPPORT] net/minecraft/network/play/server/SPacketMoveVehicle
+[SUPPORT] net/minecraft/network/play/server/SPacketMultiBlockChange
+[SUPPORT] net/minecraft/network/play/server/SPacketMultiBlockChange$BlockUpdateData
+[SUPPORT] net/minecraft/network/play/server/SPacketOpenWindow
+[SUPPORT] net/minecraft/network/play/server/SPacketParticles
+[SUPPORT] net/minecraft/network/play/server/SPacketPlaceGhostRecipe
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerAbilities
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerListHeaderFooter
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerListItem
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerListItem$1
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerListItem$Action
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerListItem$AddPlayerData
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerPosLook
+[SUPPORT] net/minecraft/network/play/server/SPacketPlayerPosLook$EnumFlags
+[SUPPORT] net/minecraft/network/play/server/SPacketRecipeBook
+[SUPPORT] net/minecraft/network/play/server/SPacketRecipeBook$State
+[SUPPORT] net/minecraft/network/play/server/SPacketRemoveEntityEffect
+[SUPPORT] net/minecraft/network/play/server/SPacketResourcePackSend
+[SUPPORT] net/minecraft/network/play/server/SPacketRespawn
+[SUPPORT] net/minecraft/network/play/server/SPacketScoreboardObjective
+[SUPPORT] net/minecraft/network/play/server/SPacketSelectAdvancementsTab
+[SUPPORT] net/minecraft/network/play/server/SPacketServerDifficulty
+[SUPPORT] net/minecraft/network/play/server/SPacketSetExperience
+[SUPPORT] net/minecraft/network/play/server/SPacketSetPassengers
+[SUPPORT] net/minecraft/network/play/server/SPacketSetSlot
+[SUPPORT] net/minecraft/network/play/server/SPacketSignEditorOpen
+[SUPPORT] net/minecraft/network/play/server/SPacketSoundEffect
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnExperienceOrb
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnGlobalEntity
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnMob
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnObject
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnPainting
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnPlayer
+[SUPPORT] net/minecraft/network/play/server/SPacketSpawnPosition
+[SUPPORT] net/minecraft/network/play/server/SPacketStatistics
+[SUPPORT] net/minecraft/network/play/server/SPacketTabComplete
+[SUPPORT] net/minecraft/network/play/server/SPacketTeams
+[SUPPORT] net/minecraft/network/play/server/SPacketTimeUpdate
+[SUPPORT] net/minecraft/network/play/server/SPacketTitle
+[SUPPORT] net/minecraft/network/play/server/SPacketTitle$Type
+[SUPPORT] net/minecraft/network/play/server/SPacketUnloadChunk
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateBossInfo
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateBossInfo$1
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateBossInfo$Operation
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateHealth
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateScore
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateScore$Action
+[SUPPORT] net/minecraft/network/play/server/SPacketUpdateTileEntity
+[SUPPORT] net/minecraft/network/play/server/SPacketUseBed
+[SUPPORT] net/minecraft/network/play/server/SPacketWindowItems
+[SUPPORT] net/minecraft/network/play/server/SPacketWindowProperty
+[SUPPORT] net/minecraft/network/play/server/SPacketWorldBorder
+[SUPPORT] net/minecraft/network/play/server/SPacketWorldBorder$1
+[SUPPORT] net/minecraft/network/play/server/SPacketWorldBorder$Action
+[SUPPORT] net/minecraft/network/rcon/IServer
+[SUPPORT] net/minecraft/network/rcon/RConConsoleSource
+[SUPPORT] net/minecraft/network/rcon/RConOutputStream
+[SUPPORT] net/minecraft/network/rcon/RConThreadBase
+[SUPPORT] net/minecraft/network/rcon/RConThreadClient
+[SUPPORT] net/minecraft/network/rcon/RConThreadMain
+[SUPPORT] net/minecraft/network/rcon/RConThreadQuery
+[SUPPORT] net/minecraft/network/rcon/RConThreadQuery$Auth
+[SUPPORT] net/minecraft/network/rcon/RConUtils
+[SUPPORT] net/minecraft/network/status/INetHandlerStatusClient
+[SUPPORT] net/minecraft/network/status/INetHandlerStatusServer
+[SUPPORT] net/minecraft/network/status/client/CPacketPing
+[SUPPORT] net/minecraft/network/status/client/CPacketServerQuery
+[SUPPORT] net/minecraft/network/status/server/SPacketPong
+[SUPPORT] net/minecraft/network/status/server/SPacketServerInfo
+[SUPPORT] net/minecraft/server/DebugLoggingPrintStream
+[SUPPORT] net/minecraft/server/MinecraftServer
+[SUPPORT] net/minecraft/server/MinecraftServer$1
+[SUPPORT] net/minecraft/server/MinecraftServer$2
+[SUPPORT] net/minecraft/server/MinecraftServer$3
+[SUPPORT] net/minecraft/server/MinecraftServer$4
+[SUPPORT] net/minecraft/server/ServerEula
+[SUPPORT] net/minecraft/server/dedicated/DedicatedPlayerList
+[SUPPORT] net/minecraft/server/dedicated/DedicatedServer
+[SUPPORT] net/minecraft/server/dedicated/DedicatedServer$1
+[SUPPORT] net/minecraft/server/dedicated/DedicatedServer$2
+[SUPPORT] net/minecraft/server/dedicated/DedicatedServer$3
+[SUPPORT] net/minecraft/server/dedicated/DedicatedServer$4
+[SUPPORT] net/minecraft/server/dedicated/PendingCommand
+[SUPPORT] net/minecraft/server/dedicated/PropertyManager
+[SUPPORT] net/minecraft/server/dedicated/ServerHangWatchdog
+[SUPPORT] net/minecraft/server/dedicated/ServerHangWatchdog$1
+[SUPPORT] net/minecraft/server/gui/MinecraftServerGui
+[SUPPORT] net/minecraft/server/gui/MinecraftServerGui$1
+[SUPPORT] net/minecraft/server/gui/MinecraftServerGui$2
+[SUPPORT] net/minecraft/server/gui/MinecraftServerGui$3
+[SUPPORT] net/minecraft/server/gui/MinecraftServerGui$4
+[SUPPORT] net/minecraft/server/gui/MinecraftServerGui$5
+[SUPPORT] net/minecraft/server/gui/PlayerListComponent
+[SUPPORT] net/minecraft/server/gui/StatsComponent
+[SUPPORT] net/minecraft/server/gui/StatsComponent$1
+[SUPPORT] net/minecraft/server/integrated/IntegratedPlayerList
+[SUPPORT] net/minecraft/server/integrated/IntegratedServer
+[SUPPORT] net/minecraft/server/integrated/IntegratedServer$1
+[SUPPORT] net/minecraft/server/integrated/IntegratedServer$2
+[SUPPORT] net/minecraft/server/integrated/IntegratedServer$3
+[SUPPORT] net/minecraft/server/integrated/IntegratedServerCommandManager
+[SUPPORT] net/minecraft/server/management/DemoPlayerInteractionManager
+[SUPPORT] net/minecraft/server/management/PlayerChunkMap
+[SUPPORT] net/minecraft/server/management/PlayerChunkMap$1
+[SUPPORT] net/minecraft/server/management/PlayerChunkMap$2
+[SUPPORT] net/minecraft/server/management/PlayerChunkMap$3
+[SUPPORT] net/minecraft/server/management/PlayerChunkMap$4
+[SUPPORT] net/minecraft/server/management/PlayerChunkMap$5
+[SUPPORT] net/minecraft/server/management/PlayerChunkMapEntry
+[SUPPORT] net/minecraft/server/management/PlayerInteractionManager
+[SUPPORT] net/minecraft/server/management/PlayerList
+[SUPPORT] net/minecraft/server/management/PlayerList$1
+[SUPPORT] net/minecraft/server/management/PlayerProfileCache
+[SUPPORT] net/minecraft/server/management/PlayerProfileCache$1
+[SUPPORT] net/minecraft/server/management/PlayerProfileCache$2
+[SUPPORT] net/minecraft/server/management/PlayerProfileCache$ProfileEntry
+[SUPPORT] net/minecraft/server/management/PlayerProfileCache$Serializer
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$1
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$2
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$3
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$4
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$5
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$6
+[SUPPORT] net/minecraft/server/management/PreYggdrasilConverter$ConversionError
+[SUPPORT] net/minecraft/server/management/UserList
+[SUPPORT] net/minecraft/server/management/UserList$1
+[SUPPORT] net/minecraft/server/management/UserList$Serializer
+[SUPPORT] net/minecraft/server/management/UserListBans
+[SUPPORT] net/minecraft/server/management/UserListBansEntry
+[SUPPORT] net/minecraft/server/management/UserListEntry
+[SUPPORT] net/minecraft/server/management/UserListEntryBan
+[SUPPORT] net/minecraft/server/management/UserListIPBans
+[SUPPORT] net/minecraft/server/management/UserListIPBansEntry
+[SUPPORT] net/minecraft/server/management/UserListOps
+[SUPPORT] net/minecraft/server/management/UserListOpsEntry
+[SUPPORT] net/minecraft/server/management/UserListWhitelist
+[SUPPORT] net/minecraft/server/management/UserListWhitelistEntry
+[SUPPORT] net/minecraft/server/network/NetHandlerHandshakeTCP
+[SUPPORT] net/minecraft/server/network/NetHandlerHandshakeTCP$1
+[SUPPORT] net/minecraft/server/network/NetHandlerLoginServer
+[SUPPORT] net/minecraft/server/network/NetHandlerLoginServer$1
+[SUPPORT] net/minecraft/server/network/NetHandlerLoginServer$2
+[SUPPORT] net/minecraft/server/network/NetHandlerLoginServer$LoginState
+[SUPPORT] net/minecraft/server/network/NetHandlerStatusServer
+
+===== PHYSICS =====
+[CORE   ] net/minecraft/entity/MoverType
+[CORE   ] net/minecraft/util/EnumFacing
+[CORE   ] net/minecraft/util/math/AxisAlignedBB
+[CORE   ] net/minecraft/util/math/BlockPos
+[CORE   ] net/minecraft/util/math/RayTraceResult
+[CORE   ] net/minecraft/util/math/RayTraceResult$Type
+[CORE   ] net/minecraft/util/math/Vec3d
+
+===== POTION =====
+[SUPPORT] net/minecraft/potion/Potion
+[SUPPORT] net/minecraft/potion/PotionAbsorption
+[SUPPORT] net/minecraft/potion/PotionAttackDamage
+[SUPPORT] net/minecraft/potion/PotionEffect
+[SUPPORT] net/minecraft/potion/PotionHealth
+[SUPPORT] net/minecraft/potion/PotionHealthBoost
+[SUPPORT] net/minecraft/potion/PotionHelper
+[SUPPORT] net/minecraft/potion/PotionHelper$1
+[SUPPORT] net/minecraft/potion/PotionHelper$MixPredicate
+[SUPPORT] net/minecraft/potion/PotionType
+[SUPPORT] net/minecraft/potion/PotionUtils
+
+===== REDSTONE =====
+[CORE   ] net/minecraft/block/BlockDispenser
+[CORE   ] net/minecraft/block/BlockDropper
+[CORE   ] net/minecraft/block/BlockHopper
+[CORE   ] net/minecraft/block/BlockHopper$1
+[CORE   ] net/minecraft/block/BlockObserver
+[CORE   ] net/minecraft/block/BlockPistonBase
+[CORE   ] net/minecraft/block/BlockPistonBase$1
+[CORE   ] net/minecraft/block/BlockPistonExtension
+[CORE   ] net/minecraft/block/BlockPistonExtension$1
+[CORE   ] net/minecraft/block/BlockPistonExtension$EnumPistonType
+[CORE   ] net/minecraft/block/BlockPistonMoving
+[CORE   ] net/minecraft/block/BlockRedstoneComparator
+[CORE   ] net/minecraft/block/BlockRedstoneComparator$1
+[CORE   ] net/minecraft/block/BlockRedstoneComparator$Mode
+[CORE   ] net/minecraft/block/BlockRedstoneDiode
+[CORE   ] net/minecraft/block/BlockRedstoneLight
+[CORE   ] net/minecraft/block/BlockRedstoneOre
+[CORE   ] net/minecraft/block/BlockRedstoneRepeater
+[CORE   ] net/minecraft/block/BlockRedstoneTorch
+[CORE   ] net/minecraft/block/BlockRedstoneTorch$Toggle
+[CORE   ] net/minecraft/block/BlockRedstoneWire
+[CORE   ] net/minecraft/block/BlockRedstoneWire$1
+[CORE   ] net/minecraft/block/BlockRedstoneWire$EnumAttachPosition
+[CORE   ] net/minecraft/block/state/BlockPistonStructureHelper
+[CORE   ] net/minecraft/tileentity/TileEntityPiston
+[CORE   ] net/minecraft/tileentity/TileEntityPiston$1
+[CORE   ] net/minecraft/tileentity/TileEntityPiston$2
+
+===== SKIP_PLUMBING =====
+[SKIP   ] net/minecraft/advancements/Advancement
+[SKIP   ] net/minecraft/advancements/Advancement$Builder
+[SKIP   ] net/minecraft/advancements/AdvancementList
+[SKIP   ] net/minecraft/advancements/AdvancementList$Listener
+[SKIP   ] net/minecraft/advancements/AdvancementManager
+[SKIP   ] net/minecraft/advancements/AdvancementManager$1
+[SKIP   ] net/minecraft/advancements/AdvancementProgress
+[SKIP   ] net/minecraft/advancements/AdvancementProgress$Serializer
+[SKIP   ] net/minecraft/advancements/AdvancementRewards
+[SKIP   ] net/minecraft/advancements/AdvancementRewards$1
+[SKIP   ] net/minecraft/advancements/AdvancementRewards$Deserializer
+[SKIP   ] net/minecraft/advancements/AdvancementTreeNode
+[SKIP   ] net/minecraft/advancements/CriteriaTriggers
+[SKIP   ] net/minecraft/advancements/Criterion
+[SKIP   ] net/minecraft/advancements/CriterionProgress
+[SKIP   ] net/minecraft/advancements/DisplayInfo
+[SKIP   ] net/minecraft/advancements/FrameType
+[SKIP   ] net/minecraft/advancements/FunctionManager
+[SKIP   ] net/minecraft/advancements/FunctionManager$1
+[SKIP   ] net/minecraft/advancements/FunctionManager$QueuedCommand
+[SKIP   ] net/minecraft/advancements/ICriterionInstance
+[SKIP   ] net/minecraft/advancements/ICriterionTrigger
+[SKIP   ] net/minecraft/advancements/ICriterionTrigger$Listener
+[SKIP   ] net/minecraft/advancements/PlayerAdvancements
+[SKIP   ] net/minecraft/advancements/PlayerAdvancements$1
+[SKIP   ] net/minecraft/advancements/critereon/AbstractCriterionInstance
+[SKIP   ] net/minecraft/advancements/critereon/BredAnimalsTrigger
+[SKIP   ] net/minecraft/advancements/critereon/BredAnimalsTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/BredAnimalsTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/BrewedPotionTrigger
+[SKIP   ] net/minecraft/advancements/critereon/BrewedPotionTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/BrewedPotionTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/ChangeDimensionTrigger
+[SKIP   ] net/minecraft/advancements/critereon/ChangeDimensionTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/ChangeDimensionTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/ConstructBeaconTrigger
+[SKIP   ] net/minecraft/advancements/critereon/ConstructBeaconTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/ConstructBeaconTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/ConsumeItemTrigger
+[SKIP   ] net/minecraft/advancements/critereon/ConsumeItemTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/ConsumeItemTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/CuredZombieVillagerTrigger
+[SKIP   ] net/minecraft/advancements/critereon/CuredZombieVillagerTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/CuredZombieVillagerTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/DamagePredicate
+[SKIP   ] net/minecraft/advancements/critereon/DamageSourcePredicate
+[SKIP   ] net/minecraft/advancements/critereon/DistancePredicate
+[SKIP   ] net/minecraft/advancements/critereon/EffectsChangedTrigger
+[SKIP   ] net/minecraft/advancements/critereon/EffectsChangedTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/EffectsChangedTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/EnchantedItemTrigger
+[SKIP   ] net/minecraft/advancements/critereon/EnchantedItemTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/EnchantedItemTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/EnchantmentPredicate
+[SKIP   ] net/minecraft/advancements/critereon/EnterBlockTrigger
+[SKIP   ] net/minecraft/advancements/critereon/EnterBlockTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/EnterBlockTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/EntityHurtPlayerTrigger
+[SKIP   ] net/minecraft/advancements/critereon/EntityHurtPlayerTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/EntityHurtPlayerTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/EntityPredicate
+[SKIP   ] net/minecraft/advancements/critereon/ImpossibleTrigger
+[SKIP   ] net/minecraft/advancements/critereon/ImpossibleTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/InventoryChangeTrigger
+[SKIP   ] net/minecraft/advancements/critereon/InventoryChangeTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/InventoryChangeTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/ItemDurabilityTrigger
+[SKIP   ] net/minecraft/advancements/critereon/ItemDurabilityTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/ItemDurabilityTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/ItemPredicate
+[SKIP   ] net/minecraft/advancements/critereon/KilledTrigger
+[SKIP   ] net/minecraft/advancements/critereon/KilledTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/KilledTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/LevitationTrigger
+[SKIP   ] net/minecraft/advancements/critereon/LevitationTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/LevitationTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/LocationPredicate
+[SKIP   ] net/minecraft/advancements/critereon/MinMaxBounds
+[SKIP   ] net/minecraft/advancements/critereon/MobEffectsPredicate
+[SKIP   ] net/minecraft/advancements/critereon/MobEffectsPredicate$InstancePredicate
+[SKIP   ] net/minecraft/advancements/critereon/NBTPredicate
+[SKIP   ] net/minecraft/advancements/critereon/NetherTravelTrigger
+[SKIP   ] net/minecraft/advancements/critereon/NetherTravelTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/NetherTravelTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/PlacedBlockTrigger
+[SKIP   ] net/minecraft/advancements/critereon/PlacedBlockTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/PlacedBlockTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/PlayerHurtEntityTrigger
+[SKIP   ] net/minecraft/advancements/critereon/PlayerHurtEntityTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/PlayerHurtEntityTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/PositionTrigger
+[SKIP   ] net/minecraft/advancements/critereon/PositionTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/PositionTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/RecipeUnlockedTrigger
+[SKIP   ] net/minecraft/advancements/critereon/RecipeUnlockedTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/RecipeUnlockedTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/SummonedEntityTrigger
+[SKIP   ] net/minecraft/advancements/critereon/SummonedEntityTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/SummonedEntityTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/TameAnimalTrigger
+[SKIP   ] net/minecraft/advancements/critereon/TameAnimalTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/TameAnimalTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/TickTrigger
+[SKIP   ] net/minecraft/advancements/critereon/TickTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/TickTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/UsedEnderEyeTrigger
+[SKIP   ] net/minecraft/advancements/critereon/UsedEnderEyeTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/UsedEnderEyeTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/UsedTotemTrigger
+[SKIP   ] net/minecraft/advancements/critereon/UsedTotemTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/UsedTotemTrigger$Listeners
+[SKIP   ] net/minecraft/advancements/critereon/VillagerTradeTrigger
+[SKIP   ] net/minecraft/advancements/critereon/VillagerTradeTrigger$Instance
+[SKIP   ] net/minecraft/advancements/critereon/VillagerTradeTrigger$Listeners
+[SKIP   ] net/minecraft/client/audio/ElytraSound
+[SKIP   ] net/minecraft/client/audio/GuardianSound
+[SKIP   ] net/minecraft/client/audio/ISound
+[SKIP   ] net/minecraft/client/audio/ISound$AttenuationType
+[SKIP   ] net/minecraft/client/audio/ISoundEventAccessor
+[SKIP   ] net/minecraft/client/audio/ISoundEventListener
+[SKIP   ] net/minecraft/client/audio/ITickableSound
+[SKIP   ] net/minecraft/client/audio/MovingSound
+[SKIP   ] net/minecraft/client/audio/MovingSoundMinecart
+[SKIP   ] net/minecraft/client/audio/MovingSoundMinecartRiding
+[SKIP   ] net/minecraft/client/audio/MusicTicker
+[SKIP   ] net/minecraft/client/audio/MusicTicker$MusicType
+[SKIP   ] net/minecraft/client/audio/PositionedSound
+[SKIP   ] net/minecraft/client/audio/PositionedSoundRecord
+[SKIP   ] net/minecraft/client/audio/Sound
+[SKIP   ] net/minecraft/client/audio/Sound$Type
+[SKIP   ] net/minecraft/client/audio/SoundEventAccessor
+[SKIP   ] net/minecraft/client/audio/SoundHandler
+[SKIP   ] net/minecraft/client/audio/SoundHandler$1
+[SKIP   ] net/minecraft/client/audio/SoundHandler$2
+[SKIP   ] net/minecraft/client/audio/SoundHandler$3
+[SKIP   ] net/minecraft/client/audio/SoundList
+[SKIP   ] net/minecraft/client/audio/SoundListSerializer
+[SKIP   ] net/minecraft/client/audio/SoundManager
+[SKIP   ] net/minecraft/client/audio/SoundManager$1
+[SKIP   ] net/minecraft/client/audio/SoundManager$1$1
+[SKIP   ] net/minecraft/client/audio/SoundManager$2
+[SKIP   ] net/minecraft/client/audio/SoundManager$2$1
+[SKIP   ] net/minecraft/client/audio/SoundManager$SoundSystemStarterThread
+[SKIP   ] net/minecraft/client/audio/SoundRegistry
+[SKIP   ] net/minecraft/client/gui/BossInfoClient
+[SKIP   ] net/minecraft/client/gui/BossInfoClient$1
+[SKIP   ] net/minecraft/client/gui/ChatLine
+[SKIP   ] net/minecraft/client/gui/FontRenderer
+[SKIP   ] net/minecraft/client/gui/Gui
+[SKIP   ] net/minecraft/client/gui/GuiBossOverlay
+[SKIP   ] net/minecraft/client/gui/GuiButton
+[SKIP   ] net/minecraft/client/gui/GuiButtonImage
+[SKIP   ] net/minecraft/client/gui/GuiButtonLanguage
+[SKIP   ] net/minecraft/client/gui/GuiButtonRealmsProxy
+[SKIP   ] net/minecraft/client/gui/GuiButtonToggle
+[SKIP   ] net/minecraft/client/gui/GuiChat
+[SKIP   ] net/minecraft/client/gui/GuiChat$ChatTabCompleter
+[SKIP   ] net/minecraft/client/gui/GuiClickableScrolledSelectionListProxy
+[SKIP   ] net/minecraft/client/gui/GuiCommandBlock
+[SKIP   ] net/minecraft/client/gui/GuiCommandBlock$1
+[SKIP   ] net/minecraft/client/gui/GuiCommandBlock$2
+[SKIP   ] net/minecraft/client/gui/GuiConfirmOpenLink
+[SKIP   ] net/minecraft/client/gui/GuiControls
+[SKIP   ] net/minecraft/client/gui/GuiCreateFlatWorld
+[SKIP   ] net/minecraft/client/gui/GuiCreateFlatWorld$Details
+[SKIP   ] net/minecraft/client/gui/GuiCreateWorld
+[SKIP   ] net/minecraft/client/gui/GuiCustomizeSkin
+[SKIP   ] net/minecraft/client/gui/GuiCustomizeSkin$1
+[SKIP   ] net/minecraft/client/gui/GuiCustomizeSkin$ButtonPart
+[SKIP   ] net/minecraft/client/gui/GuiCustomizeWorldScreen
+[SKIP   ] net/minecraft/client/gui/GuiCustomizeWorldScreen$1
+[SKIP   ] net/minecraft/client/gui/GuiDisconnected
+[SKIP   ] net/minecraft/client/gui/GuiDownloadTerrain
+[SKIP   ] net/minecraft/client/gui/GuiEnchantment
+[SKIP   ] net/minecraft/client/gui/GuiErrorScreen
+[SKIP   ] net/minecraft/client/gui/GuiFlatPresets
+[SKIP   ] net/minecraft/client/gui/GuiFlatPresets$LayerItem
+[SKIP   ] net/minecraft/client/gui/GuiFlatPresets$ListSlot
+[SKIP   ] net/minecraft/client/gui/GuiGameOver
+[SKIP   ] net/minecraft/client/gui/GuiHopper
+[SKIP   ] net/minecraft/client/gui/GuiIngame
+[SKIP   ] net/minecraft/client/gui/GuiIngame$1
+[SKIP   ] net/minecraft/client/gui/GuiIngameMenu
+[SKIP   ] net/minecraft/client/gui/GuiKeyBindingList
+[SKIP   ] net/minecraft/client/gui/GuiKeyBindingList$1
+[SKIP   ] net/minecraft/client/gui/GuiKeyBindingList$CategoryEntry
+[SKIP   ] net/minecraft/client/gui/GuiKeyBindingList$KeyEntry
+[SKIP   ] net/minecraft/client/gui/GuiLabel
+[SKIP   ] net/minecraft/client/gui/GuiLanguage
+[SKIP   ] net/minecraft/client/gui/GuiLanguage$List
+[SKIP   ] net/minecraft/client/gui/GuiListButton
+[SKIP   ] net/minecraft/client/gui/GuiListExtended
+[SKIP   ] net/minecraft/client/gui/GuiListExtended$IGuiListEntry
+[SKIP   ] net/minecraft/client/gui/GuiListWorldSelection
+[SKIP   ] net/minecraft/client/gui/GuiListWorldSelectionEntry
+[SKIP   ] net/minecraft/client/gui/GuiListWorldSelectionEntry$1
+[SKIP   ] net/minecraft/client/gui/GuiListWorldSelectionEntry$2
+[SKIP   ] net/minecraft/client/gui/GuiLockIconButton
+[SKIP   ] net/minecraft/client/gui/GuiLockIconButton$Icon
+[SKIP   ] net/minecraft/client/gui/GuiMainMenu
+[SKIP   ] net/minecraft/client/gui/GuiMemoryErrorScreen
+[SKIP   ] net/minecraft/client/gui/GuiMerchant
+[SKIP   ] net/minecraft/client/gui/GuiMerchant$MerchantButton
+[SKIP   ] net/minecraft/client/gui/GuiMultiplayer
+[SKIP   ] net/minecraft/client/gui/GuiNewChat
+[SKIP   ] net/minecraft/client/gui/GuiOptionButton
+[SKIP   ] net/minecraft/client/gui/GuiOptionSlider
+[SKIP   ] net/minecraft/client/gui/GuiOptions
+[SKIP   ] net/minecraft/client/gui/GuiOptionsRowList
+[SKIP   ] net/minecraft/client/gui/GuiOptionsRowList$Row
+[SKIP   ] net/minecraft/client/gui/GuiOverlayDebug
+[SKIP   ] net/minecraft/client/gui/GuiOverlayDebug$1
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$EditBoxEntry
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$GuiButtonEntry
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$GuiEntry
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$GuiLabelEntry
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$GuiListEntry
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$GuiResponder
+[SKIP   ] net/minecraft/client/gui/GuiPageButtonList$GuiSlideEntry
+[SKIP   ] net/minecraft/client/gui/GuiPlayerTabOverlay
+[SKIP   ] net/minecraft/client/gui/GuiPlayerTabOverlay$1
+[SKIP   ] net/minecraft/client/gui/GuiPlayerTabOverlay$PlayerComparator
+[SKIP   ] net/minecraft/client/gui/GuiRepair
+[SKIP   ] net/minecraft/client/gui/GuiResourcePackAvailable
+[SKIP   ] net/minecraft/client/gui/GuiResourcePackList
+[SKIP   ] net/minecraft/client/gui/GuiResourcePackSelected
+[SKIP   ] net/minecraft/client/gui/GuiScreen
+[SKIP   ] net/minecraft/client/gui/GuiScreenAddServer
+[SKIP   ] net/minecraft/client/gui/GuiScreenAddServer$1
+[SKIP   ] net/minecraft/client/gui/GuiScreenBook
+[SKIP   ] net/minecraft/client/gui/GuiScreenBook$NextPageButton
+[SKIP   ] net/minecraft/client/gui/GuiScreenCustomizePresets
+[SKIP   ] net/minecraft/client/gui/GuiScreenCustomizePresets$Info
+[SKIP   ] net/minecraft/client/gui/GuiScreenCustomizePresets$ListPreset
+[SKIP   ] net/minecraft/client/gui/GuiScreenDemo
+[SKIP   ] net/minecraft/client/gui/GuiScreenOptionsSounds
+[SKIP   ] net/minecraft/client/gui/GuiScreenOptionsSounds$Button
+[SKIP   ] net/minecraft/client/gui/GuiScreenRealmsProxy
+[SKIP   ] net/minecraft/client/gui/GuiScreenResourcePacks
+[SKIP   ] net/minecraft/client/gui/GuiScreenServerList
+[SKIP   ] net/minecraft/client/gui/GuiScreenWorking
+[SKIP   ] net/minecraft/client/gui/GuiShareToLan
+[SKIP   ] net/minecraft/client/gui/GuiSimpleScrolledSelectionListProxy
+[SKIP   ] net/minecraft/client/gui/GuiSleepMP
+[SKIP   ] net/minecraft/client/gui/GuiSlider
+[SKIP   ] net/minecraft/client/gui/GuiSlider$FormatHelper
+[SKIP   ] net/minecraft/client/gui/GuiSlot
+[SKIP   ] net/minecraft/client/gui/GuiSlotRealmsProxy
+[SKIP   ] net/minecraft/client/gui/GuiSnooper
+[SKIP   ] net/minecraft/client/gui/GuiSnooper$List
+[SKIP   ] net/minecraft/client/gui/GuiSpectator
+[SKIP   ] net/minecraft/client/gui/GuiSubtitleOverlay
+[SKIP   ] net/minecraft/client/gui/GuiSubtitleOverlay$Subtitle
+[SKIP   ] net/minecraft/client/gui/GuiTextField
+[SKIP   ] net/minecraft/client/gui/GuiUtilRenderComponents
+[SKIP   ] net/minecraft/client/gui/GuiVideoSettings
+[SKIP   ] net/minecraft/client/gui/GuiWinGame
+[SKIP   ] net/minecraft/client/gui/GuiWorldEdit
+[SKIP   ] net/minecraft/client/gui/GuiWorldSelection
+[SKIP   ] net/minecraft/client/gui/GuiYesNo
+[SKIP   ] net/minecraft/client/gui/GuiYesNoCallback
+[SKIP   ] net/minecraft/client/gui/IProgressMeter
+[SKIP   ] net/minecraft/client/gui/MapItemRenderer
+[SKIP   ] net/minecraft/client/gui/MapItemRenderer$1
+[SKIP   ] net/minecraft/client/gui/MapItemRenderer$Instance
+[SKIP   ] net/minecraft/client/gui/ScaledResolution
+[SKIP   ] net/minecraft/client/gui/ScreenChatOptions
+[SKIP   ] net/minecraft/client/gui/ServerListEntryLanDetected
+[SKIP   ] net/minecraft/client/gui/ServerListEntryLanScan
+[SKIP   ] net/minecraft/client/gui/ServerListEntryNormal
+[SKIP   ] net/minecraft/client/gui/ServerListEntryNormal$1
+[SKIP   ] net/minecraft/client/gui/ServerSelectionList
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$Stats
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$StatsBlock
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$StatsBlock$1
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$StatsGeneral
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$StatsItem
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$StatsItem$1
+[SKIP   ] net/minecraft/client/gui/achievement/GuiStats$StatsMobsList
+[SKIP   ] net/minecraft/client/gui/advancements/AdvancementState
+[SKIP   ] net/minecraft/client/gui/advancements/AdvancementTabType
+[SKIP   ] net/minecraft/client/gui/advancements/AdvancementTabType$1
+[SKIP   ] net/minecraft/client/gui/advancements/GuiAdvancement
+[SKIP   ] net/minecraft/client/gui/advancements/GuiAdvancementTab
+[SKIP   ] net/minecraft/client/gui/advancements/GuiScreenAdvancements
+[SKIP   ] net/minecraft/client/gui/chat/IChatListener
+[SKIP   ] net/minecraft/client/gui/chat/NarratorChatListener
+[SKIP   ] net/minecraft/client/gui/chat/NormalChatListener
+[SKIP   ] net/minecraft/client/gui/chat/OverlayChatListener
+[SKIP   ] net/minecraft/client/gui/inventory/CreativeCrafting
+[SKIP   ] net/minecraft/client/gui/inventory/GuiBeacon
+[SKIP   ] net/minecraft/client/gui/inventory/GuiBeacon$Button
+[SKIP   ] net/minecraft/client/gui/inventory/GuiBeacon$CancelButton
+[SKIP   ] net/minecraft/client/gui/inventory/GuiBeacon$ConfirmButton
+[SKIP   ] net/minecraft/client/gui/inventory/GuiBeacon$PowerButton
+[SKIP   ] net/minecraft/client/gui/inventory/GuiBrewingStand
+[SKIP   ] net/minecraft/client/gui/inventory/GuiChest
+[SKIP   ] net/minecraft/client/gui/inventory/GuiContainer
+[SKIP   ] net/minecraft/client/gui/inventory/GuiContainerCreative
+[SKIP   ] net/minecraft/client/gui/inventory/GuiContainerCreative$ContainerCreative
+[SKIP   ] net/minecraft/client/gui/inventory/GuiContainerCreative$CreativeSlot
+[SKIP   ] net/minecraft/client/gui/inventory/GuiContainerCreative$LockedSlot
+[SKIP   ] net/minecraft/client/gui/inventory/GuiCrafting
+[SKIP   ] net/minecraft/client/gui/inventory/GuiDispenser
+[SKIP   ] net/minecraft/client/gui/inventory/GuiEditCommandBlockMinecart
+[SKIP   ] net/minecraft/client/gui/inventory/GuiEditCommandBlockMinecart$1
+[SKIP   ] net/minecraft/client/gui/inventory/GuiEditSign
+[SKIP   ] net/minecraft/client/gui/inventory/GuiEditStructure
+[SKIP   ] net/minecraft/client/gui/inventory/GuiEditStructure$1
+[SKIP   ] net/minecraft/client/gui/inventory/GuiFurnace
+[SKIP   ] net/minecraft/client/gui/inventory/GuiInventory
+[SKIP   ] net/minecraft/client/gui/inventory/GuiScreenHorseInventory
+[SKIP   ] net/minecraft/client/gui/inventory/GuiShulkerBox
+[SKIP   ] net/minecraft/client/gui/recipebook/GhostRecipe
+[SKIP   ] net/minecraft/client/gui/recipebook/GhostRecipe$GhostIngredient
+[SKIP   ] net/minecraft/client/gui/recipebook/GuiButtonRecipe
+[SKIP   ] net/minecraft/client/gui/recipebook/GuiButtonRecipeTab
+[SKIP   ] net/minecraft/client/gui/recipebook/GuiRecipeBook
+[SKIP   ] net/minecraft/client/gui/recipebook/GuiRecipeOverlay
+[SKIP   ] net/minecraft/client/gui/recipebook/GuiRecipeOverlay$Button
+[SKIP   ] net/minecraft/client/gui/recipebook/IRecipeShownListener
+[SKIP   ] net/minecraft/client/gui/recipebook/IRecipeUpdateListener
+[SKIP   ] net/minecraft/client/gui/recipebook/RecipeBookPage
+[SKIP   ] net/minecraft/client/gui/recipebook/RecipeList
+[SKIP   ] net/minecraft/client/gui/spectator/BaseSpectatorGroup
+[SKIP   ] net/minecraft/client/gui/spectator/ISpectatorMenuObject
+[SKIP   ] net/minecraft/client/gui/spectator/ISpectatorMenuRecipient
+[SKIP   ] net/minecraft/client/gui/spectator/ISpectatorMenuView
+[SKIP   ] net/minecraft/client/gui/spectator/PlayerMenuObject
+[SKIP   ] net/minecraft/client/gui/spectator/SpectatorMenu
+[SKIP   ] net/minecraft/client/gui/spectator/SpectatorMenu$1
+[SKIP   ] net/minecraft/client/gui/spectator/SpectatorMenu$EndSpectatorObject
+[SKIP   ] net/minecraft/client/gui/spectator/SpectatorMenu$MoveMenuObject
+[SKIP   ] net/minecraft/client/gui/spectator/categories/SpectatorDetails
+[SKIP   ] net/minecraft/client/gui/spectator/categories/TeleportToPlayer
+[SKIP   ] net/minecraft/client/gui/spectator/categories/TeleportToPlayer$1
+[SKIP   ] net/minecraft/client/gui/spectator/categories/TeleportToTeam
+[SKIP   ] net/minecraft/client/gui/spectator/categories/TeleportToTeam$TeamSelectionObject
+[SKIP   ] net/minecraft/client/gui/toasts/AdvancementToast
+[SKIP   ] net/minecraft/client/gui/toasts/GuiToast
+[SKIP   ] net/minecraft/client/gui/toasts/GuiToast$1
+[SKIP   ] net/minecraft/client/gui/toasts/GuiToast$ToastInstance
+[SKIP   ] net/minecraft/client/gui/toasts/IToast
+[SKIP   ] net/minecraft/client/gui/toasts/IToast$Visibility
+[SKIP   ] net/minecraft/client/gui/toasts/RecipeToast
+[SKIP   ] net/minecraft/client/gui/toasts/SystemToast
+[SKIP   ] net/minecraft/client/gui/toasts/SystemToast$Type
+[SKIP   ] net/minecraft/client/gui/toasts/TutorialToast
+[SKIP   ] net/minecraft/client/gui/toasts/TutorialToast$Icons
+[SKIP   ] net/minecraft/client/main/GameConfiguration
+[SKIP   ] net/minecraft/client/main/GameConfiguration$DisplayInformation
+[SKIP   ] net/minecraft/client/main/GameConfiguration$FolderInformation
+[SKIP   ] net/minecraft/client/main/GameConfiguration$GameInformation
+[SKIP   ] net/minecraft/client/main/GameConfiguration$ServerInformation
+[SKIP   ] net/minecraft/client/main/GameConfiguration$UserInformation
+[SKIP   ] net/minecraft/client/main/Main
+[SKIP   ] net/minecraft/client/main/Main$1
+[SKIP   ] net/minecraft/client/main/Main$2
+[SKIP   ] net/minecraft/client/multiplayer/ChunkProviderClient
+[SKIP   ] net/minecraft/client/multiplayer/ChunkProviderClient$1
+[SKIP   ] net/minecraft/client/multiplayer/ClientAdvancementManager
+[SKIP   ] net/minecraft/client/multiplayer/ClientAdvancementManager$IListener
+[SKIP   ] net/minecraft/client/multiplayer/GuiConnecting
+[SKIP   ] net/minecraft/client/multiplayer/GuiConnecting$1
+[SKIP   ] net/minecraft/client/multiplayer/PlayerControllerMP
+[SKIP   ] net/minecraft/client/multiplayer/ServerAddress
+[SKIP   ] net/minecraft/client/multiplayer/ServerData
+[SKIP   ] net/minecraft/client/multiplayer/ServerData$ServerResourceMode
+[SKIP   ] net/minecraft/client/multiplayer/ServerList
+[SKIP   ] net/minecraft/client/multiplayer/ThreadLanServerPing
+[SKIP   ] net/minecraft/client/multiplayer/WorldClient
+[SKIP   ] net/minecraft/client/multiplayer/WorldClient$1
+[SKIP   ] net/minecraft/client/multiplayer/WorldClient$2
+[SKIP   ] net/minecraft/client/multiplayer/WorldClient$3
+[SKIP   ] net/minecraft/client/multiplayer/WorldClient$4
+[SKIP   ] net/minecraft/client/renderer/ActiveRenderInfo
+[SKIP   ] net/minecraft/client/renderer/BannerTextures
+[SKIP   ] net/minecraft/client/renderer/BannerTextures$1
+[SKIP   ] net/minecraft/client/renderer/BannerTextures$Cache
+[SKIP   ] net/minecraft/client/renderer/BannerTextures$CacheEntry
+[SKIP   ] net/minecraft/client/renderer/BlockFluidRenderer
+[SKIP   ] net/minecraft/client/renderer/BlockModelRenderer
+[SKIP   ] net/minecraft/client/renderer/BlockModelRenderer$1
+[SKIP   ] net/minecraft/client/renderer/BlockModelRenderer$AmbientOcclusionFace
+[SKIP   ] net/minecraft/client/renderer/BlockModelRenderer$EnumNeighborInfo
+[SKIP   ] net/minecraft/client/renderer/BlockModelRenderer$Orientation
+[SKIP   ] net/minecraft/client/renderer/BlockModelRenderer$VertexTranslations
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$1
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$2
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$3
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$4
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$5
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$6
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$7
+[SKIP   ] net/minecraft/client/renderer/BlockModelShapes$8
+[SKIP   ] net/minecraft/client/renderer/BlockRendererDispatcher
+[SKIP   ] net/minecraft/client/renderer/BlockRendererDispatcher$1
+[SKIP   ] net/minecraft/client/renderer/BufferBuilder
+[SKIP   ] net/minecraft/client/renderer/BufferBuilder$1
+[SKIP   ] net/minecraft/client/renderer/BufferBuilder$2
+[SKIP   ] net/minecraft/client/renderer/BufferBuilder$State
+[SKIP   ] net/minecraft/client/renderer/ChestRenderer
+[SKIP   ] net/minecraft/client/renderer/ChunkRenderContainer
+[SKIP   ] net/minecraft/client/renderer/DestroyBlockProgress
+[SKIP   ] net/minecraft/client/renderer/EntityRenderer
+[SKIP   ] net/minecraft/client/renderer/EntityRenderer$1
+[SKIP   ] net/minecraft/client/renderer/EntityRenderer$2
+[SKIP   ] net/minecraft/client/renderer/EntityRenderer$3
+[SKIP   ] net/minecraft/client/renderer/EntityRenderer$4
+[SKIP   ] net/minecraft/client/renderer/EnumFaceDirection
+[SKIP   ] net/minecraft/client/renderer/EnumFaceDirection$1
+[SKIP   ] net/minecraft/client/renderer/EnumFaceDirection$Constants
+[SKIP   ] net/minecraft/client/renderer/EnumFaceDirection$VertexInformation
+[SKIP   ] net/minecraft/client/renderer/GLAllocation
+[SKIP   ] net/minecraft/client/renderer/GlStateManager
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$1
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$AlphaState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$BlendState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$BooleanState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$ClearState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$Color
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$ColorLogicState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$ColorMask
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$ColorMaterialState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$CullFace
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$CullState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$DepthState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$DestFactor
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$FogMode
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$FogState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$LogicOp
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$PolygonOffsetState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$Profile
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$Profile$1
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$Profile$2
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$Profile$3
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$SourceFactor
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$StencilFunc
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$StencilState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$TexGen
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$TexGenCoord
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$TexGenState
+[SKIP   ] net/minecraft/client/renderer/GlStateManager$TextureState
+[SKIP   ] net/minecraft/client/renderer/IImageBuffer
+[SKIP   ] net/minecraft/client/renderer/ImageBufferDownload
+[SKIP   ] net/minecraft/client/renderer/InventoryEffectRenderer
+[SKIP   ] net/minecraft/client/renderer/ItemMeshDefinition
+[SKIP   ] net/minecraft/client/renderer/ItemModelMesher
+[SKIP   ] net/minecraft/client/renderer/ItemRenderer
+[SKIP   ] net/minecraft/client/renderer/ItemRenderer$1
+[SKIP   ] net/minecraft/client/renderer/Matrix4f
+[SKIP   ] net/minecraft/client/renderer/OpenGlHelper
+[SKIP   ] net/minecraft/client/renderer/OpenGlHelper$1
+[SKIP   ] net/minecraft/client/renderer/OpenGlHelper$FboMode
+[SKIP   ] net/minecraft/client/renderer/RegionRenderCacheBuilder
+[SKIP   ] net/minecraft/client/renderer/RenderGlobal
+[SKIP   ] net/minecraft/client/renderer/RenderGlobal$1
+[SKIP   ] net/minecraft/client/renderer/RenderGlobal$2
+[SKIP   ] net/minecraft/client/renderer/RenderGlobal$ContainerLocalRenderInformation
+[SKIP   ] net/minecraft/client/renderer/RenderHelper
+[SKIP   ] net/minecraft/client/renderer/RenderItem
+[SKIP   ] net/minecraft/client/renderer/RenderItem$1
+[SKIP   ] net/minecraft/client/renderer/RenderItem$10
+[SKIP   ] net/minecraft/client/renderer/RenderItem$2
+[SKIP   ] net/minecraft/client/renderer/RenderItem$3
+[SKIP   ] net/minecraft/client/renderer/RenderItem$4
+[SKIP   ] net/minecraft/client/renderer/RenderItem$5
+[SKIP   ] net/minecraft/client/renderer/RenderItem$6
+[SKIP   ] net/minecraft/client/renderer/RenderItem$7
+[SKIP   ] net/minecraft/client/renderer/RenderItem$8
+[SKIP   ] net/minecraft/client/renderer/RenderItem$9
+[SKIP   ] net/minecraft/client/renderer/RenderList
+[SKIP   ] net/minecraft/client/renderer/StitcherException
+[SKIP   ] net/minecraft/client/renderer/Tessellator
+[SKIP   ] net/minecraft/client/renderer/ThreadDownloadImageData
+[SKIP   ] net/minecraft/client/renderer/ThreadDownloadImageData$1
+[SKIP   ] net/minecraft/client/renderer/VboRenderList
+[SKIP   ] net/minecraft/client/renderer/Vector3d
+[SKIP   ] net/minecraft/client/renderer/VertexBufferUploader
+[SKIP   ] net/minecraft/client/renderer/ViewFrustum
+[SKIP   ] net/minecraft/client/renderer/WorldVertexBufferUploader
+[SKIP   ] net/minecraft/client/renderer/WorldVertexBufferUploader$1
+[SKIP   ] net/minecraft/client/renderer/block/model/BakedQuad
+[SKIP   ] net/minecraft/client/renderer/block/model/BakedQuadRetextured
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockFaceUV
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockFaceUV$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockPart
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockPart$1
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockPart$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockPartFace
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockPartFace$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/BlockPartRotation
+[SKIP   ] net/minecraft/client/renderer/block/model/BuiltInModel
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery$1
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery$2
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery$3
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery$4
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery$5
+[SKIP   ] net/minecraft/client/renderer/block/model/FaceBakery$Rotation
+[SKIP   ] net/minecraft/client/renderer/block/model/IBakedModel
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemCameraTransforms
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemCameraTransforms$1
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemCameraTransforms$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemCameraTransforms$TransformType
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemModelGenerator
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemModelGenerator$1
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemModelGenerator$Span
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemModelGenerator$SpanFacing
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemOverride
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemOverride$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemOverrideList
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemTransformVec3f
+[SKIP   ] net/minecraft/client/renderer/block/model/ItemTransformVec3f$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBakery
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBakery$1
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBakery$2
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBakery$3
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlock
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlock$1
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlock$Bookkeep
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlock$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlock$LoopException
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlockDefinition
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlockDefinition$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelBlockDefinition$MissingVariantException
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelManager
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelResourceLocation
+[SKIP   ] net/minecraft/client/renderer/block/model/ModelRotation
+[SKIP   ] net/minecraft/client/renderer/block/model/MultipartBakedModel
+[SKIP   ] net/minecraft/client/renderer/block/model/MultipartBakedModel$Builder
+[SKIP   ] net/minecraft/client/renderer/block/model/SimpleBakedModel
+[SKIP   ] net/minecraft/client/renderer/block/model/SimpleBakedModel$Builder
+[SKIP   ] net/minecraft/client/renderer/block/model/Variant
+[SKIP   ] net/minecraft/client/renderer/block/model/Variant$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/VariantList
+[SKIP   ] net/minecraft/client/renderer/block/model/VariantList$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/WeightedBakedModel
+[SKIP   ] net/minecraft/client/renderer/block/model/WeightedBakedModel$Builder
+[SKIP   ] net/minecraft/client/renderer/block/model/WeightedBakedModel$WeightedModel
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionAnd
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionAnd$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionOr
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionOr$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionPropertyValue
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionPropertyValue$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ConditionPropertyValue$2
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ICondition
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ICondition$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ICondition$1$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ICondition$2
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/ICondition$2$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/Multipart
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/Multipart$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/Selector
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/Selector$Deserializer
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/Selector$Deserializer$1
+[SKIP   ] net/minecraft/client/renderer/block/model/multipart/Selector$Deserializer$2
+[SKIP   ] net/minecraft/client/renderer/block/statemap/BlockStateMapper
+[SKIP   ] net/minecraft/client/renderer/block/statemap/DefaultStateMapper
+[SKIP   ] net/minecraft/client/renderer/block/statemap/IStateMapper
+[SKIP   ] net/minecraft/client/renderer/block/statemap/StateMap
+[SKIP   ] net/minecraft/client/renderer/block/statemap/StateMap$1
+[SKIP   ] net/minecraft/client/renderer/block/statemap/StateMap$Builder
+[SKIP   ] net/minecraft/client/renderer/block/statemap/StateMapperBase
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkCompileTaskGenerator
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkCompileTaskGenerator$Status
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkCompileTaskGenerator$Type
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderDispatcher
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$1
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$2
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$3
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderDispatcher$PendingUpload
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderWorker
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderWorker$1
+[SKIP   ] net/minecraft/client/renderer/chunk/ChunkRenderWorker$2
+[SKIP   ] net/minecraft/client/renderer/chunk/CompiledChunk
+[SKIP   ] net/minecraft/client/renderer/chunk/CompiledChunk$1
+[SKIP   ] net/minecraft/client/renderer/chunk/IRenderChunkFactory
+[SKIP   ] net/minecraft/client/renderer/chunk/ListChunkFactory
+[SKIP   ] net/minecraft/client/renderer/chunk/ListedRenderChunk
+[SKIP   ] net/minecraft/client/renderer/chunk/RenderChunk
+[SKIP   ] net/minecraft/client/renderer/chunk/SetVisibility
+[SKIP   ] net/minecraft/client/renderer/chunk/VboChunkFactory
+[SKIP   ] net/minecraft/client/renderer/chunk/VisGraph
+[SKIP   ] net/minecraft/client/renderer/chunk/VisGraph$1
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$1
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$10
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$11
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$12
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$2
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$3
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$4
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$5
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$6
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$7
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$8
+[SKIP   ] net/minecraft/client/renderer/color/BlockColors$9
+[SKIP   ] net/minecraft/client/renderer/color/IBlockColor
+[SKIP   ] net/minecraft/client/renderer/color/IItemColor
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$1
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$2
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$3
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$4
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$5
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$6
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$7
+[SKIP   ] net/minecraft/client/renderer/color/ItemColors$8
+[SKIP   ] net/minecraft/client/renderer/culling/ClippingHelper
+[SKIP   ] net/minecraft/client/renderer/culling/ClippingHelperImpl
+[SKIP   ] net/minecraft/client/renderer/culling/Frustum
+[SKIP   ] net/minecraft/client/renderer/culling/ICamera
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRenderer
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRenderer$IDebugRenderer
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererChunkBorder
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererCollisionBox
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererHeightMap
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererNeighborsUpdate
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererPathfinding
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererSolidFace
+[SKIP   ] net/minecraft/client/renderer/debug/DebugRendererWater
+[SKIP   ] net/minecraft/client/renderer/entity/Render
+[SKIP   ] net/minecraft/client/renderer/entity/RenderAbstractHorse
+[SKIP   ] net/minecraft/client/renderer/entity/RenderAreaEffectCloud
+[SKIP   ] net/minecraft/client/renderer/entity/RenderArmorStand
+[SKIP   ] net/minecraft/client/renderer/entity/RenderArmorStand$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderArrow
+[SKIP   ] net/minecraft/client/renderer/entity/RenderBat
+[SKIP   ] net/minecraft/client/renderer/entity/RenderBiped
+[SKIP   ] net/minecraft/client/renderer/entity/RenderBlaze
+[SKIP   ] net/minecraft/client/renderer/entity/RenderBoat
+[SKIP   ] net/minecraft/client/renderer/entity/RenderCaveSpider
+[SKIP   ] net/minecraft/client/renderer/entity/RenderChicken
+[SKIP   ] net/minecraft/client/renderer/entity/RenderCow
+[SKIP   ] net/minecraft/client/renderer/entity/RenderCreeper
+[SKIP   ] net/minecraft/client/renderer/entity/RenderDragon
+[SKIP   ] net/minecraft/client/renderer/entity/RenderDragonFireball
+[SKIP   ] net/minecraft/client/renderer/entity/RenderElderGuardian
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEnderCrystal
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEnderman
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEndermite
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEntity
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEntityItem
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEvoker
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEvoker$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderEvokerFangs
+[SKIP   ] net/minecraft/client/renderer/entity/RenderFallingBlock
+[SKIP   ] net/minecraft/client/renderer/entity/RenderFireball
+[SKIP   ] net/minecraft/client/renderer/entity/RenderFish
+[SKIP   ] net/minecraft/client/renderer/entity/RenderGhast
+[SKIP   ] net/minecraft/client/renderer/entity/RenderGiantZombie
+[SKIP   ] net/minecraft/client/renderer/entity/RenderGiantZombie$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderGuardian
+[SKIP   ] net/minecraft/client/renderer/entity/RenderHorse
+[SKIP   ] net/minecraft/client/renderer/entity/RenderHusk
+[SKIP   ] net/minecraft/client/renderer/entity/RenderIllusionIllager
+[SKIP   ] net/minecraft/client/renderer/entity/RenderIllusionIllager$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderIronGolem
+[SKIP   ] net/minecraft/client/renderer/entity/RenderItemFrame
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLeashKnot
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLightningBolt
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLiving
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLivingBase
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLivingBase$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLlama
+[SKIP   ] net/minecraft/client/renderer/entity/RenderLlamaSpit
+[SKIP   ] net/minecraft/client/renderer/entity/RenderMagmaCube
+[SKIP   ] net/minecraft/client/renderer/entity/RenderManager
+[SKIP   ] net/minecraft/client/renderer/entity/RenderMinecart
+[SKIP   ] net/minecraft/client/renderer/entity/RenderMinecartMobSpawner
+[SKIP   ] net/minecraft/client/renderer/entity/RenderMooshroom
+[SKIP   ] net/minecraft/client/renderer/entity/RenderOcelot
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPainting
+[SKIP   ] net/minecraft/client/renderer/entity/RenderParrot
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPig
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPigZombie
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPigZombie$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPlayer
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPolarBear
+[SKIP   ] net/minecraft/client/renderer/entity/RenderPotion
+[SKIP   ] net/minecraft/client/renderer/entity/RenderRabbit
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSheep
+[SKIP   ] net/minecraft/client/renderer/entity/RenderShulker
+[SKIP   ] net/minecraft/client/renderer/entity/RenderShulker$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderShulker$HeadLayer
+[SKIP   ] net/minecraft/client/renderer/entity/RenderShulkerBullet
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSilverfish
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSkeleton
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSkeleton$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSlime
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSnowMan
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSnowball
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSpectralArrow
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSpider
+[SKIP   ] net/minecraft/client/renderer/entity/RenderSquid
+[SKIP   ] net/minecraft/client/renderer/entity/RenderStray
+[SKIP   ] net/minecraft/client/renderer/entity/RenderTNTPrimed
+[SKIP   ] net/minecraft/client/renderer/entity/RenderTippedArrow
+[SKIP   ] net/minecraft/client/renderer/entity/RenderTntMinecart
+[SKIP   ] net/minecraft/client/renderer/entity/RenderVex
+[SKIP   ] net/minecraft/client/renderer/entity/RenderVillager
+[SKIP   ] net/minecraft/client/renderer/entity/RenderVindicator
+[SKIP   ] net/minecraft/client/renderer/entity/RenderVindicator$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderWitch
+[SKIP   ] net/minecraft/client/renderer/entity/RenderWither
+[SKIP   ] net/minecraft/client/renderer/entity/RenderWitherSkeleton
+[SKIP   ] net/minecraft/client/renderer/entity/RenderWitherSkull
+[SKIP   ] net/minecraft/client/renderer/entity/RenderWolf
+[SKIP   ] net/minecraft/client/renderer/entity/RenderXPOrb
+[SKIP   ] net/minecraft/client/renderer/entity/RenderZombie
+[SKIP   ] net/minecraft/client/renderer/entity/RenderZombie$1
+[SKIP   ] net/minecraft/client/renderer/entity/RenderZombieVillager
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerArmorBase
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerArmorBase$1
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerArrow
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerBipedArmor
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerBipedArmor$1
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerCape
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerCreeperCharge
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerCustomHead
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerDeadmau5Head
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerElytra
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerEnderDragonDeath
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerEnderDragonEyes
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerEndermanEyes
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerEntityOnShoulder
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerEntityOnShoulder$DataHolder
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerHeldBlock
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerHeldItem
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerHeldItemWitch
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerIronGolemFlower
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerLlamaDecor
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerMooshroomMushroom
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerRenderer
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerSaddle
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerSheepWool
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerSlimeGel
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerSnowmanHead
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerSpiderEyes
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerStrayClothing
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerVillagerArmor
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerWitherAura
+[SKIP   ] net/minecraft/client/renderer/entity/layers/LayerWolfCollar
+[SKIP   ] net/minecraft/client/renderer/texture/AbstractTexture
+[SKIP   ] net/minecraft/client/renderer/texture/DynamicTexture
+[SKIP   ] net/minecraft/client/renderer/texture/ITextureMapPopulator
+[SKIP   ] net/minecraft/client/renderer/texture/ITextureObject
+[SKIP   ] net/minecraft/client/renderer/texture/ITickable
+[SKIP   ] net/minecraft/client/renderer/texture/ITickableTextureObject
+[SKIP   ] net/minecraft/client/renderer/texture/LayeredColorMaskTexture
+[SKIP   ] net/minecraft/client/renderer/texture/LayeredTexture
+[SKIP   ] net/minecraft/client/renderer/texture/PngSizeInfo
+[SKIP   ] net/minecraft/client/renderer/texture/SimpleTexture
+[SKIP   ] net/minecraft/client/renderer/texture/Stitcher
+[SKIP   ] net/minecraft/client/renderer/texture/Stitcher$Holder
+[SKIP   ] net/minecraft/client/renderer/texture/Stitcher$Slot
+[SKIP   ] net/minecraft/client/renderer/texture/TextureAtlasSprite
+[SKIP   ] net/minecraft/client/renderer/texture/TextureAtlasSprite$1
+[SKIP   ] net/minecraft/client/renderer/texture/TextureManager
+[SKIP   ] net/minecraft/client/renderer/texture/TextureManager$1
+[SKIP   ] net/minecraft/client/renderer/texture/TextureMap
+[SKIP   ] net/minecraft/client/renderer/texture/TextureMap$1
+[SKIP   ] net/minecraft/client/renderer/texture/TextureMap$2
+[SKIP   ] net/minecraft/client/renderer/texture/TextureMap$3
+[SKIP   ] net/minecraft/client/renderer/texture/TextureUtil
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityBannerRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityBeaconRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityBedRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityChestRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityEnchantmentTableRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityEndGatewayRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityEndPortalRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityEnderChestRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityItemStackRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityMobSpawnerRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityPistonRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityRendererDispatcher
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityShulkerBoxRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityShulkerBoxRenderer$1
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntitySignRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntitySkullRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntitySkullRenderer$1
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntitySpecialRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityStructureRenderer
+[SKIP   ] net/minecraft/client/renderer/tileentity/TileEntityStructureRenderer$1
+[SKIP   ] net/minecraft/client/renderer/vertex/DefaultVertexFormats
+[SKIP   ] net/minecraft/client/renderer/vertex/VertexBuffer
+[SKIP   ] net/minecraft/client/renderer/vertex/VertexFormat
+[SKIP   ] net/minecraft/client/renderer/vertex/VertexFormat$1
+[SKIP   ] net/minecraft/client/renderer/vertex/VertexFormatElement
+[SKIP   ] net/minecraft/client/renderer/vertex/VertexFormatElement$EnumType
+[SKIP   ] net/minecraft/client/renderer/vertex/VertexFormatElement$EnumUsage
+[SKIP   ] net/minecraft/client/resources/AbstractResourcePack
+[SKIP   ] net/minecraft/client/resources/DefaultPlayerSkin
+[SKIP   ] net/minecraft/client/resources/DefaultResourcePack
+[SKIP   ] net/minecraft/client/resources/FallbackResourceManager
+[SKIP   ] net/minecraft/client/resources/FallbackResourceManager$InputStreamLeakedResourceLogger
+[SKIP   ] net/minecraft/client/resources/FileResourcePack
+[SKIP   ] net/minecraft/client/resources/FolderResourcePack
+[SKIP   ] net/minecraft/client/resources/FoliageColorReloadListener
+[SKIP   ] net/minecraft/client/resources/GrassColorReloadListener
+[SKIP   ] net/minecraft/client/resources/I18n
+[SKIP   ] net/minecraft/client/resources/IReloadableResourceManager
+[SKIP   ] net/minecraft/client/resources/IResource
+[SKIP   ] net/minecraft/client/resources/IResourceManager
+[SKIP   ] net/minecraft/client/resources/IResourceManagerReloadListener
+[SKIP   ] net/minecraft/client/resources/IResourcePack
+[SKIP   ] net/minecraft/client/resources/Language
+[SKIP   ] net/minecraft/client/resources/LanguageManager
+[SKIP   ] net/minecraft/client/resources/LegacyV2Adapter
+[SKIP   ] net/minecraft/client/resources/LegacyV2Adapter$1
+[SKIP   ] net/minecraft/client/resources/Locale
+[SKIP   ] net/minecraft/client/resources/ResourceIndex
+[SKIP   ] net/minecraft/client/resources/ResourceIndexFolder
+[SKIP   ] net/minecraft/client/resources/ResourcePackFileNotFoundException
+[SKIP   ] net/minecraft/client/resources/ResourcePackListEntry
+[SKIP   ] net/minecraft/client/resources/ResourcePackListEntry$1
+[SKIP   ] net/minecraft/client/resources/ResourcePackListEntryDefault
+[SKIP   ] net/minecraft/client/resources/ResourcePackListEntryFound
+[SKIP   ] net/minecraft/client/resources/ResourcePackListEntryServer
+[SKIP   ] net/minecraft/client/resources/ResourcePackRepository
+[SKIP   ] net/minecraft/client/resources/ResourcePackRepository$1
+[SKIP   ] net/minecraft/client/resources/ResourcePackRepository$2
+[SKIP   ] net/minecraft/client/resources/ResourcePackRepository$3
+[SKIP   ] net/minecraft/client/resources/ResourcePackRepository$Entry
+[SKIP   ] net/minecraft/client/resources/SimpleReloadableResourceManager
+[SKIP   ] net/minecraft/client/resources/SimpleReloadableResourceManager$1
+[SKIP   ] net/minecraft/client/resources/SimpleResource
+[SKIP   ] net/minecraft/client/resources/SkinManager
+[SKIP   ] net/minecraft/client/resources/SkinManager$1
+[SKIP   ] net/minecraft/client/resources/SkinManager$2
+[SKIP   ] net/minecraft/client/resources/SkinManager$3
+[SKIP   ] net/minecraft/client/resources/SkinManager$3$1
+[SKIP   ] net/minecraft/client/resources/SkinManager$SkinAvailableCallback
+[SKIP   ] net/minecraft/client/resources/data/AnimationFrame
+[SKIP   ] net/minecraft/client/resources/data/AnimationMetadataSection
+[SKIP   ] net/minecraft/client/resources/data/AnimationMetadataSectionSerializer
+[SKIP   ] net/minecraft/client/resources/data/BaseMetadataSectionSerializer
+[SKIP   ] net/minecraft/client/resources/data/FontMetadataSection
+[SKIP   ] net/minecraft/client/resources/data/FontMetadataSectionSerializer
+[SKIP   ] net/minecraft/client/resources/data/IMetadataSection
+[SKIP   ] net/minecraft/client/resources/data/IMetadataSectionSerializer
+[SKIP   ] net/minecraft/client/resources/data/LanguageMetadataSection
+[SKIP   ] net/minecraft/client/resources/data/LanguageMetadataSectionSerializer
+[SKIP   ] net/minecraft/client/resources/data/MetadataSerializer
+[SKIP   ] net/minecraft/client/resources/data/MetadataSerializer$1
+[SKIP   ] net/minecraft/client/resources/data/MetadataSerializer$Registration
+[SKIP   ] net/minecraft/client/resources/data/PackMetadataSection
+[SKIP   ] net/minecraft/client/resources/data/PackMetadataSectionSerializer
+[SKIP   ] net/minecraft/client/resources/data/TextureMetadataSection
+[SKIP   ] net/minecraft/client/resources/data/TextureMetadataSectionSerializer
+[SKIP   ] net/minecraft/crash/CrashReport
+[SKIP   ] net/minecraft/crash/CrashReport$1
+[SKIP   ] net/minecraft/crash/CrashReport$2
+[SKIP   ] net/minecraft/crash/CrashReport$3
+[SKIP   ] net/minecraft/crash/CrashReport$4
+[SKIP   ] net/minecraft/crash/CrashReport$5
+[SKIP   ] net/minecraft/crash/CrashReport$6
+[SKIP   ] net/minecraft/crash/CrashReport$7
+[SKIP   ] net/minecraft/crash/CrashReportCategory
+[SKIP   ] net/minecraft/crash/CrashReportCategory$1
+[SKIP   ] net/minecraft/crash/CrashReportCategory$2
+[SKIP   ] net/minecraft/crash/CrashReportCategory$3
+[SKIP   ] net/minecraft/crash/CrashReportCategory$6
+[SKIP   ] net/minecraft/crash/CrashReportCategory$7
+[SKIP   ] net/minecraft/crash/CrashReportCategory$Entry
+[SKIP   ] net/minecraft/crash/ICrashReportDetail
+[SKIP   ] net/minecraft/scoreboard/IScoreCriteria
+[SKIP   ] net/minecraft/scoreboard/IScoreCriteria$EnumRenderType
+[SKIP   ] net/minecraft/scoreboard/Score
+[SKIP   ] net/minecraft/scoreboard/Score$1
+[SKIP   ] net/minecraft/scoreboard/ScoreCriteria
+[SKIP   ] net/minecraft/scoreboard/ScoreCriteriaColored
+[SKIP   ] net/minecraft/scoreboard/ScoreCriteriaHealth
+[SKIP   ] net/minecraft/scoreboard/ScoreCriteriaReadOnly
+[SKIP   ] net/minecraft/scoreboard/ScoreCriteriaStat
+[SKIP   ] net/minecraft/scoreboard/ScoreObjective
+[SKIP   ] net/minecraft/scoreboard/ScorePlayerTeam
+[SKIP   ] net/minecraft/scoreboard/Scoreboard
+[SKIP   ] net/minecraft/scoreboard/ScoreboardSaveData
+[SKIP   ] net/minecraft/scoreboard/ServerScoreboard
+[SKIP   ] net/minecraft/scoreboard/Team
+[SKIP   ] net/minecraft/scoreboard/Team$CollisionRule
+[SKIP   ] net/minecraft/scoreboard/Team$EnumVisible
+[SKIP   ] net/minecraft/stats/IStatType
+[SKIP   ] net/minecraft/stats/RecipeBook
+[SKIP   ] net/minecraft/stats/RecipeBookServer
+[SKIP   ] net/minecraft/stats/StatBase
+[SKIP   ] net/minecraft/stats/StatBase$1
+[SKIP   ] net/minecraft/stats/StatBase$2
+[SKIP   ] net/minecraft/stats/StatBase$3
+[SKIP   ] net/minecraft/stats/StatBase$4
+[SKIP   ] net/minecraft/stats/StatBasic
+[SKIP   ] net/minecraft/stats/StatCrafting
+[SKIP   ] net/minecraft/stats/StatList
+[SKIP   ] net/minecraft/stats/StatisticsManager
+[SKIP   ] net/minecraft/stats/StatisticsManagerServer
+[SKIP   ] net/minecraft/util/text/ChatType
+[SKIP   ] net/minecraft/util/text/ITextComponent
+[SKIP   ] net/minecraft/util/text/ITextComponent$Serializer
+[SKIP   ] net/minecraft/util/text/Style
+[SKIP   ] net/minecraft/util/text/Style$1
+[SKIP   ] net/minecraft/util/text/Style$Serializer
+[SKIP   ] net/minecraft/util/text/TextComponentBase
+[SKIP   ] net/minecraft/util/text/TextComponentBase$1
+[SKIP   ] net/minecraft/util/text/TextComponentBase$2
+[SKIP   ] net/minecraft/util/text/TextComponentKeybind
+[SKIP   ] net/minecraft/util/text/TextComponentScore
+[SKIP   ] net/minecraft/util/text/TextComponentSelector
+[SKIP   ] net/minecraft/util/text/TextComponentString
+[SKIP   ] net/minecraft/util/text/TextComponentTranslation
+[SKIP   ] net/minecraft/util/text/TextComponentTranslationFormatException
+[SKIP   ] net/minecraft/util/text/TextComponentUtils
+[SKIP   ] net/minecraft/util/text/TextFormatting
+[SKIP   ] net/minecraft/util/text/event/ClickEvent
+[SKIP   ] net/minecraft/util/text/event/ClickEvent$Action
+[SKIP   ] net/minecraft/util/text/event/HoverEvent
+[SKIP   ] net/minecraft/util/text/event/HoverEvent$Action
+[SKIP   ] net/minecraft/util/text/translation/I18n
+[SKIP   ] net/minecraft/util/text/translation/LanguageMap
+
+===== UTIL =====
+[SUPPORT] net/minecraft/util/ActionResult
+[SUPPORT] net/minecraft/util/BitArray
+[SUPPORT] net/minecraft/util/BlockRenderLayer
+[SUPPORT] net/minecraft/util/ChatAllowedCharacters
+[SUPPORT] net/minecraft/util/ClassInheritanceMultiMap
+[SUPPORT] net/minecraft/util/ClassInheritanceMultiMap$1
+[SUPPORT] net/minecraft/util/CombatEntry
+[SUPPORT] net/minecraft/util/CombatRules
+[SUPPORT] net/minecraft/util/CombatTracker
+[SUPPORT] net/minecraft/util/CooldownTracker
+[SUPPORT] net/minecraft/util/CooldownTracker$1
+[SUPPORT] net/minecraft/util/CooldownTracker$Cooldown
+[SUPPORT] net/minecraft/util/CooldownTrackerServer
+[SUPPORT] net/minecraft/util/CryptManager
+[SUPPORT] net/minecraft/util/DamageSource
+[SUPPORT] net/minecraft/util/EnchantmentNameParts
+[SUPPORT] net/minecraft/util/EntityDamageSource
+[SUPPORT] net/minecraft/util/EntityDamageSourceIndirect
+[SUPPORT] net/minecraft/util/EntitySelectors
+[SUPPORT] net/minecraft/util/EntitySelectors$1
+[SUPPORT] net/minecraft/util/EntitySelectors$2
+[SUPPORT] net/minecraft/util/EntitySelectors$3
+[SUPPORT] net/minecraft/util/EntitySelectors$4
+[SUPPORT] net/minecraft/util/EntitySelectors$5
+[SUPPORT] net/minecraft/util/EntitySelectors$6
+[SUPPORT] net/minecraft/util/EntitySelectors$7
+[SUPPORT] net/minecraft/util/EntitySelectors$8
+[SUPPORT] net/minecraft/util/EntitySelectors$ArmoredMob
+[SUPPORT] net/minecraft/util/EnumActionResult
+[SUPPORT] net/minecraft/util/EnumBlockRenderType
+[SUPPORT] net/minecraft/util/EnumFacing$1
+[SUPPORT] net/minecraft/util/EnumFacing$Axis
+[SUPPORT] net/minecraft/util/EnumFacing$AxisDirection
+[SUPPORT] net/minecraft/util/EnumFacing$Plane
+[SUPPORT] net/minecraft/util/EnumHand
+[SUPPORT] net/minecraft/util/EnumHandSide
+[SUPPORT] net/minecraft/util/EnumParticleTypes
+[SUPPORT] net/minecraft/util/EnumTypeAdapterFactory
+[SUPPORT] net/minecraft/util/EnumTypeAdapterFactory$1
+[SUPPORT] net/minecraft/util/FoodStats
+[SUPPORT] net/minecraft/util/FrameTimer
+[SUPPORT] net/minecraft/util/HttpUtil
+[SUPPORT] net/minecraft/util/HttpUtil$1
+[SUPPORT] net/minecraft/util/IJsonSerializable
+[SUPPORT] net/minecraft/util/IObjectIntIterable
+[SUPPORT] net/minecraft/util/IProgressUpdate
+[SUPPORT] net/minecraft/util/IStringSerializable
+[SUPPORT] net/minecraft/util/ITabCompleter
+[SUPPORT] net/minecraft/util/IThreadListener
+[SUPPORT] net/minecraft/util/ITickable
+[SUPPORT] net/minecraft/util/IntHashMap
+[SUPPORT] net/minecraft/util/IntHashMap$Entry
+[SUPPORT] net/minecraft/util/IntIdentityHashBiMap
+[SUPPORT] net/minecraft/util/IntegerCache
+[SUPPORT] net/minecraft/util/JsonUtils
+[SUPPORT] net/minecraft/util/LazyLoadBase
+[SUPPORT] net/minecraft/util/LoggingPrintStream
+[SUPPORT] net/minecraft/util/LowerStringMap
+[SUPPORT] net/minecraft/util/MapPopulator
+[SUPPORT] net/minecraft/util/MinecraftError
+[SUPPORT] net/minecraft/util/Mirror
+[SUPPORT] net/minecraft/util/Mirror$1
+[SUPPORT] net/minecraft/util/MouseFilter
+[SUPPORT] net/minecraft/util/MouseHelper
+[SUPPORT] net/minecraft/util/MovementInput
+[SUPPORT] net/minecraft/util/MovementInputFromOptions
+[SUPPORT] net/minecraft/util/NonNullList
+[SUPPORT] net/minecraft/util/ObjectIntIdentityMap
+[SUPPORT] net/minecraft/util/ReportedException
+[SUPPORT] net/minecraft/util/ResourceLocation
+[SUPPORT] net/minecraft/util/ResourceLocation$Serializer
+[SUPPORT] net/minecraft/util/Rotation
+[SUPPORT] net/minecraft/util/Rotation$1
+[SUPPORT] net/minecraft/util/ScreenShotHelper
+[SUPPORT] net/minecraft/util/ServerRecipeBookHelper
+[SUPPORT] net/minecraft/util/Session
+[SUPPORT] net/minecraft/util/Session$Type
+[SUPPORT] net/minecraft/util/SoundCategory
+[SUPPORT] net/minecraft/util/SoundEvent
+[SUPPORT] net/minecraft/util/StringUtils
+[SUPPORT] net/minecraft/util/TabCompleter
+[SUPPORT] net/minecraft/util/Timer
+[SUPPORT] net/minecraft/util/Tuple
+[SUPPORT] net/minecraft/util/TupleIntJsonSerializable
+[SUPPORT] net/minecraft/util/Util
+[SUPPORT] net/minecraft/util/Util$EnumOS
+[SUPPORT] net/minecraft/util/WeightedRandom
+[SUPPORT] net/minecraft/util/WeightedRandom$Item
+[SUPPORT] net/minecraft/util/WeightedSpawnerEntity
+[SUPPORT] net/minecraft/util/datafix/DataFixer
+[SUPPORT] net/minecraft/util/datafix/DataFixesManager
+[SUPPORT] net/minecraft/util/datafix/FixTypes
+[SUPPORT] net/minecraft/util/datafix/IDataFixer
+[SUPPORT] net/minecraft/util/datafix/IDataWalker
+[SUPPORT] net/minecraft/util/datafix/IFixType
+[SUPPORT] net/minecraft/util/datafix/IFixableData
+[SUPPORT] net/minecraft/util/datafix/fixes/AddBedTileEntity
+[SUPPORT] net/minecraft/util/datafix/fixes/ArmorStandSilent
+[SUPPORT] net/minecraft/util/datafix/fixes/BannerItemColor
+[SUPPORT] net/minecraft/util/datafix/fixes/BedItemColor
+[SUPPORT] net/minecraft/util/datafix/fixes/BookPagesStrictJSON
+[SUPPORT] net/minecraft/util/datafix/fixes/CookedFishIDTypo
+[SUPPORT] net/minecraft/util/datafix/fixes/ElderGuardianSplit
+[SUPPORT] net/minecraft/util/datafix/fixes/EntityArmorAndHeld
+[SUPPORT] net/minecraft/util/datafix/fixes/EntityHealth
+[SUPPORT] net/minecraft/util/datafix/fixes/EntityId
+[SUPPORT] net/minecraft/util/datafix/fixes/ForceVBOOn
+[SUPPORT] net/minecraft/util/datafix/fixes/HorseSaddle
+[SUPPORT] net/minecraft/util/datafix/fixes/HorseSplit
+[SUPPORT] net/minecraft/util/datafix/fixes/ItemIntIDToString
+[SUPPORT] net/minecraft/util/datafix/fixes/MinecartEntityTypes
+[SUPPORT] net/minecraft/util/datafix/fixes/OptionsLowerCaseLanguage
+[SUPPORT] net/minecraft/util/datafix/fixes/PaintingDirection
+[SUPPORT] net/minecraft/util/datafix/fixes/PotionItems
+[SUPPORT] net/minecraft/util/datafix/fixes/PotionWater
+[SUPPORT] net/minecraft/util/datafix/fixes/RedundantChanceTags
+[SUPPORT] net/minecraft/util/datafix/fixes/RidingToPassengers
+[SUPPORT] net/minecraft/util/datafix/fixes/ShulkerBoxEntityColor
+[SUPPORT] net/minecraft/util/datafix/fixes/ShulkerBoxItemColor
+[SUPPORT] net/minecraft/util/datafix/fixes/ShulkerBoxTileColor
+[SUPPORT] net/minecraft/util/datafix/fixes/SignStrictJSON
+[SUPPORT] net/minecraft/util/datafix/fixes/SignStrictJSON$1
+[SUPPORT] net/minecraft/util/datafix/fixes/SkeletonSplit
+[SUPPORT] net/minecraft/util/datafix/fixes/SpawnEggNames
+[SUPPORT] net/minecraft/util/datafix/fixes/SpawnerEntityTypes
+[SUPPORT] net/minecraft/util/datafix/fixes/StringToUUID
+[SUPPORT] net/minecraft/util/datafix/fixes/TileEntityId
+[SUPPORT] net/minecraft/util/datafix/fixes/TotemItemRename
+[SUPPORT] net/minecraft/util/datafix/fixes/ZombieProfToType
+[SUPPORT] net/minecraft/util/datafix/fixes/ZombieSplit
+[SUPPORT] net/minecraft/util/datafix/walkers/BlockEntityTag
+[SUPPORT] net/minecraft/util/datafix/walkers/EntityTag
+[SUPPORT] net/minecraft/util/datafix/walkers/Filtered
+[SUPPORT] net/minecraft/util/datafix/walkers/ItemStackData
+[SUPPORT] net/minecraft/util/datafix/walkers/ItemStackDataLists
+[SUPPORT] net/minecraft/util/math/BlockPos$1
+[SUPPORT] net/minecraft/util/math/BlockPos$1$1
+[SUPPORT] net/minecraft/util/math/BlockPos$2
+[SUPPORT] net/minecraft/util/math/BlockPos$2$1
+[SUPPORT] net/minecraft/util/math/BlockPos$4
+[SUPPORT] net/minecraft/util/math/BlockPos$MutableBlockPos
+[SUPPORT] net/minecraft/util/math/BlockPos$PooledMutableBlockPos
+[SUPPORT] net/minecraft/util/math/Cartesian
+[SUPPORT] net/minecraft/util/math/Cartesian$1
+[SUPPORT] net/minecraft/util/math/Cartesian$GetList
+[SUPPORT] net/minecraft/util/math/Cartesian$Product
+[SUPPORT] net/minecraft/util/math/Cartesian$Product$ProductIterator
+[SUPPORT] net/minecraft/util/math/MathHelper
+[SUPPORT] net/minecraft/util/math/Rotations
+[SUPPORT] net/minecraft/util/math/Vec2f
+[SUPPORT] net/minecraft/util/math/Vec3i
+[SUPPORT] net/minecraft/util/registry/IRegistry
+[SUPPORT] net/minecraft/util/registry/RegistryDefaulted
+[SUPPORT] net/minecraft/util/registry/RegistryNamespaced
+[SUPPORT] net/minecraft/util/registry/RegistryNamespacedDefaultedByKey
+[SUPPORT] net/minecraft/util/registry/RegistrySimple
+
+===== WORLDGEN =====
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorDebug
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorEnd
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorFlat
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorHell
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorOverworld
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorSettings
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorSettings$1
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorSettings$Factory
+[CORE   ] net/minecraft/world/gen/ChunkGeneratorSettings$Serializer
+[CORE   ] net/minecraft/world/gen/ChunkProviderServer
+[CORE   ] net/minecraft/world/gen/FlatGeneratorInfo
+[CORE   ] net/minecraft/world/gen/FlatLayerInfo
+[CORE   ] net/minecraft/world/gen/IChunkGenerator
+[CORE   ] net/minecraft/world/gen/MapGenBase
+[CORE   ] net/minecraft/world/gen/MapGenCaves
+[CORE   ] net/minecraft/world/gen/MapGenCavesHell
+[CORE   ] net/minecraft/world/gen/MapGenRavine
+[CORE   ] net/minecraft/world/gen/NoiseGenerator
+[CORE   ] net/minecraft/world/gen/NoiseGeneratorImproved
+[CORE   ] net/minecraft/world/gen/NoiseGeneratorOctaves
+[CORE   ] net/minecraft/world/gen/NoiseGeneratorPerlin
+[CORE   ] net/minecraft/world/gen/NoiseGeneratorSimplex
+[CORE   ] net/minecraft/world/gen/feature/WorldGenAbstractTree
+[CORE   ] net/minecraft/world/gen/feature/WorldGenBigMushroom
+[CORE   ] net/minecraft/world/gen/feature/WorldGenBigTree
+[CORE   ] net/minecraft/world/gen/feature/WorldGenBigTree$FoliageCoordinates
+[CORE   ] net/minecraft/world/gen/feature/WorldGenBirchTree
+[CORE   ] net/minecraft/world/gen/feature/WorldGenBlockBlob
+[CORE   ] net/minecraft/world/gen/feature/WorldGenBush
+[CORE   ] net/minecraft/world/gen/feature/WorldGenCactus
+[CORE   ] net/minecraft/world/gen/feature/WorldGenCanopyTree
+[CORE   ] net/minecraft/world/gen/feature/WorldGenClay
+[CORE   ] net/minecraft/world/gen/feature/WorldGenDeadBush
+[CORE   ] net/minecraft/world/gen/feature/WorldGenDesertWells
+[CORE   ] net/minecraft/world/gen/feature/WorldGenDoublePlant
+[CORE   ] net/minecraft/world/gen/feature/WorldGenDungeons
+[CORE   ] net/minecraft/world/gen/feature/WorldGenEndGateway
+[CORE   ] net/minecraft/world/gen/feature/WorldGenEndIsland
+[CORE   ] net/minecraft/world/gen/feature/WorldGenEndPodium
+[CORE   ] net/minecraft/world/gen/feature/WorldGenFire
+[CORE   ] net/minecraft/world/gen/feature/WorldGenFlowers
+[CORE   ] net/minecraft/world/gen/feature/WorldGenFossils
+[CORE   ] net/minecraft/world/gen/feature/WorldGenGlowStone1
+[CORE   ] net/minecraft/world/gen/feature/WorldGenGlowStone2
+[CORE   ] net/minecraft/world/gen/feature/WorldGenHellLava
+[CORE   ] net/minecraft/world/gen/feature/WorldGenHugeTrees
+[CORE   ] net/minecraft/world/gen/feature/WorldGenIcePath
+[CORE   ] net/minecraft/world/gen/feature/WorldGenIceSpike
+[CORE   ] net/minecraft/world/gen/feature/WorldGenLakes
+[CORE   ] net/minecraft/world/gen/feature/WorldGenLiquids
+[CORE   ] net/minecraft/world/gen/feature/WorldGenMegaJungle
+[CORE   ] net/minecraft/world/gen/feature/WorldGenMegaPineTree
+[CORE   ] net/minecraft/world/gen/feature/WorldGenMelon
+[CORE   ] net/minecraft/world/gen/feature/WorldGenMinable
+[CORE   ] net/minecraft/world/gen/feature/WorldGenMinable$1
+[CORE   ] net/minecraft/world/gen/feature/WorldGenMinable$StonePredicate
+[CORE   ] net/minecraft/world/gen/feature/WorldGenPumpkin
+[CORE   ] net/minecraft/world/gen/feature/WorldGenReed
+[CORE   ] net/minecraft/world/gen/feature/WorldGenSand
+[CORE   ] net/minecraft/world/gen/feature/WorldGenSavannaTree
+[CORE   ] net/minecraft/world/gen/feature/WorldGenShrub
+[CORE   ] net/minecraft/world/gen/feature/WorldGenSpikes
+[CORE   ] net/minecraft/world/gen/feature/WorldGenSpikes$EndSpike
+[CORE   ] net/minecraft/world/gen/feature/WorldGenSwamp
+[CORE   ] net/minecraft/world/gen/feature/WorldGenTaiga1
+[CORE   ] net/minecraft/world/gen/feature/WorldGenTaiga2
+[CORE   ] net/minecraft/world/gen/feature/WorldGenTallGrass
+[CORE   ] net/minecraft/world/gen/feature/WorldGenTrees
+[CORE   ] net/minecraft/world/gen/feature/WorldGenVines
+[CORE   ] net/minecraft/world/gen/feature/WorldGenWaterlily
+[CORE   ] net/minecraft/world/gen/feature/WorldGenerator
+[CORE   ] net/minecraft/world/gen/feature/WorldGeneratorBonusChest
+[CORE   ] net/minecraft/world/gen/layer/GenLayer
+[CORE   ] net/minecraft/world/gen/layer/GenLayerAddIsland
+[CORE   ] net/minecraft/world/gen/layer/GenLayerAddMushroomIsland
+[CORE   ] net/minecraft/world/gen/layer/GenLayerAddSnow
+[CORE   ] net/minecraft/world/gen/layer/GenLayerBiome
+[CORE   ] net/minecraft/world/gen/layer/GenLayerBiomeEdge
+[CORE   ] net/minecraft/world/gen/layer/GenLayerDeepOcean
+[CORE   ] net/minecraft/world/gen/layer/GenLayerEdge
+[CORE   ] net/minecraft/world/gen/layer/GenLayerEdge$1
+[CORE   ] net/minecraft/world/gen/layer/GenLayerEdge$Mode
+[CORE   ] net/minecraft/world/gen/layer/GenLayerFuzzyZoom
+[CORE   ] net/minecraft/world/gen/layer/GenLayerHills
+[CORE   ] net/minecraft/world/gen/layer/GenLayerIsland
+[CORE   ] net/minecraft/world/gen/layer/GenLayerRareBiome
+[CORE   ] net/minecraft/world/gen/layer/GenLayerRemoveTooMuchOcean
+[CORE   ] net/minecraft/world/gen/layer/GenLayerRiver
+[CORE   ] net/minecraft/world/gen/layer/GenLayerRiverInit
+[CORE   ] net/minecraft/world/gen/layer/GenLayerRiverMix
+[CORE   ] net/minecraft/world/gen/layer/GenLayerShore
+[CORE   ] net/minecraft/world/gen/layer/GenLayerSmooth
+[CORE   ] net/minecraft/world/gen/layer/GenLayerVoronoiZoom
+[CORE   ] net/minecraft/world/gen/layer/GenLayerZoom
+[CORE   ] net/minecraft/world/gen/layer/IntCache
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$1
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$DesertPyramid
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$Feature
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$Igloo
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$JunglePyramid
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$JunglePyramid$Stones
+[CORE   ] net/minecraft/world/gen/structure/ComponentScatteredFeaturePieces$SwampHut
+[CORE   ] net/minecraft/world/gen/structure/MapGenEndCity
+[CORE   ] net/minecraft/world/gen/structure/MapGenEndCity$Start
+[CORE   ] net/minecraft/world/gen/structure/MapGenMineshaft
+[CORE   ] net/minecraft/world/gen/structure/MapGenMineshaft$Type
+[CORE   ] net/minecraft/world/gen/structure/MapGenNetherBridge
+[CORE   ] net/minecraft/world/gen/structure/MapGenNetherBridge$Start
+[CORE   ] net/minecraft/world/gen/structure/MapGenScatteredFeature
+[CORE   ] net/minecraft/world/gen/structure/MapGenScatteredFeature$Start
+[CORE   ] net/minecraft/world/gen/structure/MapGenStronghold
+[CORE   ] net/minecraft/world/gen/structure/MapGenStronghold$Start
+[CORE   ] net/minecraft/world/gen/structure/MapGenStructure
+[CORE   ] net/minecraft/world/gen/structure/MapGenStructure$1
+[CORE   ] net/minecraft/world/gen/structure/MapGenStructure$2
+[CORE   ] net/minecraft/world/gen/structure/MapGenStructure$3
+[CORE   ] net/minecraft/world/gen/structure/MapGenStructureData
+[CORE   ] net/minecraft/world/gen/structure/MapGenStructureIO
+[CORE   ] net/minecraft/world/gen/structure/MapGenVillage
+[CORE   ] net/minecraft/world/gen/structure/MapGenVillage$Start
+[CORE   ] net/minecraft/world/gen/structure/StructureBoundingBox
+[CORE   ] net/minecraft/world/gen/structure/StructureBoundingBox$1
+[CORE   ] net/minecraft/world/gen/structure/StructureComponent
+[CORE   ] net/minecraft/world/gen/structure/StructureComponent$1
+[CORE   ] net/minecraft/world/gen/structure/StructureComponent$BlockSelector
+[CORE   ] net/minecraft/world/gen/structure/StructureComponentTemplate
+[CORE   ] net/minecraft/world/gen/structure/StructureComponentTemplate$1
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces$1
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces$2
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces$3
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces$4
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces$CityTemplate
+[CORE   ] net/minecraft/world/gen/structure/StructureEndCityPieces$IGenerator
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces$1
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces$Corridor
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces$Cross
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces$Peice
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces$Room
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftPieces$Stairs
+[CORE   ] net/minecraft/world/gen/structure/StructureMineshaftStart
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$1
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Corridor
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Corridor2
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Corridor3
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Corridor4
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Corridor5
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Crossing
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Crossing2
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Crossing3
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$End
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Entrance
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$NetherStalkRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Piece
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$PieceWeight
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Stairs
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Start
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Straight
+[CORE   ] net/minecraft/world/gen/structure/StructureNetherBridgePieces$Throne
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonument
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonument$StartMonument
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$1
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$DoubleXRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$DoubleXYRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$DoubleYRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$DoubleYZRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$DoubleZRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$EntryRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$FitSimpleRoomHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$FitSimpleRoomTopHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$MonumentBuilding
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$MonumentCoreRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$MonumentRoomFitHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$Penthouse
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$Piece
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$RoomDefinition
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$SimpleRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$SimpleTopRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$WingRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$XDoubleRoomFitHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$XYDoubleRoomFitHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$YDoubleRoomFitHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$YZDoubleRoomFitHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureOceanMonumentPieces$ZDoubleRoomFitHelper
+[CORE   ] net/minecraft/world/gen/structure/StructureStart
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$1
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$2
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$3
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$ChestCorridor
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Corridor
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Crossing
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$LeftTurn
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Library
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$PieceWeight
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$PortalRoom
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Prison
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$RightTurn
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$RoomCrossing
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Stairs
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Stairs2
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$StairsStraight
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Stones
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Straight
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Stronghold
+[CORE   ] net/minecraft/world/gen/structure/StructureStrongholdPieces$Stronghold$Door
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$1
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Church
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Field1
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Field2
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Hall
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$House1
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$House2
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$House3
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$House4Garden
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Path
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$PieceWeight
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Road
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Start
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Torch
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Village
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$Well
+[CORE   ] net/minecraft/world/gen/structure/StructureVillagePieces$WoodHut
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansion
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansion$Start
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$1
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$FirstFloor
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$Grid
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$MansionTemplate
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$PlacementData
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$Placer
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$RoomCollection
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$SecondFloor
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$SimpleGrid
+[CORE   ] net/minecraft/world/gen/structure/WoodlandMansionPieces$ThirdFloor
+[CORE   ] net/minecraft/world/gen/structure/template/BlockRotationProcessor
+[CORE   ] net/minecraft/world/gen/structure/template/ITemplateProcessor
+[CORE   ] net/minecraft/world/gen/structure/template/PlacementSettings
+[CORE   ] net/minecraft/world/gen/structure/template/Template
+[CORE   ] net/minecraft/world/gen/structure/template/Template$1
+[CORE   ] net/minecraft/world/gen/structure/template/Template$2
+[CORE   ] net/minecraft/world/gen/structure/template/Template$3
+[CORE   ] net/minecraft/world/gen/structure/template/Template$BasicPalette
+[CORE   ] net/minecraft/world/gen/structure/template/Template$BlockInfo
+[CORE   ] net/minecraft/world/gen/structure/template/Template$EntityInfo
+[CORE   ] net/minecraft/world/gen/structure/template/TemplateManager
+
+===== WORLD_CHUNK =====
+[CORE   ] net/minecraft/util/math/ChunkPos
+[CORE   ] net/minecraft/world/World
+[CORE   ] net/minecraft/world/WorldEntitySpawner
+[CORE   ] net/minecraft/world/WorldProvider
+[CORE   ] net/minecraft/world/WorldProviderEnd
+[CORE   ] net/minecraft/world/WorldProviderHell
+[CORE   ] net/minecraft/world/WorldProviderHell$1
+[CORE   ] net/minecraft/world/WorldProviderSurface
+[CORE   ] net/minecraft/world/WorldServer
+[CORE   ] net/minecraft/world/WorldServer$1
+[CORE   ] net/minecraft/world/WorldServer$ServerBlockEventList
+[CORE   ] net/minecraft/world/WorldServerDemo
+[CORE   ] net/minecraft/world/WorldServerMulti
+[CORE   ] net/minecraft/world/WorldServerMulti$1
+[CORE   ] net/minecraft/world/WorldSettings
+[CORE   ] net/minecraft/world/WorldType
+[CORE   ] net/minecraft/world/chunk/BlockStateContainer
+[CORE   ] net/minecraft/world/chunk/BlockStatePaletteHashMap
+[CORE   ] net/minecraft/world/chunk/BlockStatePaletteLinear
+[CORE   ] net/minecraft/world/chunk/BlockStatePaletteRegistry
+[CORE   ] net/minecraft/world/chunk/Chunk
+[CORE   ] net/minecraft/world/chunk/Chunk$1
+[CORE   ] net/minecraft/world/chunk/Chunk$EnumCreateEntityType
+[CORE   ] net/minecraft/world/chunk/ChunkPrimer
+[CORE   ] net/minecraft/world/chunk/EmptyChunk
+[CORE   ] net/minecraft/world/chunk/IBlockStatePalette
+[CORE   ] net/minecraft/world/chunk/IBlockStatePaletteResizer
+[CORE   ] net/minecraft/world/chunk/IChunkProvider
+[CORE   ] net/minecraft/world/chunk/NibbleArray
+[CORE   ] net/minecraft/world/chunk/storage/AnvilChunkLoader
+[CORE   ] net/minecraft/world/chunk/storage/AnvilChunkLoader$1
+[CORE   ] net/minecraft/world/chunk/storage/AnvilSaveConverter
+[CORE   ] net/minecraft/world/chunk/storage/AnvilSaveConverter$1
+[CORE   ] net/minecraft/world/chunk/storage/AnvilSaveHandler
+[CORE   ] net/minecraft/world/chunk/storage/ChunkLoader
+[CORE   ] net/minecraft/world/chunk/storage/ChunkLoader$AnvilConverterData
+[CORE   ] net/minecraft/world/chunk/storage/ExtendedBlockStorage
+[CORE   ] net/minecraft/world/chunk/storage/IChunkLoader
+[CORE   ] net/minecraft/world/chunk/storage/NibbleArrayReader
+[CORE   ] net/minecraft/world/chunk/storage/RegionFile
+[CORE   ] net/minecraft/world/chunk/storage/RegionFile$ChunkBuffer
+[CORE   ] net/minecraft/world/chunk/storage/RegionFileCache
+[CORE   ] net/minecraft/world/storage/DerivedWorldInfo
+[CORE   ] net/minecraft/world/storage/IPlayerFileData
+[CORE   ] net/minecraft/world/storage/ISaveFormat
+[CORE   ] net/minecraft/world/storage/ISaveHandler
+[CORE   ] net/minecraft/world/storage/IThreadedFileIO
+[CORE   ] net/minecraft/world/storage/MapData
+[CORE   ] net/minecraft/world/storage/MapData$MapInfo
+[CORE   ] net/minecraft/world/storage/MapDecoration
+[CORE   ] net/minecraft/world/storage/MapDecoration$Type
+[CORE   ] net/minecraft/world/storage/MapStorage
+[CORE   ] net/minecraft/world/storage/SaveDataMemoryStorage
+[CORE   ] net/minecraft/world/storage/SaveFormatOld
+[CORE   ] net/minecraft/world/storage/SaveHandler
+[CORE   ] net/minecraft/world/storage/SaveHandlerMP
+[CORE   ] net/minecraft/world/storage/ThreadedFileIOBase
+[CORE   ] net/minecraft/world/storage/WorldInfo
+[CORE   ] net/minecraft/world/storage/WorldInfo$1
+[CORE   ] net/minecraft/world/storage/WorldInfo$10
+[CORE   ] net/minecraft/world/storage/WorldInfo$2
+[CORE   ] net/minecraft/world/storage/WorldInfo$3
+[CORE   ] net/minecraft/world/storage/WorldInfo$4
+[CORE   ] net/minecraft/world/storage/WorldInfo$5
+[CORE   ] net/minecraft/world/storage/WorldInfo$6
+[CORE   ] net/minecraft/world/storage/WorldInfo$7
+[CORE   ] net/minecraft/world/storage/WorldInfo$8
+[CORE   ] net/minecraft/world/storage/WorldInfo$9
+[CORE   ] net/minecraft/world/storage/WorldSavedData
+[CORE   ] net/minecraft/world/storage/WorldSavedDataCallableSave
+[CORE   ] net/minecraft/world/storage/WorldSummary
+[CORE   ] net/minecraft/world/storage/loot/ILootContainer
+[CORE   ] net/minecraft/world/storage/loot/LootContext
+[CORE   ] net/minecraft/world/storage/loot/LootContext$1
+[CORE   ] net/minecraft/world/storage/loot/LootContext$Builder
+[CORE   ] net/minecraft/world/storage/loot/LootContext$EntityTarget
+[CORE   ] net/minecraft/world/storage/loot/LootContext$EntityTarget$Serializer
+[CORE   ] net/minecraft/world/storage/loot/LootEntry
+[CORE   ] net/minecraft/world/storage/loot/LootEntry$Serializer
+[CORE   ] net/minecraft/world/storage/loot/LootEntryEmpty
+[CORE   ] net/minecraft/world/storage/loot/LootEntryItem
+[CORE   ] net/minecraft/world/storage/loot/LootEntryTable
+[CORE   ] net/minecraft/world/storage/loot/LootPool
+[CORE   ] net/minecraft/world/storage/loot/LootPool$Serializer
+[CORE   ] net/minecraft/world/storage/loot/LootTable
+[CORE   ] net/minecraft/world/storage/loot/LootTable$Serializer
+[CORE   ] net/minecraft/world/storage/loot/LootTableList
+[CORE   ] net/minecraft/world/storage/loot/LootTableManager
+[CORE   ] net/minecraft/world/storage/loot/LootTableManager$1
+[CORE   ] net/minecraft/world/storage/loot/LootTableManager$Loader
+[CORE   ] net/minecraft/world/storage/loot/RandomValueRange
+[CORE   ] net/minecraft/world/storage/loot/RandomValueRange$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/EntityHasProperty
+[CORE   ] net/minecraft/world/storage/loot/conditions/EntityHasProperty$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/EntityHasScore
+[CORE   ] net/minecraft/world/storage/loot/conditions/EntityHasScore$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/KilledByPlayer
+[CORE   ] net/minecraft/world/storage/loot/conditions/KilledByPlayer$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/LootCondition
+[CORE   ] net/minecraft/world/storage/loot/conditions/LootCondition$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/LootConditionManager
+[CORE   ] net/minecraft/world/storage/loot/conditions/LootConditionManager$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/RandomChance
+[CORE   ] net/minecraft/world/storage/loot/conditions/RandomChance$Serializer
+[CORE   ] net/minecraft/world/storage/loot/conditions/RandomChanceWithLooting
+[CORE   ] net/minecraft/world/storage/loot/conditions/RandomChanceWithLooting$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/EnchantRandomly
+[CORE   ] net/minecraft/world/storage/loot/functions/EnchantRandomly$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/EnchantWithLevels
+[CORE   ] net/minecraft/world/storage/loot/functions/EnchantWithLevels$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/LootFunction
+[CORE   ] net/minecraft/world/storage/loot/functions/LootFunction$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/LootFunctionManager
+[CORE   ] net/minecraft/world/storage/loot/functions/LootFunctionManager$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/LootingEnchantBonus
+[CORE   ] net/minecraft/world/storage/loot/functions/LootingEnchantBonus$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/SetAttributes
+[CORE   ] net/minecraft/world/storage/loot/functions/SetAttributes$Modifier
+[CORE   ] net/minecraft/world/storage/loot/functions/SetAttributes$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/SetCount
+[CORE   ] net/minecraft/world/storage/loot/functions/SetCount$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/SetDamage
+[CORE   ] net/minecraft/world/storage/loot/functions/SetDamage$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/SetMetadata
+[CORE   ] net/minecraft/world/storage/loot/functions/SetMetadata$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/SetNBT
+[CORE   ] net/minecraft/world/storage/loot/functions/SetNBT$Serializer
+[CORE   ] net/minecraft/world/storage/loot/functions/Smelt
+[CORE   ] net/minecraft/world/storage/loot/functions/Smelt$Serializer
+[CORE   ] net/minecraft/world/storage/loot/properties/EntityOnFire
+[CORE   ] net/minecraft/world/storage/loot/properties/EntityOnFire$Serializer
+[CORE   ] net/minecraft/world/storage/loot/properties/EntityProperty
+[CORE   ] net/minecraft/world/storage/loot/properties/EntityProperty$Serializer
+[CORE   ] net/minecraft/world/storage/loot/properties/EntityPropertyManager

@@ -1,0 +1,1 @@
+"""Crafting recipes and execution."""

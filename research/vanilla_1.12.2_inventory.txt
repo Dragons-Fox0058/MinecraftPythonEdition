@@ -1,0 +1,23 @@
+MINECRAFT JAVA EDITION 1.12.2
+=============================================
+Version: 1.12.2
+Main class: net.minecraft.client.main.Main
+Total JAR entries: 7957
+Java classes: 3310
+Libraries: 39
+Asset index: 1.12
+
+TOP 30 PACKAGES
+---------------------------------------------
+(root): 3280 classes
+net/minecraft/realms: 22 classes
+net/minecraft/server: 4 classes
+net/minecraft/client/main: 3 classes
+net/minecraft/client: 1 classes
+
+IMPORTANT PACKAGE CHECK
+---------------------------------------------
+net/minecraft/: 30 entries
+com/mojang/: 0 entries
+org/lwjgl/: 0 entries
+assets/: 4642 entries

@@ -1,0 +1,8 @@
+private-input/
+*.jar
+*.class
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/

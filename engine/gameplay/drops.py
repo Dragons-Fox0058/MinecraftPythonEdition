@@ -1,0 +1,1 @@
+"""Item drops and pickup."""

@@ -1,0 +1,33 @@
+# Category counts
+
+CATEGORY          CORE  SUPPORT  CLIENT  SKIP  TOTAL
+----------------------------------------------------
+BIOME               45        0       0     0     45
+BLOCK              256        0       0     0    256
+BLOCK_STATE         19        0       0     0     19
+COMMAND              0      114       0     0    114
+CORE_MISC            0      418       0     0    418
+ENCHANT              0       46       0     0     46
+ENTITY             284        0       0     0    284
+FLUID               11        0       0     0     11
+INVENTORY           54        0       0     0     54
+ITEM               144        0       0     0    144
+LIGHTING            14        0       0     0     14
+MOB_AI              98        0       0     0     98
+NBT                 23        0       0     0     23
+NETWORK              0      306       0     0    306
+PHYSICS              7        0       0     0      7
+POTION               0       11       0     0     11
+REDSTONE            27        0       0     0     27
+SKIP_PLUMBING        0        0       0   925    925
+UTIL                 0      156       0     0    156
+WORLDGEN           252        0       0     0    252
+WORLD_CHUNK        134        0       0     0    134
+
+# Tier totals
+
+CORE        1368
+SUPPORT     1051
+CLIENT         0
+SKIP         925
+UNKNOWN        0
