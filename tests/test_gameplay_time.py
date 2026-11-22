@@ -61,6 +61,17 @@ class TestGameRules(unittest.TestCase):
         self.assertFalse(rules.get_bool("keepInventory"))
         self.assertEqual(rules.get_int("randomTickSpeed"), 3)
 
+    def test_string_game_loop_function_rule(self):
+        rules = GameRules()
+        self.assertEqual(rules.get_str("gameLoopFunction"), "")
+        rules.set("gameLoopFunction", "minecraft:tick")
+        self.assertEqual(rules.get_str("gameLoopFunction"), "minecraft:tick")
+        with self.assertRaises(TypeError):
+            rules.set("gameLoopFunction", 1)
+
+    def test_announce_advancements_default(self):
+        self.assertTrue(GameRules().get_bool("announceAdvancements"))
+
     def test_set_bool_from_string(self):
         rules = GameRules()
         rules.set("doDaylightCycle", "false")
