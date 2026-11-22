@@ -43,6 +43,7 @@ __all__ = [
     "VANILLA_TOOL_MATERIALS", "create_vanilla_tool_registry",
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
+    "EffectType", "StatusEffect", "StatusEffectManager",
 ]
 
 from engine.gameplay.effects import EffectType, StatusEffect, StatusEffectManager
