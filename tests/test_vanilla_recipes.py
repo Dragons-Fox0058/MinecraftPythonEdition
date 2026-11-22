@@ -44,6 +44,25 @@ class TestVanillaToolRecipes(unittest.TestCase):
         self.assertIs(table.item, self.items["crafting_table"])
         self.assertEqual(table.count, 1)
 
+    def test_player_2x2_grid_crafts_planks_sticks_and_crafting_table(self):
+        grid = CraftingGrid(2, 2)
+        grid.set_slot(0, ItemStack(self.items["log"], 1, metadata=3))
+        planks = grid.craft(self.recipes)
+        self.assertIs(planks.item, self.items["planks"])
+        self.assertEqual(planks.count, 4)
+
+        grid.set_slot(0, ItemStack(self.items["planks"], 1, metadata=3))
+        grid.set_slot(2, ItemStack(self.items["planks"], 1, metadata=3))
+        sticks = grid.craft(self.recipes)
+        self.assertIs(sticks.item, self.items["stick"])
+        self.assertEqual(sticks.count, 4)
+
+        for slot in range(4):
+            grid.set_slot(slot, ItemStack(self.items["planks"], 1, metadata=3))
+        table = grid.craft(self.recipes)
+        self.assertIs(table.item, self.items["crafting_table"])
+        self.assertEqual(table.count, 1)
+
     def test_crafts_wooden_pickaxe_and_consumes_exact_inputs(self):
         grid = CraftingGrid(3, 3)
         for slot in (0, 1, 2):
