@@ -467,3 +467,63 @@ GPT-6 — PYTHON LAN SERVER / DESKTOP PREVIEW / LAUNCHER
 - Fixed newline framing after the first server tests exposed literal backslash-n framing; corrected test input as well. CI for latest fixes is pending.
 - Files added: engine/server/__init__.py, engine/server/local.py, engine/network/python_edition.py, engine/app/client.py, launcher.py, requirements.txt, build_windows.bat, .github/workflows/build-windows.yml, tests/test_local_server.py, tests/test_launcher_config.py. Additional fixes in engine/app/client.py and server tests.
 - Known limitations: no chunk replication/player entity simulation yet; launcher host starts a Python-only relay service, not a complete Minecraft multiplayer world; no textures/HUD/inventory/interaction; Windows EXE artifact and actual GPU launch still require successful workflow/device verification.
+
+
+============================================================
+GPT-6 — SINGLE-PLAYER PLAYABILITY IMPLEMENTATION
+============================================================
+2026-11-22
+
+İSTENEN HEDEF:
+Launcher ve oyun arayüzü dâhil, Python Edition içinde tek oyunculu Survival akışını oynanabilir hâle getirmek. Java Edition istemcisi bu kapsamın dışında.
+
+DOĞRUDAN MAIN'E GÖNDERİLEN KOD DEĞİŞİKLİKLERİ:
+- engine/app/client.py:
+  - Kamera serbest uçuşundan Entity tabanlı oyuncu hareketine geçildi.
+  - Sabit 20 TPS hareket adımı, çarpışma, yerçekimi, zıplama ve sprint eklendi.
+  - Sol tık ile hedef blok kazma; sağ tık ile geçici blok paletinden blok yerleştirme eklendi.
+  - 1–9 tuşları geçici blok paletini seçiyor.
+  - Oyuncu chunk değiştirdikçe 5×5 yakın çevre chunk meshleri yükleniyor; uzaktaki GPU meshleri kaldırılıyor.
+  - Dünya adı/seed ile yeni dünya oluşturma, var olan level.dat dosyasından yükleme ve pencere kapanırken save_world ile kaydetme eklendi.
+  - Spawn koordinatları kayıtlı dünyadan okunuyor; kapanışta oyuncunun konumu world spawn konumuna yazılıyor.
+- launcher.py:
+  - Dünya adı ve seed girişleri eklendi.
+  - PLAY SINGLEPLAYER düğmesi bu değerlerle oyunu başlatıyor.
+- engine/worldgen/generator.py:
+  - Y=255 hava katmanı korunacak şekilde maksimum arazi yüksekliği 254'e çekildi.
+  - Seed farklarının yükseklik haritasında görünmesi için terrain variation katsayısı artırıldı.
+- README.md ve PHASE_9_PLAN.md güncellendi.
+
+KOD COMMITLERİ:
+- fe8cc20e4e7d42c86e14d0c58d7b573ceffc9710 — oyuncu hareketi / fizik entegrasyonu
+- 7b36ddf084a7798cc2556f8cc3682b1b30895360 — blok kazma/koyma
+- 02d995ccf744137bf64678bf942c9486bf5c1bf9 — dünya yükleme/kaydetme
+- 5b12406bf21f82eb5d311d4dfa1cb101bc01d381 — yeni dünya spawn düzeltmesi
+- 810006deca40b71ec3f84a49b4554611e6c51793 — launcher dünya adı/seed girişleri
+- 2d6983866de5208e13c7aab0c059cdb6be90949c — chunk streaming
+- 80667f0f4ee42465a53459e27ebf7c91b217ba2a — kayıtlı spawn, sabit tick kazma, chunk sınır mesh yenileme
+- 9ec4c17699b8160f79ea938af3487d2047492a49 — worldgen tavan/seed varyasyonu düzeltmesi
+- 5b899c995fb148a41660e4a6cfa8e9a937ac3395 — README
+- b595549ddd7a0166eeb5dfa54866ced14de83c29 — Phase 9 plan
+
+TEST / CI:
+- Önceki genel Python testleri 432 testten 430 başarılı, 2 WorldGen başarısız olarak raporlandı.
+- Hatalar: farklı seed'lerde aynı heightmap ve y=255'te hava olmaması.
+- Son commit 9ec4c176... bu iki hatayı düzeltmek üzere gönderildi. Bu commit için GitHub Actions sonucu bu not yazılırken henüz bekleniyor; başarılı olduğu iddia edilmemelidir.
+- Windows EXE workflow daha önce fe8cc20 ve 5b12406 commitlerinde başarılı oldu. En son kaynak commitinin EXE çıktısı henüz doğrulanmadı.
+- Gerçek GPU/Windows açılış testi yapılmadı.
+
+AÇIK EKSİKLER — TEK OYUNCULU TAM SÜRÜMÜ ENGELLİYOR:
+- Render edilmiş HUD, nişangâh ve görsel hotbar.
+- Gerçek Inventory ile hotbar entegrasyonu; geçici blok paleti kaldırılmalı.
+- Blok loot/drop üretimi ve item pickup.
+- Crafting grid ve crafting ekranı.
+- Oyuncu canı/açlığı, hasar, ölüm/respawn ve Survival UI.
+- Texture atlas / Minecraft 1.12.2 dokuları ve gerçek blok yüzeyleri.
+- Pause, options, video/audio settings, world selection/load/delete UI.
+- Mob spawn/AI, combat, audio, liquids/tile entities.
+- Oyuncu verisinin envanter dâhil world save/load entegrasyonu.
+- Gerçek GPU smoke test ve son Windows EXE artifact doğrulaması.
+
+DÜRÜST DURUM:
+Bu çalışma tam Minecraft tek oyunculu sistemi değildir. Hareket, blok etkileşimi, yakın chunk streaming ve temel dünya kalıcılığı olan ilk oynanabilir iskelet sağlandı. Survival döngüsü, envanter, HUD, crafting, moblar, dokular ve menüler hâlâ eksiktir. Phase 9 tamamlandı olarak işaretlenmemelidir.
