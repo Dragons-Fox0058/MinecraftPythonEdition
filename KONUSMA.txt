@@ -527,3 +527,54 @@ AÇIK EKSİKLER — TEK OYUNCULU TAM SÜRÜMÜ ENGELLİYOR:
 
 DÜRÜST DURUM:
 Bu çalışma tam Minecraft tek oyunculu sistemi değildir. Hareket, blok etkileşimi, yakın chunk streaming ve temel dünya kalıcılığı olan ilk oynanabilir iskelet sağlandı. Survival döngüsü, envanter, HUD, crafting, moblar, dokular ve menüler hâlâ eksiktir. Phase 9 tamamlandı olarak işaretlenmemelidir.
+
+
+============================================================
+GPT-6 — SINGLE-PLAYER INVENTORY / HUD / PAUSE UPDATE
+============================================================
+2026-11-22
+
+EKLENENLER:
+- engine/app/client.py:
+  - Oyuncu için DesktopPlayer sağlık ve status-effect alanları.
+  - PlayerController ile açlık tick'i, health state ve death/respawn temeli.
+  - Blok item subset'i için ItemRegistry + gerçek Inventory.
+  - Kazılan destekli bloklar EntityItem olarak düşüyor; yakındaki oyuncu bunları toplayabiliyor.
+  - Sağ tık yalnızca seçili hotbar stack'inde eşya varsa blok yerleştiriyor ve stack'ten bir adet tüketiyor.
+  - Item IDs desteklenen subset için legacy blok item ID'leriyle eşleştirildi.
+  - Player inventory/health/hunger, save_world_player/load_world_player ile dünya klasörüne kaydedilip geri yükleniyor.
+  - E envanter panelini açıp kapatıyor; fare ile hotbar slotu seçilebiliyor ve diğer slotlar seçili hotbar slotuyla takas edilebiliyor.
+  - ESC pause/resume; cursor serbest bırakma/yakalama ve simulation pause.
+- engine/render/opengl.py:
+  - Crosshair, dokuz hotbar slotu, health/hunger barları.
+  - Pause overlay.
+  - 36 slotluk envanter paneli; slot item id'sine göre geçici renkli simge.
+- tests/test_render_camera.py: HUD ve 36 slot envanter geometri testleri.
+- tests/test_launcher_config.py: DesktopPlayer health/heal/death testi.
+- README.md ve PHASE_9_PLAN.md kontroller ve kapsamla güncellendi.
+
+DOĞRULAMA:
+- Python tests run 45022515002, commit 84a0ab42047e46933dc1c6ba62237e7663ec11c2: SUCCESS.
+- Python tests run 45022686276, commit d3b4b3d6cbdbefbb9f44bab88b5faa509683dc8a: SUCCESS.
+- Python tests run 45022725073, commit c09d3ed0d11d3f57e9170a29e41318a351fcb855: SUCCESS.
+- Windows build 45022348576 for 7eef180...: SUCCESS; newer build 45022725036 for c09d3ed... was still running at the time of this note.
+- Latest test-only commit c927443... and docs commit c84f9a5... / plan commit fd2c476... were pushed after the c09 test; their workflows should be checked before declaring final green.
+- GPU launch / real Windows play test has not been performed.
+
+WORLDGEN TEST FIX:
+- Previous 432-test suite had failing seed-difference and Y=255-air assertions.
+- Y=255 issue fixed by clamping generated surface to Y=254.
+- Root cause of seed-height failure was unnormalized 16-octave noise accumulating huge amplitudes and saturating heightmaps. The heightmap now normalizes the 16-octave output by 65535 before applying terrain variation; the successful 433-test run 45022515002 validates this fix.
+- The generator remains simplified and is not claimed to reproduce Java 1.12.2 terrain exactly.
+
+KALAN ÖNEMLİ EKSİKLER:
+- Complete Minecraft 1.12.2 item/block catalogue and correct per-block loot/harvest/tool requirements.
+- Actual texture atlas/resource pack, item textures and count text.
+- Crafting recipes wired into in-game UI; furnace UI.
+- Full survival damage sources, fall damage, mobs, combat, armor/effects and audio.
+- Proper world list/select/rename/delete screen and full options/settings.
+- Full multiplayer world replication; existing Python LAN transport is still only a relay.
+- Final current Windows EXE artifact and GPU smoke test.
+
+DURUM:
+Tek oyunculu prototip artık dünya kaydı, hareket, blok etkileşimi, item pickup, envanter, can/açlık state'i, HUD ve pause/inventory paneline sahip. Bu hâlâ tamamlanmış Minecraft 1.12.2 Survival değildir. Phase 9 devam ediyor.
