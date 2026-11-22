@@ -889,3 +889,23 @@ FINAL CI CONFIRMATION — 2026-11-22:
 - Windows launcher build run 45027053772 on the same code commit: "Build launcher EXE" SUCCESS and "Upload launcher" SUCCESS. The workflow was still completing its post-job cleanup at the time of this note; both substantive build/artifact steps were successful.
 - The later documentation commits 4898624b and 0f128b2a also passed the Python tests workflow.
 - No claim is made that the GUI was manually played on a physical Windows desktop; this verification covers automated tests and Windows EXE packaging.
+
+
+
+SURVIVAL EQUIPMENT EXPANSION — 2026-11-22
+
+Implemented directly on main:
+- Added engine/gameplay/vanilla_equipment.py with the five legacy sword IDs (268, 272, 267, 276, 283) and five hoe IDs (290–294), source-era durability values, and explicit combat stats.
+- Added the ten 1.12.2 shaped recipes. Hoe recipe supports mirroring; wooden recipes accept plank metadata variants.
+- Added RecipeManager.extend() so independently maintained recipe groups can be composed without accessing private storage.
+- Integrated sword/hoe item registration and recipes into engine/app/client.py; they use the existing player 2x2 and crafting-table 3x3 UI.
+- Added tests/test_vanilla_equipment.py covering IDs, durability, combat stats, recipe registration, ingredient consumption, and mirrored crafting.
+
+Commits:
+- 62d8a1c — add sword/hoe definitions and recipes.
+- 2399dce — add equipment regression tests.
+- 089bfb0 — correct hoe recipe pattern.
+- 1e37c12 — add recipe-manager composition.
+- 34a442c — integrate equipment into desktop survival client.
+
+CI is running for the integration commit; its result must be checked before this stage is marked verified. No physical Windows GPU playtest is claimed.
