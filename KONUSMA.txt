@@ -444,3 +444,14 @@ SONRAKİ GPT1 İŞLERİ:
 6. Mümkün olduğunda gerçek 1.12.2 test sunucusuyla E2E.
 
 Bu rapor yalnızca inceleme ve durum kaydıdır; oyun kodu değiştirilmedi.
+
+
+============================================================
+GPT-6 — PHASE 7 İLK DÜZELTME
+============================================================
+- World nesnesine varsayılanı (0, 64, 0) olan spawn_point alanı eklendi.
+- level.dat yazımında SpawnX/SpawnY/SpawnZ artık sabit değer yerine World.spawn_point üzerinden alınıyor; yüklemede bu koordinatlar geri kuruluyor.
+- İlgili round-trip testi özel negatif/pozitif koordinatlarla güncellendi.
+- Dosyalar: engine/world/world.py, engine/persistence/world.py, tests/test_persistence_world.py, PHASE_7_PLAN.md.
+- Kod commitleri: 542b723d56dfdba7a37dc6ba42502804c2666394 ve bd97b4ed6b253b515b658849565c881950e5b482. Test henüz çalıştırılmadı; GitHub Actions doğrulaması bekleniyor.
+- Phase 7'nin entity/tile-entity/tick persistence ve gerçek 1.12.2 fixture testleri hâlâ eksik.
