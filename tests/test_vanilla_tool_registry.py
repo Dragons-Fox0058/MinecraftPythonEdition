@@ -2,8 +2,9 @@
 import unittest
 from types import SimpleNamespace
 
-from engine.gameplay.items import Item
+from engine.gameplay.items import Item, ItemStack
 from engine.gameplay.vanilla_drops import resolve_vanilla_block_drops
+from engine.gameplay.vanilla_enchantments import get_enchantment_level, get_tool_enchantments
 from engine.gameplay.vanilla_tools import (
     VANILLA_TOOL_MATERIALS,
     create_vanilla_tool_items,
@@ -213,6 +214,30 @@ class TestVanillaToolRegistry(unittest.TestCase):
         )
         self.assertEqual([(drop.item.item_id, drop.count) for drop in drops],
                          [(16, 1)])
+
+    def test_enchantment_levels_read_legacy_nbt(self):
+        stack = ItemStack(
+            Item(270, "minecraft:wooden_pickaxe", max_stack_size=1, max_damage=59),
+            nbt={"ench": [{"id": 35, "lvl": 3}, {"id": 34, "lvl": 2}]},
+        )
+        self.assertEqual(get_enchantment_level(stack, "fortune"), 3)
+        self.assertEqual(get_enchantment_level(stack, 34), 2)
+        self.assertEqual(get_tool_enchantments(stack), (3, False))
+
+    def test_silk_touch_and_stored_enchantments(self):
+        stack = ItemStack(
+            Item(403, "minecraft:enchanted_book"),
+            nbt={"StoredEnchantments": [{"id": 33, "lvl": 1}]},
+        )
+        self.assertTrue(get_tool_enchantments(stack)[1])
+        self.assertEqual(get_enchantment_level(ItemStack.empty(), "fortune"), 0)
+
+    def test_enchantment_parser_ignores_malformed_entries(self):
+        stack = ItemStack(
+            Item(270, "minecraft:wooden_pickaxe", max_stack_size=1, max_damage=59),
+            nbt={"ench": [{"id": "bad", "lvl": 3}, {"id": 35, "lvl": "2"}]},
+        )
+        self.assertEqual(get_enchantment_level(stack, "fortune"), 2)
 
     def test_vanilla_harvest_levels(self):
         self.assertFalse(
