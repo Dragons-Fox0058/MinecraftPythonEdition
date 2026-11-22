@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import struct
+import time
 
 from engine.core import BlockPos
 from engine.network.packets import (
@@ -54,6 +55,8 @@ class PlaySession:
         self._client_settings_sent = False
         self._sent_position = None
         self._sent_rotation = None
+        self._ticks = 0
+        self._last_keep_alive_at = time.monotonic()
 
     def _emit(self, name: str, value):
         if self.on_event is not None:
@@ -115,6 +118,7 @@ class PlaySession:
 
         if packet_id == CLIENTBOUND["keep_alive"]:
             keep_alive_id = decode_clientbound_keep_alive(payload)
+            self._last_keep_alive_at = time.monotonic()
             self.connection.send(0x0B, struct.pack(">q", keep_alive_id))
             return self._emit("keep_alive", keep_alive_id)
 
@@ -288,10 +292,53 @@ class PlaySession:
 
         return self._emit("unknown_packet", (packet_id, bytes(payload)))
 
-    def process_next(self):
+    def check_keep_alive_timeout(self, *, now: float | None = None,
+                                 timeout_seconds: float = 20.0) -> bool:
+        if not self.connected:
+            return False
+        if not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be positive and finite")
+        current = time.monotonic() if now is None else float(now)
+        if not math.isfinite(current):
+            raise ValueError("now must be finite")
+        if current - self._last_keep_alive_at > timeout_seconds:
+            self.close()
+            return False
+        return True
+
+    def tick(self) -> bool:
+        """Advance one client tick and emit movement at least once per second."""
+        if not self.check_keep_alive_timeout():
+            return False
+        self._ticks += 1
+        if self.player is not None:
+            pos = self.player.pos
+            position = (float(pos.x), float(pos.y), float(pos.z))
+            rotation = (float(getattr(self.player, "yaw", 0.0)),
+                        float(getattr(self.player, "pitch", 0.0)))
+            if (position != self._sent_position or rotation != self._sent_rotation
+                    or self._ticks % 20 == 0):
+                self.send_player_state()
+        return True
+
+    def process_next(self, *, timeout: float = 20.0):
         if not self.connected:
             raise RuntimeError("play session is disconnected")
-        packet_id, payload = self.connection.receive()
+        if not math.isfinite(timeout) or timeout <= 0:
+            raise ValueError("timeout must be positive and finite")
+        if hasattr(self.connection, "set_timeout"):
+            self.connection.set_timeout(timeout)
+        try:
+            packet_id, payload = self.connection.receive()
+        except (TimeoutError, OSError) as exc:
+            self.close()
+            raise TimeoutError("Minecraft server did not send a packet in time") from exc
+        finally:
+            if hasattr(self.connection, "set_timeout"):
+                try:
+                    self.connection.set_timeout(None)
+                except (OSError, ValueError):
+                    pass
         return self.process_packet(packet_id, payload)
 
     def close(self):
