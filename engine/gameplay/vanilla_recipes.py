@@ -20,10 +20,11 @@ def create_vanilla_tool_recipes(tool_items: dict[str, Item],
     }
     stick = Ingredient(ingredient_items["stick"])
     manager = RecipeManager()
-    manager.register(ShapedRecipe(
-        1, 1, (Ingredient(ingredient_items["log"]),),
-        ItemStack(ingredient_items["planks"], 4),
-    ))
+    for wood_metadata in range(4):
+        manager.register(ShapedRecipe(
+            1, 1, (Ingredient(ingredient_items["log"], wood_metadata),),
+            ItemStack(ingredient_items["planks"], 4, metadata=wood_metadata),
+        ))
     manager.register(ShapedRecipe(
         1, 2, (Ingredient(ingredient_items["planks"]), Ingredient(ingredient_items["planks"])),
         ItemStack(ingredient_items["stick"], 4),
