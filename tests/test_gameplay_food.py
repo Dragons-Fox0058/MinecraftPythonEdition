@@ -34,6 +34,17 @@ class TestFoodConsumption(unittest.TestCase):
         self.assertEqual(stack.count, 0)
         self.assertEqual(hunger.food_level, 20)
 
+    def test_soup_consumption_replaces_held_item_with_bowl(self):
+        bowl = Item(10, "test:bowl", max_stack_size=64)
+        soup = Item(11, "test:soup", max_stack_size=1, container_item=bowl)
+        foods = FoodRegistry()
+        foods.register(soup, FoodProperties(6, 1.2))
+        hunger = HungerManager(food_level=10)
+        stack = ItemStack(soup, 1)
+        self.assertTrue(hunger.consume(stack, foods))
+        self.assertIs(stack.item, bowl)
+        self.assertEqual(stack.count, 1)
+
     def test_unregistered_item_is_not_food(self):
         hunger = HungerManager(food_level=10)
         stick = Item(3, "minecraft:stick")
