@@ -12,6 +12,10 @@ class ChunkFormatError(ValueError):
     """Invalid or unsupported 1.12.2 chunk NBT."""
 
 
+def _plain(value):
+    return value.value if isinstance(value, NBTTag) else value
+
+
 def _pack_nibbles(values: np.ndarray) -> bytes:
     flat = np.asarray(values, dtype=np.uint8).reshape(-1)
     if len(flat) % 2:
@@ -89,9 +93,9 @@ def chunk_from_nbt(document: NBTDocument, *, expected_pos: ChunkPos | None = Non
     if not isinstance(document, NBTDocument):
         raise TypeError("document must be NBTDocument")
     try:
-        level = document.value["Level"]
-        cx, cz = int(level["xPos"]), int(level["zPos"])
-        raw_sections = level["Sections"]
+        level = _plain(document.value["Level"])
+        cx, cz = int(_plain(level["xPos"])), int(_plain(level["zPos"]))
+        raw_sections = _plain(level["Sections"])
         if not isinstance(raw_sections, NBTList) or raw_sections.tag_type != TAG_COMPOUND:
             raise ChunkFormatError("Sections must be a compound list")
         if expected_pos is not None and (cx, cz) != (expected_pos.x, expected_pos.z):
@@ -99,7 +103,7 @@ def chunk_from_nbt(document: NBTDocument, *, expected_pos: ChunkPos | None = Non
         chunk = Chunk(ChunkPos(cx, cz))
         seen = set()
         for section in raw_sections.values:
-            sy = int(section["Y"])
+            sy = int(_plain(section["Y"]))
             if not 0 <= sy < 16 or sy in seen:
                 raise ChunkFormatError("invalid or duplicate section Y")
             seen.add(sy)
