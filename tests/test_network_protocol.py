@@ -33,6 +33,7 @@ class FakeSocket:
         self.incoming = bytearray(incoming)
         self.sent = bytearray()
         self.closed = False
+        self.shutdown_mode = None
 
     def recv(self, size):
         if not self.incoming:
@@ -43,6 +44,9 @@ class FakeSocket:
 
     def sendall(self, data):
         self.sent.extend(data)
+
+    def shutdown(self, how):
+        self.shutdown_mode = how
 
     def close(self):
         self.closed = True
@@ -89,6 +93,13 @@ class TestPacketBuffer(unittest.TestCase):
 
 
 class TestProtocolHandshake(unittest.TestCase):
+    def test_connection_close_shuts_down_before_closing_socket(self):
+        sock = FakeSocket()
+        connection = MinecraftConnection(sock)
+        connection.close()
+        self.assertEqual(sock.shutdown_mode, 2)
+        self.assertTrue(sock.closed)
+
     def test_handshake_status_and_login(self):
         for state in (ConnectionState.STATUS, ConnectionState.LOGIN):
             frame = encode_handshake("localhost", 25565, state)
