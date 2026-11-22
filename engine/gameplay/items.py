@@ -202,7 +202,10 @@ class ItemStack:
     def can_stack_with(self, other: "ItemStack") -> bool:
         if not isinstance(other, ItemStack) or self.is_empty or other.is_empty:
             return False
-        return (self.item is other.item and self.metadata == other.metadata
+        metadata_matches = (
+            self.metadata == other.metadata if self.item.has_subtypes else True
+        )
+        return (self.item is other.item and metadata_matches
                 and self.damage == other.damage and self.nbt == other.nbt
                 and self.item.max_stack_size > 1)
 
