@@ -162,13 +162,13 @@ class TestVanillaToolRegistry(unittest.TestCase):
 
         lapis = resolve_vanilla_block_drops(
             block(21, "lapis_ore"), items, fortune=3,
-            rng=ScriptedRandom([4, 4]),
+            rng=ScriptedRandom([4, 3]),
         )[0]
-        self.assertEqual((lapis.item.item_id, lapis.count, lapis.metadata), (351, 32, 4))
+        self.assertEqual((lapis.item.item_id, lapis.count, lapis.metadata), (351, 28, 4))
 
         redstone = resolve_vanilla_block_drops(
             block(73, "redstone_ore"), items, fortune=3,
-            rng=ScriptedRandom([1, 4]),
+            rng=ScriptedRandom([4, 1]),
         )[0]
         self.assertEqual((redstone.item.item_id, redstone.count), (331, 20))
 
