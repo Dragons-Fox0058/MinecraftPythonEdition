@@ -215,13 +215,16 @@ class Furnace:
             self._consume_fuel()
 
         smelted = False
-        if self.is_burning and self.can_smelt():
-            self.cook_time += 1
-            if self.cook_time >= self.total_cook_time:
+        if self.is_burning:
+            if self.can_smelt():
+                self.cook_time += 1
+                if self.cook_time >= self.total_cook_time:
+                    self.cook_time = 0
+                    smelted = self._smelt_once()
+            else:
                 self.cook_time = 0
-                smelted = self._smelt_once()
-        else:
-            self.cook_time = 0
+        elif self.cook_time > 0:
+            self.cook_time = max(0, self.cook_time - 2)
 
         # If the fuel ran out and no recipe can proceed, preserve remaining
         # burn ticks but expose the correct burning state through burn_time.
