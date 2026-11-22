@@ -228,7 +228,14 @@ class TestProtocolHandshake(unittest.TestCase):
 
         packet_id, payload = serverbound_keep_alive(1234)
         self.assertEqual(packet_id, 0x0B)
+        self.assertEqual(payload, struct.pack(">q", 1234))
         self.assertEqual(decode_clientbound_keep_alive(payload), 1234)
+        packet_id, payload = serverbound_keep_alive(-(1 << 40))
+        self.assertEqual(decode_clientbound_keep_alive(payload), -(1 << 40))
+        with self.assertRaises(ValueError):
+            serverbound_keep_alive(1 << 63)
+        with self.assertRaises(ProtocolError):
+            decode_clientbound_keep_alive(b"\\x01")
 
         packet_id, payload = serverbound_position(1.0, 64.0, -2.0, True)
         self.assertEqual(packet_id, 0x0D)
