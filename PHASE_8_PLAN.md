@@ -15,6 +15,7 @@
 - [x] Additional protocol-340 client settings, client status, teleport confirmation, block change, chunk unload, disconnect, health, time, and player-abilities codecs with explicit packet dispatch.
 - [x] Unit tests for codec boundaries, compression, handshake, status, offline login, and play payloads.
 - [x] Unit tests for the additional client settings/status/teleport and common world/player state packet decoders.
+- [x] Unit tests for keep-alive/teleport acknowledgement, world block updates, chunk unload, disconnect, and unknown-packet forwarding.
 - [x] Opt-in GitHub Actions workflow to test status and offline login against the genuine Mojang 1.12.2 server JAR.
 
 ## Remaining compatibility work
@@ -22,8 +23,9 @@
 - [x] RSA/AES-CFB8 transport and session join flow implemented and covered with a simulated cryptographic handshake. **Not yet validated against a live online-mode server.**
 - [ ] Complete the protocol-340 packet registry for both directions and all states; the implemented registry remains intentionally partial.
 - [ ] Complete play packet codecs and semantics: chunk block-entity NBT decoding, entity updates, inventory/windows, plugin messages, full chat components, and complete disconnect/reason handling.
-- [ ] Integrate network state changes with world, player, inventory, entity, and chunk systems.
-- [ ] Implement robust reconnect, timeout, keep-alive scheduling, and graceful disconnect behavior.
+- [x] Add a play-session layer that acknowledges keep-alives and teleports, applies block changes/unloads to the world, updates supported player state, and surfaces unsupported packets without guessing.
+- [ ] Complete integration of all network state changes with player, inventory, entity, and chunk systems.
+- [ ] Implement robust reconnect, timeout policy, periodic client movement/state packets, and graceful disconnect behavior.
 - [ ] Run the real Java 1.12.2 interoperability workflow and record the result.
 
 ## Real-server test gate
