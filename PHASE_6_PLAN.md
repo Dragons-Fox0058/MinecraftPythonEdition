@@ -30,7 +30,7 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 - [x] Source-derived non-weapon furnace fuel durations and smelting recipes.
 - [x] Source-backed food crafting recipes: bread, cookie, cake, pumpkin pie, mushroom stew, and beetroot soup.
 - [x] Hunger, saturation, exhaustion, natural regeneration, and starvation thresholds by difficulty.
-- [x] Dropped item entities, inventory pickup, lifetime, pickup delay, and compatible-stack merging.
+- [x] Dropped item entities, inventory pickup, lifetime, pickup delay, and vanilla-style partial stack merging with remainder preservation.
 - [x] World clock and typed game rules integrated with world ticking.
 - [x] Player controller joining inventory, block interaction, food consumption, crafting, item drops, pickup, and death handling.
 - [x] keepInventory, doEntityDrops, and doTileDrops handling in the implemented paths.
