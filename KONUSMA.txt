@@ -747,3 +747,65 @@ DOĞRULAMA EKİ — 2026-11-22:
 - İlk client.py commit'i (793e9eb) modül dosyası eklenmeden önce CI'ya girdiği için o commit'in testi import hatasıyla başarısız oldu. Sonraki commit 1ddee6b modülü ekledi; 0da7c9a üzerindeki tam ağaç testleri başarılı.
 - Ardından client.py içindeki harvest/drop entegrasyon açıklaması netleştirildi: commit 7a979fa. Bu commit için yeni Python ve Windows workflow sonuçları bekleniyor.
 - Windows launcher build run 45023860355, eski 793e9eb commit'i üzerinde hâlâ çalışıyor; bu nedenle yeni commit 7a979fa için başlatılan build sonucu ayrıca kontrol edilmeli.
+
+
+============================================================
+GPT-6 — ORE DROPS, FORTUNE VE VANILLA ALETLER — 2026-11-22
+============================================================
+
+DOĞRUDAN MAIN DALINA UYGULANANLAR:
+
+1) engine/gameplay/vanilla_drops.py
+- Kömür cevheri -> coal (263).
+- Elmas cevheri -> diamond (264).
+- Zümrüt cevheri -> emerald (388).
+- Lapis cevheri -> dye (351), metadata 4.
+- Redstone cevheri (normal/yanan) -> redstone (331).
+- Nether quartz cevheri -> quartz (406).
+- Demir ve altın cevheri kendi blok item'ini düşürür; Fortune miktarı artırmaz.
+- Desteklenen cevherlerde Silk Touch parametresi blok item'ini döndürür.
+- Fortune miktar çarpanı Java 1.12.2 Block.quantityDroppedWithBonus mantığıyla uygulandı.
+- Lapis ve redstone taban miktarları ile Java tarafındaki rastgele sayı çağrı sırası testlerle sabitlendi.
+- Bilinmeyen bloklar hâlâ yanlış item üretmemek için boş drop listesi döndürür.
+
+2) engine/gameplay/vanilla_tools.py
+- 1.12.2 legacy item ID'leriyle 15 alet tanımı eklendi: wooden/stone/iron/diamond/golden pickaxe, axe ve shovel.
+- Aletlerin max stack size değeri 1; dayanıklılık değerleri ToolMaterial ile eşleşiyor.
+- create_vanilla_tool_items() ve VANILLA_TOOL_ITEM_IDS dışa açıldı.
+
+3) engine/app/client.py
+- Cevher blok item'leri ve normal cevher drop item'leri ItemRegistry'ye eklendi.
+- Bütün aletler ItemRegistry ve ToolRegistry'ye kaydedildi.
+- Gerçek seçili alet; kazma hızı, harvest tier ve dayanıklılık hesabına bağlandı.
+- Yeni oyuncu kaydı oluşturulurken geçici test kolaylığı olarak hotbar slot 1–3'e tahta kazma, balta ve kürek konuyor. Bu vanilla'nın normal boş başlangıç envanteri değildir; sonraki crafting entegrasyonunda kaldırılmalı/değiştirilmeli. Var olan oyuncu kayıtlarının envanteri yükleme sırasında korunur.
+
+4) tests/test_vanilla_tool_registry.py
+- Alet ID/dayanıklılık testleri eklendi.
+- Coal/diamond/emerald/lapis/redstone/quartz Fortune drop testleri eklendi.
+- Iron/gold Fortune davranışı ve Silk Touch ore dönüşü test edildi.
+- Lapis/redstone RNG çağrı sırası deterministik test ile denetleniyor.
+
+COMMITLER:
+- f80116207e1e05bcee321a6f23757a69705fea15 — ore drop resolver.
+- f4f5794de605067d7b865130acf1bc16da14772b — vanilla tool catalogue/registry.
+- 593e5336bce2b89ceed11b82f06e9215b6ea046c — desktop inventory/drop/tool integration.
+- 0a85e659422145a0a8c8ddc5f02b64c03c3a71d9 — initial ore/tool tests.
+- 6b001633b70c32c486292f091be42c70009063f8 — Fortune random-call order correction.
+- be631c47029b6f90ddc59e9bdff6a4dc611e5d65 — regression expectation update.
+- PHASE_9_PLAN.md update commit is recorded separately in GitHub history.
+
+TEST / CI:
+- GitHub Actions has been triggered by the implementation commits. Final status must be read from the run associated with the latest test commit; no local Codespaces execution is claimed.
+- No actual Windows GPU session or Java 1.12.2 side-by-side runtime comparison was performed.
+
+KNOWN LIMITATIONS:
+- Fortune and Silk Touch are supported by the drop resolver API, but enchantment levels/flags are not yet extracted from held ItemStack NBT.
+- Crafting UI/recipes are not connected; the temporary wooden-tool bootstrap is not a final survival progression system.
+- Plant, leaf, slab, metadata, mob, and complete 1.12.2 loot tables remain incomplete.
+- World generation, movement, textures, audio, mob AI, and full Java parity remain outstanding.
+
+NEXT:
+1. Check Python Actions for the latest commit and fix any failures.
+2. Add enchantment NBT parsing for Fortune/Silk Touch, with tests.
+3. Connect crafting recipes/UI and remove the temporary starting tool kit when legitimate tool crafting is playable.
+4. Expand remaining 1.12.2 drops/metadata rules in small source-verified batches.
