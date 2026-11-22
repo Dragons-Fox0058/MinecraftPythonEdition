@@ -44,3 +44,5 @@ __all__ = [
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
 ]
+
+from engine.gameplay.effects import EffectType, StatusEffect, StatusEffectManager
