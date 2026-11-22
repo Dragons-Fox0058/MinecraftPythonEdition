@@ -80,11 +80,13 @@ def resolve_vanilla_block_drops(
         drop_id, count, metadata = 388, _fortune_multiplier(rng, fortune), 0
     elif name == "lapis_ore":
         drop_id = 351  # dye item; metadata 4 is lapis lazuli
-        count = (4 + rng.randrange(5)) * _fortune_multiplier(rng, fortune)
+        multiplier = _fortune_multiplier(rng, fortune)
+        count = (4 + rng.randrange(5)) * multiplier
         metadata = 4
     elif name in ("redstone_ore", "lit_redstone_ore"):
         drop_id = 331
-        count = (4 + rng.randrange(2)) * _fortune_multiplier(rng, fortune)
+        multiplier = _fortune_multiplier(rng, fortune)
+        count = (4 + rng.randrange(2)) * multiplier
         metadata = 0
     elif name == "quartz_ore":
         drop_id, count, metadata = 406, _fortune_multiplier(rng, fortune), 0
