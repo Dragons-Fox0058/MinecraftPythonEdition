@@ -19,7 +19,8 @@ from engine.network.play import (
     decode_disconnect, decode_player_abilities, decode_plugin_message,
     decode_respawn, decode_time_update, decode_unload_chunk,
     decode_update_health, serverbound_client_settings,
-    serverbound_teleport_confirm,
+    serverbound_player_abilities, serverbound_plugin_message,
+    serverbound_use_entity, serverbound_teleport_confirm,
 )
 
 
@@ -84,6 +85,25 @@ class PlaySession:
         if not self.connected:
             raise RuntimeError("play session is disconnected")
         self._send(serverbound_held_item(slot))
+
+    def send_player_abilities(self, flags: int, flying_speed: float = 0.05,
+                              walking_speed: float = 0.1) -> None:
+        if not self.connected:
+            raise RuntimeError("play session is disconnected")
+        self._send(serverbound_player_abilities(flags, flying_speed, walking_speed))
+
+    def send_plugin_message(self, channel: str, data: bytes) -> None:
+        if not self.connected:
+            raise RuntimeError("play session is disconnected")
+        self._send(serverbound_plugin_message(channel, data))
+
+    def use_entity(self, entity_id: int, action: int, *, target=None,
+                   hand: int = 0) -> None:
+        if not self.connected:
+            raise RuntimeError("play session is disconnected")
+        self._send(serverbound_use_entity(
+            entity_id, action, target=target, hand=hand
+        ))
 
     def send_player_state(self, *, force: bool = False) -> None:
         """Send a movement packet matching the player's changed state."""
