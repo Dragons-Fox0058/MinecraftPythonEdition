@@ -14,6 +14,7 @@ from engine.entities.entity import Entity
 from engine.gameplay.breaking import BlockBreaking
 from engine.gameplay.items import Item, ItemStack, ItemRegistry
 from engine.gameplay.player import PlayerController
+from engine.gameplay.game_mode import GameMode
 from engine.gameplay.effects import StatusEffectManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.drops import EntityItem
@@ -292,6 +293,28 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         glfw.CURSOR_NORMAL if inventory_open else glfw.CURSOR_DISABLED,
                     )
                     glfw.set_window_title(window, "Minecraft Python Edition — INVENTORY" if inventory_open else f"Minecraft Python Edition — {world.name}")
+                elif key == glfw.KEY_F4 and not paused and not inventory_open:
+                    try:
+                        import tkinter as tk
+                        from tkinter import simpledialog
+                        dialog = tk.Tk()
+                        dialog.withdraw()
+                        command = simpledialog.askstring(
+                            "Minecraft command",
+                            "Enter command (example: /gamemode creative):",
+                            parent=dialog,
+                        )
+                        dialog.destroy()
+                        if command:
+                            message = controller.execute_command(command)
+                            print(f"[Command] {message}")
+                            glfw.set_window_title(
+                                window,
+                                f"Minecraft Python Edition — {controller.game_mode.display_name}",
+                            )
+                            block_breaking.reset()
+                    except Exception as exc:
+                        print(f"[Command] Could not open command prompt: {exc}")
                 elif key == glfw.KEY_F6:
                     try:
                         if lan_server is not None and lan_server.running:
@@ -389,7 +412,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     return
                 hit_block_id = world.get_block_state_id(hit.pos)
                 hit_block = BLOCK_REGISTRY.by_id(hit_block_id)
-                if hit_block is not None and hit_block.registry_name == "crafting_table":
+                if hit_block is not None and hit_block.registry_name == "crafting_table" and controller.game_mode is not GameMode.SPECTATOR:
                     inventory_open = True
                     crafting_open = True
                     crafting_grid = table_crafting_grid
@@ -410,6 +433,13 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 held_stack = inventory.selected_item
                 if held_stack.is_empty:
                     return
+                if controller.game_mode is GameMode.ADVENTURE:
+                    clicked_name = world.get_block_state(hit.pos).block.registry_name
+                    if not controller.can_place_block(clicked_name, held_stack):
+                        return
+                if controller.game_mode is GameMode.SPECTATOR:
+                    return
+                    return
                 block_id = item_to_block.get(held_stack.item)
                 if block_id is None:
                     return
@@ -420,7 +450,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 if box is not None and box.intersects(player.get_entity_bounding_box()):
                     return
                 world.set_block_state_id(target, block_id)
-                held_stack.shrink(1)
+                if controller.game_mode is not GameMode.CREATIVE:
+                    held_stack.shrink(1)
                 block_breaking.reset()
                 refresh_chunk_mesh(target.chunk_x, target.chunk_z)
 
@@ -499,8 +530,16 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 if move_length:
                     move_x /= move_length
                     move_z /= move_length
-                speed = PLAYER_SPRINT_SPEED if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else PLAYER_WALK_SPEED
+                flying = controller.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR)
+                speed = (PLAYER_WALK_SPEED * 1.5 if flying else
+                         PLAYER_SPRINT_SPEED if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else PLAYER_WALK_SPEED)
                 horizontal = (right * move_x + forward * move_z) * (speed / TICK_RATE)
+                vertical_flight = 0.0
+                if flying:
+                    vertical_flight = (
+                        float(input_state.is_key_down(glfw.KEY_SPACE))
+                        - float(input_state.is_key_down(glfw.KEY_LEFT_CONTROL))
+                    ) * (speed / TICK_RATE)
 
                 tick_accumulator += frame_dt if not (paused or inventory_open) else 0.0
                 while not (paused or inventory_open) and tick_accumulator >= tick_duration:
@@ -508,9 +547,13 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         player.motion = Vec3d(player.motion.x, PLAYER_JUMP_VELOCITY, player.motion.z)
                         player.on_ground = False
                     jump_requested = False
-                    player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
-                    player.on_update()
-                    if speed == PLAYER_SPRINT_SPEED and move_length > 0:
+                    if flying:
+                        player.motion = Vec3d(0.0, 0.0, 0.0)
+                        player.move(float(horizontal[0]), vertical_flight, float(horizontal[2]))
+                    else:
+                        player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
+                        player.on_update()
+                    if not flying and speed == PLAYER_SPRINT_SPEED and move_length > 0:
                         controller.add_exhaustion(0.001)
                     controller.tick()
                     if player.dead:
@@ -526,12 +569,16 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         hit = interaction.ray_trace_blocks(
                             Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 4.5
                         )
-                        if hit is None:
+                        if hit is None or not controller.can_break_block(
+                            world.get_block_state(hit.pos).block.registry_name, inventory.selected_item
+                        ):
                             block_breaking.reset()
                         else:
+                            creative = controller.game_mode is GameMode.CREATIVE
                             result = block_breaking.damage_block(
-                                hit.pos, dig_speed=1.0, can_harvest=False,
-                                tool_stack=inventory.selected_item,
+                                hit.pos, dig_speed=1.0, can_harvest=creative,
+                                tool_stack=None if creative else inventory.selected_item,
+                                instant=creative, drop_items=not creative,
                             )
                             if result.broken:
                                 refresh_chunk_mesh(hit.pos.chunk_x, hit.pos.chunk_z)
@@ -541,7 +588,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             dx = dropped.pos.x - player.pos.x
                             dy = dropped.pos.y - (player.pos.y + 0.8)
                             dz = dropped.pos.z - player.pos.z
-                            if dx * dx + dy * dy + dz * dz <= 1.44:
+                            if (controller.game_mode is not GameMode.SPECTATOR
+                                    and dx * dx + dy * dy + dz * dz <= 1.44):
                                 dropped.try_pickup(inventory)
                     tick_accumulator -= tick_duration
 
@@ -578,6 +626,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             "selected_slot": selected_hotbar_slot,
                             "health": player.health,
                             "food": controller.hunger.food_level,
+                            "game_mode": controller.game_mode.display_name,
                             "paused": paused or inventory_open,
                             "inventory_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in inventory.slots] if inventory_open else None,
                             "crafting_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in crafting_grid.slots] if crafting_open else None,
