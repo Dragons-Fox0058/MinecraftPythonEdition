@@ -33,6 +33,18 @@ class TestWorldPersistence(unittest.TestCase):
             self.assertEqual(loaded.get_packed_block_state(BlockPos(-1, 70, 32)), (300 << 4) | 4)
             self.assertEqual(loaded.get_packed_block_state(BlockPos(17, 255, -33)), (54 << 4) | 2)
 
+    def test_loaded_world_keeps_seeded_chunk_generation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            world = World("seeded")
+            world.seed = 24680
+            save_world(world, directory)
+            loaded = load_world(directory)
+            provider = loaded.chunk_provider
+            self.assertEqual(provider.seed, 24680)
+            chunk = provider.get_or_create(4, -3)
+            self.assertEqual((chunk.pos.x, chunk.pos.z), (4, -3))
+            self.assertTrue((chunk.blocks != 0).any())
+
     def test_missing_level_dat_is_reported(self):
         with tempfile.TemporaryDirectory() as directory:
             with self.assertRaises(WorldSaveError):
