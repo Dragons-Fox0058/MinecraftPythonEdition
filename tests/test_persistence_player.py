@@ -10,6 +10,7 @@ from engine.gameplay.items import Item, ItemRegistry, ItemStack
 from engine.gameplay.player import PlayerController
 from engine.gameplay.effects import EffectType, StatusEffect
 from engine.persistence.player import player_to_nbt, player_from_nbt, save_player_data, load_player_data
+from engine.persistence.world import save_world_player, load_world_player
 from engine.world import World
 
 
@@ -36,6 +37,22 @@ class TestPlayerPersistence(unittest.TestCase):
             actual = load_player_data(path, restored, restored_controller, self.items)
             self.assertEqual(actual, expected)
             self.assertEqual(restored_controller.inventory.slots[0].count, 12)
+
+    def test_world_playerdata_helpers_use_uuid_filename(self):
+        with tempfile.TemporaryDirectory() as directory:
+            source = EntityPlayer(self.world, 4, 72, -9, "Stored")
+            controller = PlayerController(source)
+            controller.inventory.set_slot(0, ItemStack(self.blocks, 6))
+            player_id = uuid.uuid4()
+            saved_id = save_world_player(directory, source, controller, self.items, player_uuid=player_id)
+            self.assertEqual(saved_id, player_id)
+            path = Path(directory) / "playerdata" / f"{player_id}.dat"
+            self.assertTrue(path.is_file())
+            restored = EntityPlayer(self.world, name="Loaded")
+            restored_controller = PlayerController(restored)
+            loaded_id = load_world_player(directory, player_id, restored, restored_controller, self.items)
+            self.assertEqual(loaded_id, player_id)
+            self.assertEqual(restored_controller.inventory.slots[0].count, 6)
 
     def test_inventory_armor_offhand_hunger_and_effects_round_trip(self):
         source = EntityPlayer(self.world, 12.5, 70.0, -4.25, "Saver")
