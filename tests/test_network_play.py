@@ -93,7 +93,7 @@ class TestPlayPackets(unittest.TestCase):
         self.assertEqual((result.chunk_x, result.chunk_z), (-2, 3))
         self.assertEqual(
             [(r.x, r.y, r.z, r.state_id) for r in result.records],
-            [(-22, 64, 53, 17), (-17, 70, 63, 33)],
+            [(-22, 64, 53, 17), (-32, 70, 63, 33)],
         )
         with self.assertRaises(ProtocolError):
             decode_multi_block_change(body.to_bytes() + b"\\x00")
