@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import math
 from types import MappingProxyType
 from typing import Iterable, Mapping
 
@@ -22,16 +23,19 @@ class ToolMaterial:
             raise ValueError("material name must be non-empty")
         if isinstance(self.durability, bool) or not isinstance(self.durability, int) or self.durability <= 0:
             raise ValueError("durability must be a positive integer")
-        if isinstance(self.efficiency, bool) or not isinstance(self.efficiency, (int, float)) or self.efficiency <= 0:
-            raise ValueError("efficiency must be positive")
+        if (isinstance(self.efficiency, bool)
+                or not isinstance(self.efficiency, (int, float))
+                or not math.isfinite(self.efficiency) or self.efficiency <= 0):
+            raise ValueError("efficiency must be finite and positive")
         if isinstance(self.harvest_level, bool) or not isinstance(self.harvest_level, int) or self.harvest_level < 0:
             raise ValueError("harvest_level must be a non-negative integer")
         if isinstance(self.enchantability, bool) or not isinstance(self.enchantability, int) or self.enchantability < 0:
             raise ValueError("enchantability must be a non-negative integer")
         if (isinstance(self.damage_vs_entity, bool)
                 or not isinstance(self.damage_vs_entity, (int, float))
+                or not math.isfinite(self.damage_vs_entity)
                 or self.damage_vs_entity < 0):
-            raise ValueError("damage_vs_entity must be non-negative")
+            raise ValueError("damage_vs_entity must be finite and non-negative")
 
 
 @dataclass(frozen=True)
@@ -52,6 +56,8 @@ class ToolDefinition:
             raise TypeError("material must be ToolMaterial")
         if self.item.max_damage != self.material.durability:
             raise ValueError("item max_damage must match material durability")
+        if not isinstance(self.effective_blocks, frozenset):
+            raise TypeError("effective_blocks must be a frozenset")
         if any(not isinstance(name, str) or not name for name in self.effective_blocks):
             raise ValueError("effective block names must be non-empty strings")
 
