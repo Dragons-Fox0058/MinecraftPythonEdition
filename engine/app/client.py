@@ -19,6 +19,7 @@ from engine.gameplay.inventory import Inventory
 from engine.gameplay.drops import EntityItem
 from engine.gameplay.vanilla_tools import create_vanilla_tool_items, create_vanilla_tool_registry
 from engine.gameplay.vanilla_drops import resolve_vanilla_block_drops
+from engine.gameplay.vanilla_enchantments import get_tool_enchantments
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
@@ -172,9 +173,11 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
             int(world.seed) ^ (pos.x * 341873128712)
             ^ (pos.y * 132897987541) ^ (pos.z * 42317861)
         )
+        fortune, silk_touch = get_tool_enchantments(inventory.selected_item)
         return resolve_vanilla_block_drops(
             block, drop_items, flint_item=flint_item,
-            rng=random.Random(drop_seed),
+            rng=random.Random(drop_seed), fortune=fortune,
+            silk_touch=silk_touch,
         )
 
     block_breaking = BlockBreaking(
