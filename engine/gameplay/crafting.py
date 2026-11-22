@@ -7,25 +7,42 @@ from engine.gameplay.items import Item, ItemStack
 
 
 class Ingredient:
-    """An item ingredient, optionally constrained to one metadata value."""
+    """One-of item ingredient, optionally constrained to one metadata value."""
 
-    __slots__ = ("item", "metadata")
+    __slots__ = ("items", "metadata")
 
-    def __init__(self, item: Item, metadata: int | None = None) -> None:
-        if not isinstance(item, Item):
-            raise TypeError("ingredient item must be an Item")
+    def __init__(self, item: Item | Iterable[Item], metadata: int | None = None) -> None:
+        if isinstance(item, Item):
+            items = (item,)
+        else:
+            try:
+                items = tuple(item)
+            except TypeError as exc:
+                raise TypeError("ingredient must be an Item or iterable of Items") from exc
+        if not items or any(not isinstance(candidate, Item) for candidate in items):
+            raise TypeError("ingredient must contain one or more Item values")
+        items = tuple(dict.fromkeys(items))
         if metadata is not None and (
             isinstance(metadata, bool) or not isinstance(metadata, int)
             or not 0 <= metadata <= 32767
         ):
             raise ValueError("metadata must be None or an integer from 0 to 32767")
-        self.item = item
+        self.items = items
         self.metadata = metadata
+
+    @property
+    def item(self) -> Item | None:
+        """Return the sole item for single-choice ingredients, else None."""
+        return self.items[0] if len(self.items) == 1 else None
+
+    @classmethod
+    def any_of(cls, *items: Item, metadata: int | None = None) -> "Ingredient":
+        return cls(items, metadata=metadata)
 
     def matches(self, stack: ItemStack) -> bool:
         return (
             not stack.is_empty
-            and stack.item is self.item
+            and stack.item in self.items
             and (self.metadata is None or stack.metadata == self.metadata)
         )
 
