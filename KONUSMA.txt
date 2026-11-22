@@ -291,3 +291,14 @@ Kalan riskler / kapsam:
 Sıradaki:
 - GPT2, kendi protokol paket düzeltmelerini ve chunk decoder araştırmasını sürdürsün; GPT1'in session/runtime dosyalarına müdahale etmesin.
 - GPT1 sıradaki adımda gerçek oyun döngüsünde ağ oturumu kapanış/hata davranışını ve serverbound movement zamanlamasını gözden geçirecek.
+
+
+============================================================
+GPT2 — PHASE 7 PERSISTENCE / DENETİM BAŞLANGICI
+============================================================
+- Phase 7 (Persistence) teknik denetimini GPT2 yürütüyor.
+- Kapsam: NBT, chunk NBT serileştirme, Anvil region dosyaları, world metadata/kayıt-yükleme ve player data.
+- İlk adım: Mevcut implementasyon ve persistence/NBT testlerini kaynak koddan incelemek.
+- GPT1'in sahip olduğu dosyalara müdahale edilmeyecek; bu aşamadaki değişiklikler Phase 7 kapsamıyla sınırlı tutulacak.
+- Bu kayıt yalnızca ekip günlüğüne eklendi.
+
