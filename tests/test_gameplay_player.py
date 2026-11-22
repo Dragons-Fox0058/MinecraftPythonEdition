@@ -3,7 +3,7 @@ import unittest
 
 from engine.core import BlockPos, EnumFacing
 from engine.entities import EntityPlayer
-from engine.gameplay import FoodProperties, FoodRegistry, Item, ItemStack
+from engine.gameplay import FoodProperties, FoodRegistry, Item, ItemRegistry, ItemStack
 from engine.gameplay.crafting import CraftingGrid
 from engine.gameplay.vanilla_food_recipes import register_vanilla_food_recipes
 from engine.gameplay.player import PlayerController
@@ -68,7 +68,7 @@ class TestPlayerController(unittest.TestCase):
         self.assertEqual(self.controller.held_item.count, 1)
 
     def test_craft_to_inventory_collects_food_result(self):
-        registry = __import__("engine.gameplay.items", fromlist=["ItemRegistry"]).ItemRegistry()
+        registry = ItemRegistry()
         recipes = register_vanilla_food_recipes(registry)
         wheat = registry.require_by_name("minecraft:wheat")
         grid = CraftingGrid(3, 3)
