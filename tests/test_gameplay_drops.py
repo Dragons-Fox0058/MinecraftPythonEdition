@@ -45,6 +45,55 @@ class TestItemDrops(unittest.TestCase):
         self.assertEqual(drop.stack.count, 3)
         self.assertFalse(drop.dead)
 
+    def test_merge_compatible_item_entities(self):
+        older = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 10), pickup_delay=5)
+        newer = EntityItem(self.world, 0.2, 64, 0, ItemStack(self.stone, 12), pickup_delay=8)
+        self.world.add_entity(older)
+        self.world.add_entity(newer)
+        self.assertTrue(older.try_merge(newer))
+        self.assertEqual(newer.stack.count, 22)
+        self.assertEqual(newer.age, 0)
+        self.assertEqual(newer.pickup_delay, 8)
+        self.assertTrue(older.dead)
+        self.assertNotIn(older, self.world.entities)
+
+    def test_merge_rejects_overstacked_combination(self):
+        first = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 40))
+        second = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 30))
+        self.assertFalse(first.try_merge(second))
+        self.assertEqual(first.stack.count, 40)
+        self.assertEqual(second.stack.count, 30)
+
+    def test_merge_rejects_different_metadata_for_subtypes(self):
+        dye = Item(2, "test:dye", has_subtypes=True)
+        first = EntityItem(self.world, 0, 64, 0, ItemStack(dye, 2, metadata=1))
+        second = EntityItem(self.world, 0, 64, 0, ItemStack(dye, 2, metadata=2))
+        self.assertFalse(first.try_merge(second))
+
+    def test_merge_rejects_different_nbt(self):
+        first = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 2, nbt={"x": 1}))
+        second = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 2, nbt={"x": 2}))
+        self.assertFalse(first.try_merge(second))
+
+    def test_infinite_pickup_delay_prevents_merging(self):
+        first = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 2),
+                           pickup_delay=EntityItem.INFINITE_PICKUP_DELAY)
+        second = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 2))
+        self.assertFalse(first.try_merge(second))
+
+    def test_periodic_search_merges_nearby_entities(self):
+        first = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 2))
+        second = EntityItem(self.world, 0.2, 64, 0, ItemStack(self.stone, 3))
+        self.world.add_entity(first)
+        self.world.add_entity(second)
+        for _ in range(25):
+            first.on_update()
+            if first.dead:
+                break
+        self.assertTrue(first.dead or second.dead)
+        survivor = second if first.dead else first
+        self.assertEqual(survivor.stack.count, 5)
+
     def test_lifetime_despawns_entity(self):
         drop = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 1),
                           pickup_delay=0, lifetime=1)
