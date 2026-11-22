@@ -7,7 +7,7 @@ ADD    = 0xB
 class JavaRandom:
     """Exact port of java.util.Random. All 1.12.2 worldgen RNG must use this."""
 
-    __slots__ = ('_seed',)
+    __slots__ = ('_seed', '_have_next_gaussian', '_next_gaussian')
 
     def __init__(self, seed: int = 0):
         self._seed = 0
@@ -15,6 +15,8 @@ class JavaRandom:
 
     def set_seed(self, seed: int):
         self._seed = (seed ^ MULT) & MASK48
+        self._have_next_gaussian = False
+        self._next_gaussian = 0.0
 
     def _next(self, bits: int) -> int:
         self._seed = (self._seed * MULT + ADD) & MASK48
@@ -32,7 +34,8 @@ class JavaRandom:
         while True:
             bits = self._next(31)
             val = bits % bound
-            if bits - val + (bound - 1) >= 0:
+            candidate = (bits - val + (bound - 1)) & 0xFFFFFFFF
+            if candidate < 0x80000000:
                 return val
 
     def next_long(self) -> int:
@@ -56,13 +59,18 @@ class JavaRandom:
 
     def next_gaussian(self) -> float:
         import math
+        if self._have_next_gaussian:
+            self._have_next_gaussian = False
+            return self._next_gaussian
         while True:
             v1 = 2.0 * self.next_double() - 1.0
             v2 = 2.0 * self.next_double() - 1.0
-            s = v1*v1 + v2*v2
-            if s < 1.0 and s != 0.0:
-                m = math.sqrt(-2.0 * math.log(s) / s)
-                return v1 * m
+            s = v1 * v1 + v2 * v2
+            if 0.0 < s < 1.0:
+                multiplier = math.sqrt(-2.0 * math.log(s) / s)
+                self._next_gaussian = v2 * multiplier
+                self._have_next_gaussian = True
+                return v1 * multiplier
 
 def java_string_hash(s: str) -> int:
     """Java String.hashCode() as int32."""
