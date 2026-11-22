@@ -39,6 +39,20 @@ class TestToolRegistry(unittest.TestCase):
         with self.assertRaises(ValueError):
             self.registry.set_harvest_requirement("diamond_ore", "pickaxe", 2)
 
+    def test_material_rejects_non_finite_values(self):
+        for value in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(efficiency=value):
+                with self.assertRaises(ValueError):
+                    ToolMaterial("invalid", 10, value, 0)
+            with self.subTest(damage=value):
+                with self.assertRaises(ValueError):
+                    ToolMaterial("invalid", 10, 1.0, 0, damage_vs_entity=value)
+
+    def test_definition_requires_immutable_effective_block_set(self):
+        item = Item(901, "test:mutable_tool", max_stack_size=1, max_damage=59)
+        with self.assertRaises(TypeError):
+            ToolDefinition(item, "pickaxe", self.wood, {"stone"})
+
     def test_item_durability_must_match_material(self):
         wrong = Item(999, "test:wrong_tool", max_stack_size=1, max_damage=58)
         with self.assertRaises(ValueError):
