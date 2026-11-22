@@ -5,6 +5,7 @@ from engine.core import BlockPos, EnumFacing
 from engine.gameplay.breaking import BlockBreaking
 from engine.gameplay.crafting import CraftingGrid, RecipeManager
 from engine.gameplay.drops import ItemDropManager
+from engine.gameplay.damage import ArmorRegistry, DamageSource
 from engine.gameplay.health import FoodRegistry, HungerManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.interaction import InteractionManager
@@ -20,7 +21,8 @@ class PlayerController:
                  hunger: HungerManager | None = None,
                  difficulty: str = "normal", block_drop_resolver=None,
                  food_registry: FoodRegistry | None = None,
-                 tool_registry: ToolRegistry | None = None) -> None:
+                 tool_registry: ToolRegistry | None = None,
+                 armor_registry: ArmorRegistry | None = None) -> None:
         if not hasattr(entity, "world"):
             raise TypeError("entity must have a world")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
@@ -33,6 +35,9 @@ class PlayerController:
         self.difficulty = difficulty
         self.death_processed = False
         self.tool_registry = tool_registry
+        if armor_registry is not None and not isinstance(armor_registry, ArmorRegistry):
+            raise TypeError("armor_registry must be an ArmorRegistry or None")
+        self.armor_registry = armor_registry
         self.breaking = BlockBreaking(
             self.world, drop_resolver=block_drop_resolver, tool_registry=tool_registry
         )
@@ -69,6 +74,26 @@ class PlayerController:
                         self.entity.pos.z, remainder,
                     )
         return consumed
+
+    def damage(self, amount: float, source: DamageSource | None = None) -> bool:
+        """Apply damage through equipped armor; return whether health decreased."""
+        if source is None:
+            source = DamageSource("generic")
+        if not isinstance(source, DamageSource):
+            raise TypeError("source must be a DamageSource")
+        if self.entity.dead or getattr(self.entity, "hurt_time", 0) > 0:
+            return False
+        if self.armor_registry is not None:
+            armor_stacks = tuple(self.inventory.armor)
+            reduced = self.armor_registry.calculate_damage(amount, armor_stacks, source)
+            self.armor_registry.damage_armor(amount, armor_stacks, source)
+        else:
+            reduced = amount
+        if reduced <= 0:
+            return False
+        before = self.entity.health
+        self.entity.damage(reduced)
+        return self.entity.health < before
 
     def eat(self, food_points: int, saturation_modifier: float) -> None:
         self.hunger.eat(food_points, saturation_modifier)
