@@ -17,11 +17,32 @@ class TestVanillaToolRecipes(unittest.TestCase):
             "diamond": Item(264, "minecraft:diamond"),
             "gold_ingot": Item(266, "minecraft:gold_ingot"),
             "stick": Item(280, "minecraft:stick"),
+            "log": Item(17, "minecraft:log", has_subtypes=True),
+            "crafting_table": Item(58, "minecraft:crafting_table"),
         }
         self.recipes = create_vanilla_tool_recipes(self.tools, self.items)
 
     def test_all_fifteen_tool_recipes_registered(self):
-        self.assertEqual(len(self.recipes), 15)
+        self.assertEqual(len(self.recipes), 18)
+
+    def test_player_2x2_grid_crafts_planks_sticks_and_crafting_table(self):
+        grid = CraftingGrid(2, 2)
+        grid.set_slot(0, ItemStack(self.items["log"], 1, metadata=3))
+        planks = grid.craft(self.recipes)
+        self.assertIs(planks.item, self.items["planks"])
+        self.assertEqual(planks.count, 4)
+
+        grid.set_slot(0, ItemStack(self.items["planks"], 1, metadata=3))
+        grid.set_slot(2, ItemStack(self.items["planks"], 1, metadata=3))
+        sticks = grid.craft(self.recipes)
+        self.assertIs(sticks.item, self.items["stick"])
+        self.assertEqual(sticks.count, 4)
+
+        for slot in range(4):
+            grid.set_slot(slot, ItemStack(self.items["planks"], 1, metadata=3))
+        table = grid.craft(self.recipes)
+        self.assertIs(table.item, self.items["crafting_table"])
+        self.assertEqual(table.count, 1)
 
     def test_crafts_wooden_pickaxe_and_consumes_exact_inputs(self):
         grid = CraftingGrid(3, 3)
