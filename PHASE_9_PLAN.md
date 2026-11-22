@@ -21,7 +21,7 @@
 - [x] First-person player camera, mouse capture, fixed-tick WASD movement, gravity, jump, sprint, block raycast, mining, and block placement (temporary block palette).
 - [x] Basic rendered crosshair, nine-slot hotbar frame, and health/hunger bars; item icons/count labels and full inventory screen remain.
 - [x] In-game F6 Python-only LAN host toggle and F7 join dialog (transport-level; no remote world replication yet).
-- [x] Basic block item drops, pickup into a 36-slot inventory, selected-stack placement, player health/hunger ticking, and player inventory NBT save/load for the supported block-item subset.\n- [ ] Full vanilla item/block catalogue, crafting UI, item icons/count text, complete food/combat/damage systems, audio, video/audio settings, and full in-game server/join UI.
+- [x] Basic block item drops, pickup into a 36-slot inventory, selected-stack placement, player health/hunger ticking, and player inventory NBT save/load for the supported block-item subset. Stone/grass/glass/gravel drop behavior has dedicated vanilla 1.12.2 rules; full loot tables remain incomplete.\n- [ ] Full vanilla item/block catalogue, crafting UI, item icons/count text, complete food/combat/damage systems, audio, video/audio settings, and full in-game server/join UI.
 - [x] User-facing Tk launcher entrypoint and Windows PyInstaller EXE build workflow.
 - [ ] Windows build and real desktop smoke tests.
 
@@ -57,3 +57,13 @@ Known parity gaps (not marked complete):
 - Block placement is still limited to the small starter block catalogue and does not yet implement all ItemBlock callbacks, metadata/orientation, replaceability, tile entities, and all collision shapes.
 - Drop resolver only maps a small starter set; block-specific loot tables and correct item IDs/drops need broader catalogue coverage.
 - Current client has no full vanilla creative/survival mode selector, recipe-book equivalent, full crafting/furnace screen flow, mob spawn loop, or full world tick integration.
+
+
+## Java 1.12.2 block-drop correction — 2026-11-22
+
+- Added `engine/gameplay/vanilla_drops.py` for the supported desktop subset.
+- Stone now drops cobblestone (item 4), grass drops dirt (item 3), and glass drops nothing without Silk Touch.
+- Gravel uses the 1.12.2 flint probability bound `10 - 3 * fortune`; flint is registered as item 318. The desktop resolver seeds its random generator from world seed and block position.
+- Added grass block item ID 2 to the temporary placement palette.
+- Added regression tests for stone, grass, glass/Silk Touch, and gravel/Fortune.
+- This is not a complete loot-table implementation: ores, plants, metadata variants, Silk Touch/enchanted tool integration, and many other block drops still need full coverage.
