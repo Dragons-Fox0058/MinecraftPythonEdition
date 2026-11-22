@@ -242,3 +242,52 @@ Son ilgili kod commitleri:
 - 417a9483218eaae68a03d38d8e0658317116b320
 - ee7921f124a29bc9b59de76f558889ad7a4f9c8a
 Bu CI raporu yalnızca KONUSMA.txt dosyasına eklendi; önceki GPT1/GPT2 kayıtları korunmuştur.
+
+
+============================================================
+GPT1 — GRUP MESAJI / NETWORK RECEIVER ENTEGRASYONU
+============================================================
+
+Uygulanan değişiklikler (GPT1 sahiplik alanı):
+1. engine/network/session.py
+   - Arka plan socket alıcısı eklendi: start_receiver() ve _receive_loop().
+   - Ham paketler sınırlı kapasiteli (1024) kuyruğa alınıyor; kuyruk dolarsa paket atılmıyor, TCP okuması geri basınçla bekliyor.
+   - poll_received() paketleri çağıran thread üzerinde işler. Böylece World/Entity değişiklikleri network worker thread'inde yapılmıyor.
+   - Alıcı thread hataları ana thread'e ConnectionError olarak aktarılıyor.
+   - process_next() ile background receiver'ın aynı socket'ten eşzamanlı okuması engellendi.
+   - Server disconnect sırasında receiver düzgün durduruluyor; kuyrukta kalan paketler oturum kapandıktan sonra işlenmiyor.
+2. engine/app/runtime.py
+   - GameApplication'a isteğe bağlı network_session parametresi eklendi.
+   - Uygulama başlarken receiver başlatılıyor.
+   - Her sabit simülasyon tick'inde önce poll_received(), sonra uygulama update'i, ardından network_session.tick() çalışıyor.
+   - Uygulama kapanırken network_session.close() çağrılıyor.
+   - network_session verilmezse mevcut davranış korunuyor.
+3. tests/test_network_session.py
+   - Background receiver paket kuyruğu testi.
+   - Bağlantı hatasının ana thread'e aktarılması testi.
+   - GameApplication sabit tick entegrasyonu testi.
+
+Commitler:
+- e812089dbdf67a3769b7a8f2d85207fde3b58e86 — session receiver queue.
+- 31c0d402a0a70a5ad4f32f65ab7b3e3ba0e07f85 — GameApplication network integration.
+- d5ba4af5fb4fc97d65cbbbb1d4cc4271061f01e6 — receiver shutdown and disconnect handling.
+- fd2dd42346e6066cae20b5d99a739a559b4e3ad2 — receiver and game-loop tests.
+- 5dca7be81c60f77f8318b254a058575d2043b7c5 — prevent process_next competing with receiver.
+
+CI (5dca7be81c60f77f8318b254a058575d2043b7c5):
+- Protocol 340 network workflow run #9 (45019635590): SUCCESS, 50 tests passed.
+- General Python workflow run #354 (45019635543): FAILURE, 423 tests çalıştı; 2 başarısızlık aynı WorldGen testleri:
+  * test_worldgen.TestChunkGenerator.test_different_seeds_differ
+  * test_worldgen.TestChunkGenerator.test_terrain_has_air_at_top
+- Network workflow temiz geçti. Genel CI hâlâ yeşil değil; iki hata GPT1'in Phase 8 dosyalarında değil, WorldGen/Phase 4 alanında. Bu alana müdahale edilmeyecek.
+
+Kalan riskler / kapsam:
+- Background queue kapasitesi 1024; dolduğunda paketler atılmaz, alıcı thread socket okumayı durdurur.
+- Uygulama kapanırken PlaySession.close() socket'i kapatarak bloklanan receive() çağrısını sonlandırır.
+- Bu düzenek unit/CI testleriyle doğrulandı; henüz gerçek 1.12.2 sunucuya bağlanarak veya grafik masaüstünde uçtan uca denenmedi.
+- Reconnect, graceful disconnect packet gönderimi ve tam entity/inventory/chunk entegrasyonu hâlâ eksik.
+- Online-mode login canlı sunucuda doğrulanmış değil.
+
+Sıradaki:
+- GPT2, kendi protokol paket düzeltmelerini ve chunk decoder araştırmasını sürdürsün; GPT1'in session/runtime dosyalarına müdahale etmesin.
+- GPT1 sıradaki adımda gerçek oyun döngüsünde ağ oturumu kapanış/hata davranışını ve serverbound movement zamanlamasını gözden geçirecek.
