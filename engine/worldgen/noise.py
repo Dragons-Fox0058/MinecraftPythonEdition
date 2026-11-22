@@ -15,27 +15,18 @@ class NoiseGeneratorPerlin:
     GRAD_2Z = (0, 0, 0, 0, 1, 1, -1, -1, 1, 1, -1, -1, 0, 1, 0, -1)
 
     def __init__(self, rng: JavaRandom):
+        # MCP 1.12.2 NoiseGeneratorImproved consumes three doubles first,
+        # then performs the 256-entry Fisher-Yates permutation shuffle.
+        self.x_offset = rng.next_double() * 256.0
+        self.y_offset = rng.next_double() * 256.0
+        self.z_offset = rng.next_double() * 256.0
         self.perm = np.zeros(512, dtype=np.int32)
-        self.ox = np.zeros(512, dtype=np.float64)
-        self.oy = np.zeros(512, dtype=np.float64)
-        self.oz = np.zeros(512, dtype=np.float64)
         for i in range(256):
             self.perm[i] = i
         for i in range(256):
             j = rng.next_int(256 - i) + i
             self.perm[i], self.perm[j] = self.perm[j], self.perm[i]
-            self.ox[i] = rng.next_float() * 256.0
-            self.oy[i] = rng.next_float() * 256.0
-            self.oz[i] = rng.next_float() * 256.0
-        for i in range(256, 512):
-            self.perm[i] = self.perm[i - 256]
-            self.ox[i] = self.ox[i - 256]
-            self.oy[i] = self.oy[i - 256]
-            self.oz[i] = self.oz[i - 256]
-        self.perm = self.perm.astype(np.int32)
-        self.ox = self.ox.astype(np.float64)
-        self.oy = self.oy.astype(np.float64)
-        self.oz = self.oz.astype(np.float64)
+            self.perm[i + 256] = self.perm[i]
 
     def _pop2(self, x, y):
         return (self.GRAD_2X[(x & 15)] * y) if False else 0.0
@@ -53,6 +44,9 @@ class NoiseGeneratorPerlin:
         return t*t*t*(t*(t*6 - 15) + 10)
 
     def noise3(self, x, y, z) -> float:
+        x += self.x_offset
+        y += self.y_offset
+        z += self.z_offset
         fx = math.floor(x); fy = math.floor(y); fz = math.floor(z)
         xi = int(fx) & 255; yi = int(fy) & 255; zi = int(fz) & 255
         x -= fx; y -= fy; z -= fz
