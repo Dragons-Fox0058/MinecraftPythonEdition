@@ -578,3 +578,18 @@ KALAN ÖNEMLİ EKSİKLER:
 
 DURUM:
 Tek oyunculu prototip artık dünya kaydı, hareket, blok etkileşimi, item pickup, envanter, can/açlık state'i, HUD ve pause/inventory paneline sahip. Bu hâlâ tamamlanmış Minecraft 1.12.2 Survival değildir. Phase 9 devam ediyor.
+
+
+EK İLERLEME — 2026-11-22:
+- E tuşu ile 36 slotluk inventory paneli açılıp kapanıyor.
+- Inventory açıkken oyun tick'i duruyor ve fare serbest kalıyor.
+- Inventory gridinde tıklanan hotbar slotu seçiliyor; ana envanter slotları seçili hotbar slotuyla takas edilebiliyor.
+- ESC inventory panelini kapatıyor veya pause/resume yapıyor.
+- Pause overlay eklendi.
+- Launcher dünya adı alanı, saves/ altındaki level.dat bulunan dünyaları dropdown olarak listeliyor; aynı isim seçilince kayıtlı dünya açılıyor.
+- Son test sonucu: Python tests run 45022725073, commit c09d3ed... SUCCESS. Ek testler HUD/inventory geometry ve DesktopPlayer health/death davranışını kapsıyor.
+- Run 45022732255 (c927 test commit) SUCCESS; run 45022747906 (c84 README commit) SUCCESS; run 45022764277 (fd2 plan commit) SUCCESS; run 45022787012 (020 log commit) SUCCESS.
+- Sonraki launcher dropdown commit 9bf1647... ve plan commit 2d6cbe1... için CI başlatıldı; sonuçları bekleniyor.
+- Windows EXE build run 45022725036 (c09d3ed...) bu kayıt sırasında hâlâ Build launcher EXE adımındaydı; artifact henüz oluşmadı.
+
+Yeni kalanlar: crafting/furnace UI, texture atlas, gerçek item icon/count text, tam vanilla item katalog/loot/tool kuralları, mob AI, audio, ayarlar ve tam dünya yönetimi ekranı.
