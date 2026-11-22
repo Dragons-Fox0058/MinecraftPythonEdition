@@ -2,7 +2,7 @@
 
 A Python 3 voxel-engine project targeting Minecraft Java Edition 1.12.2 gameplay/data foundations. The desktop game and multiplayer host are **Python Edition only**; Java Edition clients cannot join the Python Edition LAN server.
 
-## Desktop preview
+## Single-player desktop build
 
 Install Python 3.12 and dependencies:
 
@@ -11,7 +11,21 @@ python -m pip install -r requirements.txt
 python launcher.py
 ```
 
-The current desktop preview opens an OpenGL 3.3 window with one generated chunk and a free camera (WASD, Space/Ctrl, Shift, mouse, Escape; F6 toggles LAN hosting and F7 joins a Python Edition host). Rendering currently uses deterministic placeholder block colors. Texture atlas/resource-pack support, interaction, HUD, inventory, and complete world streaming are still in progress.
+The launcher lets you enter a world name and seed, then opens a GLFW/OpenGL 3.3 first-person session. Worlds are stored under `saves/<world name>/` in Anvil/NBT form and saved when the game window closes. The renderer keeps a 5×5 chunk area around the player.
+
+### Current controls
+
+- **W/A/S/D:** move
+- **Space:** jump
+- **Shift:** sprint
+- **Mouse:** look around
+- **Left mouse:** mine the targeted block
+- **Right mouse:** place the selected block
+- **1–9:** choose a temporary block palette slot
+- **Escape:** close the game and save the world
+- **F6/F7:** start/stop a Python Edition host or connect to one
+
+Block palette slots are currently a development shortcut, not a survival inventory. Mining does not yet award item drops. Placeholder block colors are still used; the vanilla texture atlas, HUD/hotbar graphics, inventory screens, crafting UI, pause/settings menus, survival health/hunger loop, and full mob simulation are not complete. GPU/Windows desktop smoke testing is also outstanding.
 
 ## Python Edition LAN host
 
