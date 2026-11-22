@@ -30,7 +30,7 @@ class TestVanillaArmorRegistry(unittest.TestCase):
                 item_id += 1
 
         registry = create_vanilla_armor_registry(items)
-        self.assertEqual(len(registry._definitions), 20)
+        self.assertEqual(sum(registry.get(item) is not None for item in items.values()), 20)
 
     def test_armor_points_and_toughness_are_source_backed(self):
         diamond_chest = Item(
