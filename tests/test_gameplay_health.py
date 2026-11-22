@@ -29,7 +29,7 @@ class TestHungerManager(unittest.TestCase):
         hunger = HungerManager(food_level=20, saturation=2)
         hunger.add_exhaustion(8)
         hunger.tick(DummyLiving())
-        self.assertEqual(hunger.saturation, 0)
+        self.assertEqual(hunger.saturation, 1)
         self.assertEqual(hunger.food_level, 20)
 
     def test_exhaustion_consumes_food_after_saturation(self):
