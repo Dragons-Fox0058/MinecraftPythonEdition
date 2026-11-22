@@ -35,6 +35,8 @@ class TestCamera(unittest.TestCase):
         self.assertEqual(vertices.shape[1], 5)
         self.assertGreater(vertices.shape[0], 100)
         self.assertTrue(np.isfinite(vertices).all())
+        # The HUD includes a readable product identity, not only geometry.
+        self.assertGreater(vertices.shape[0], 150)
 
     def test_inventory_hud_geometry_accepts_36_slots(self):
         slots = [(index + 1, index % 64) for index in range(36)]
