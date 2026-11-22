@@ -56,7 +56,7 @@ class EntityItem(Entity):
                 self.try_merge(other)
 
     def try_merge(self, other: "EntityItem") -> bool:
-        """Merge two compatible entities only when the complete stack fits."""
+        """Merge compatible stacks, transferring only the amount that fits."""
         if not isinstance(other, EntityItem) or other is self:
             return False
         if self.dead or other.dead:
@@ -66,18 +66,22 @@ class EntityItem(Entity):
             return False
         if not self.stack.can_stack_with(other.stack):
             return False
-        if self.stack.count + other.stack.count > self.stack.item.max_stack_size:
-            return False
-
         if self.stack.count >= other.stack.count:
             destination, source = self, other
         else:
             destination, source = other, self
 
-        destination.stack.count += source.stack.count
+        capacity = destination.stack.item.max_stack_size - destination.stack.count
+        moved = min(capacity, source.stack.count)
+        if moved <= 0:
+            return False
+
+        destination.stack.count += moved
+        source.stack.shrink(moved)
         destination.pickup_delay = max(destination.pickup_delay, source.pickup_delay)
         destination.age = min(destination.age, source.age)
-        source.kill()
+        if source.stack.is_empty:
+            source.kill()
         return True
 
     def try_pickup(self, inventory) -> bool:
