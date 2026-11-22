@@ -2,6 +2,7 @@
 from __future__ import annotations
 from collections.abc import Mapping
 from engine.blocks.material import Material
+import engine.blocks.vanilla_blocks  # ensure the vanilla registry is populated
 from engine.blocks.registry import GLOBAL as BLOCK_REGISTRY
 from engine.gameplay.items import Item
 from engine.gameplay.tools import ToolDefinition, ToolMaterial, ToolRegistry
