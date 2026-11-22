@@ -104,6 +104,12 @@ class TestCrafting(unittest.TestCase):
         crafted = grid.craft(manager)
         self.assertEqual(crafted.count, 4)
 
+    def test_recipe_rejects_oversized_output(self):
+        with self.assertRaises(ValueError):
+            ShapedRecipe(1, 1, [Ingredient(self.wood)], ItemStack(self.plank, 65))
+        with self.assertRaises(ValueError):
+            ShapelessRecipe([Ingredient(self.wood)], ItemStack(self.plank, 65))
+
     def test_invalid_grid_dimensions(self):
         with self.assertRaises(ValueError):
             CraftingGrid(4, 3)
