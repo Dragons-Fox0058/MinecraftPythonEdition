@@ -25,7 +25,7 @@ The launcher lets you enter a world name and seed, then opens a GLFW/OpenGL 3.3 
 - **Escape:** close the game and save the world
 - **F6/F7:** start/stop a Python Edition host or connect to one
 
-Block palette slots are currently a development shortcut, not a survival inventory. Mining does not yet award item drops. Placeholder block colors are still used; the vanilla texture atlas, HUD/hotbar graphics, inventory screens, crafting UI, pause/settings menus, survival health/hunger loop, and full mob simulation are not complete. GPU/Windows desktop smoke testing is also outstanding.
+Mining produces item entities for the supported block subset; collected items enter the 36-slot inventory, and placement consumes the selected stack. The player has health and hunger state, and the renderer draws a basic crosshair, nine-slot hotbar frame, and health/hunger bars. The item catalogue is still a small local subset rather than the complete verified 1.12.2 catalogue. Placeholder block colors remain; the vanilla texture atlas, item icons/count text, inventory screen, crafting UI, pause/settings menus, mob simulation, and richer Survival mechanics are not complete. GPU/Windows desktop smoke testing is also outstanding.
 
 ## Python Edition LAN host
 
