@@ -109,6 +109,11 @@ class TestJavaRandom(unittest.TestCase):
         self.assertEqual(r.next_int(), -723955400)
         self.assertEqual(r.next_int(), 1033096058)
 
+    def test_bounded_int_rejection_matches_java_overflow(self):
+        # Java rejects the first two samples for this non-power-of-two bound.
+        r = JavaRandom(0)
+        self.assertEqual(r.next_int(1073741825), 516548029)
+
     def test_next_long_matches_openjdk_seed_0(self):
         # OpenJDK: new Random(0L).nextLong()
         r = JavaRandom(0)
