@@ -2,6 +2,7 @@
 import unittest
 import numpy as np
 from engine.core import JavaRandom, ChunkPos
+from engine.world.chunk import Chunk
 from engine.worldgen import (
     NoiseGeneratorPerlin, NoiseGeneratorOctaves, NoiseGeneratorSimplex,
     BiomeProvider, BIOMES, DEFAULT_BIOME,
@@ -117,6 +118,22 @@ class TestChunkGenerator(unittest.TestCase):
         g = ChunkGeneratorOverworld(0)
         c = g.generate_chunk(0, 0)
         self.assertTrue((c.blocks == (1 << 4)).any())
+
+    def test_tree_feature_places_logs_and_leaves_deterministically(self):
+        class OneTreeRandom:
+            def __init__(self):
+                self.calls = 0
+            def next_int(self, bound):
+                self.calls += 1
+                return 0 if self.calls <= 2 else 1
+
+        generator = ChunkGeneratorOverworld(123)
+        chunk = Chunk(ChunkPos(0, 0))
+        chunk.blocks[8, 8, 64] = 2 << 4
+        chunk.heightmap[8, 8] = 65
+        generator.generate_trees(chunk, OneTreeRandom())
+        self.assertTrue((chunk.blocks == (17 << 4)).any())
+        self.assertTrue((chunk.blocks == (18 << 4)).any())
 
     def test_different_seeds_differ(self):
         g1 = ChunkGeneratorOverworld(0)
