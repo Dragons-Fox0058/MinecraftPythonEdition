@@ -102,7 +102,8 @@ def register_vanilla_fuels(
     for name in (
         "minecraft:planks", "minecraft:log", "minecraft:log2",
         "minecraft:noteblock", "minecraft:bookshelf", "minecraft:wooden_stairs",
-        "minecraft:chest", "minecraft:crafting_table", "minecraft:fence",
+        "minecraft:chest", "minecraft:crafting_table", "minecraft:wooden_pressure_plate",
+        "minecraft:fence",
         "minecraft:trapdoor", "minecraft:fence_gate",
     ):
         fuels.register(items[name], 300)
