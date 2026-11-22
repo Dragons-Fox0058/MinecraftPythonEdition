@@ -32,8 +32,9 @@ The following code foundations have been added to the repository:
 - [x] Block breaking progress and optional injected loot resolver
 - [x] Block placement with an explicit Item-to-Block resolver
 - [x] Shaped and shapeless crafting recipe engine with alternative ingredients, output stack validation, and container-item returns
-- [x] Furnace fuel and smelting recipe engine with metadata-aware fuels, container returns, XP accounting, slot insertion/extraction, and progress state
+- [x] Furnace fuel and smelting recipe engine with source-derived 1.12.2 non-weapon fuel/smelting catalogues, container returns, XP accounting, slot insertion/extraction, and progress state
 - [x] Metadata-aware food properties and food registry; source-derived 1.12.2 food IDs/values, hunger, exhaustion, regeneration, and starvation manager
+- [x] Source-backed food crafting recipes (bread, cookie, cake, pumpkin pie, mushroom stew, beetroot soup)
 - [x] Dropped item entities and inventory pickup
 - [x] World clock and typed game rules, integrated into World.tick
 - [x] Player gameplay controller, block ray tracing, food use, and death drops honoring keepInventory
