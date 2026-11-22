@@ -20,6 +20,8 @@ from engine.gameplay.drops import EntityItem
 from engine.gameplay.vanilla_tools import create_vanilla_tool_items, create_vanilla_tool_registry
 from engine.gameplay.vanilla_drops import resolve_vanilla_block_drops
 from engine.gameplay.vanilla_enchantments import get_tool_enchantments
+from engine.gameplay.crafting import CraftingGrid
+from engine.gameplay.vanilla_recipes import create_vanilla_tool_recipes
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
@@ -151,6 +153,18 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     for item in tool_items.values():
         item_registry.register(item)
     tool_registry = create_vanilla_tool_registry(tool_items)
+    ingredient_items = {
+        "planks": block_items[5],
+        "cobblestone": block_items[4],
+        "iron_ingot": Item(265, "minecraft:iron_ingot"),
+        "diamond": ordinary_drop_items[264],
+        "gold_ingot": Item(266, "minecraft:gold_ingot"),
+        "stick": Item(280, "minecraft:stick"),
+    }
+    for item in (ingredient_items["iron_ingot"], ingredient_items["gold_ingot"], ingredient_items["stick"]):
+        item_registry.register(item)
+    tool_recipes = create_vanilla_tool_recipes(tool_items, ingredient_items)
+    crafting_grid = CraftingGrid(3, 3)
     controller = PlayerController(
         player, inventory=inventory, difficulty="normal",
         tool_registry=tool_registry,
