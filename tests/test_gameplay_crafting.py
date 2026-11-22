@@ -62,6 +62,13 @@ class TestCrafting(unittest.TestCase):
         grid.set_slot(3, ItemStack(self.wood, 2))
         self.assertIs(grid.find_recipe(manager), recipe)
 
+    def test_ingredient_accepts_alternative_items(self):
+        other_wood = Item(10, "test:other_wood")
+        ingredient = Ingredient.any_of(self.wood, other_wood)
+        self.assertTrue(ingredient.matches(ItemStack(self.wood, 1)))
+        self.assertTrue(ingredient.matches(ItemStack(other_wood, 1)))
+        self.assertIsNone(ingredient.item)
+
     def test_shapeless_wildcard_metadata_matching(self):
         grid = CraftingGrid(2, 2)
         recipe = ShapelessRecipe(
