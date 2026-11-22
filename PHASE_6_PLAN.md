@@ -39,9 +39,9 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 ## Current automated verification
 
 Latest successful GitHub Actions run observed during this update:
-- Commit: 9cf8b719fa1e502055b60343f8cdde440ee18b1e
-- Result: 293 tests passed
-- Runtime: approximately 0.94 s
+- Commit: abb4b66e50c6e6f918659c39ca881af79c121c80
+- Result: 298 tests passed
+- Runtime: approximately 0.50 s
 
 This is repository CI evidence, not a claim that the game has been tested against a running Java server.
 
