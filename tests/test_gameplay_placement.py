@@ -51,6 +51,16 @@ class TestBlockPlacement(unittest.TestCase):
         self.assertFalse(result.placed)
         self.assertEqual(result.reason, "not_a_block_item")
 
+    def test_unregistered_block_rejected(self):
+        unregistered = __import__("engine.blocks", fromlist=["Block"]).Block(
+            "test:unregistered", 9999, VB.STONE.material
+        )
+        placement = BlockPlacement(self.world, lambda item: unregistered)
+        result = placement.place(self.stack, self.pos, EnumFacing.UP)
+        self.assertFalse(result.placed)
+        self.assertEqual(result.reason, "unregistered_block")
+        self.assertEqual(self.stack.count, 4)
+
     def test_empty_stack_rejected(self):
         result = self.placement.place(ItemStack.empty(), self.pos, EnumFacing.UP)
         self.assertFalse(result.placed)
