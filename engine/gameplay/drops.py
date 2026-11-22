@@ -10,6 +10,7 @@ class EntityItem(Entity):
 
     DEFAULT_PICKUP_DELAY = 10
     DEFAULT_LIFETIME = 6000
+    INFINITE_PICKUP_DELAY = 32767
 
     def __init__(self, world, x: float, y: float, z: float, stack: ItemStack,
                  pickup_delay: int = DEFAULT_PICKUP_DELAY,
@@ -38,6 +39,46 @@ class EntityItem(Entity):
         super().on_update()
         if self.age >= self.lifetime:
             self.kill()
+            return
+        if self.ticks_existed % 25 == 0:
+            self.search_for_nearby_items()
+
+    def search_for_nearby_items(self) -> None:
+        """Attempt vanilla-style merging with nearby live item entities."""
+        for other in tuple(self.world.entities):
+            if self.dead:
+                break
+            if not isinstance(other, EntityItem) or other is self or other.dead:
+                continue
+            if (abs(self.pos.x - other.pos.x) <= 0.75
+                    and abs(self.pos.z - other.pos.z) <= 0.75
+                    and abs(self.pos.y - other.pos.y) <= 0.5):
+                self.try_merge(other)
+
+    def try_merge(self, other: "EntityItem") -> bool:
+        """Merge two compatible entities only when the complete stack fits."""
+        if not isinstance(other, EntityItem) or other is self:
+            return False
+        if self.dead or other.dead:
+            return False
+        if (self.pickup_delay == self.INFINITE_PICKUP_DELAY
+                or other.pickup_delay == self.INFINITE_PICKUP_DELAY):
+            return False
+        if not self.stack.can_stack_with(other.stack):
+            return False
+        if self.stack.count + other.stack.count > self.stack.item.max_stack_size:
+            return False
+
+        if self.stack.count >= other.stack.count:
+            destination, source = self, other
+        else:
+            destination, source = other, self
+
+        destination.stack.count += source.stack.count
+        destination.pickup_delay = max(destination.pickup_delay, source.pickup_delay)
+        destination.age = min(destination.age, source.age)
+        source.kill()
+        return True
 
     def try_pickup(self, inventory) -> bool:
         if self.dead or self.pickup_delay > 0 or self.stack.is_empty:
