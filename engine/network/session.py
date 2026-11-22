@@ -250,6 +250,7 @@ class PlaySession:
         if packet_id == CLIENTBOUND["disconnect"]:
             self.last_disconnect = decode_disconnect(payload)
             self.connected = False
+            self._remove_remote_entities()
             self.connection.close()
             return self._emit("disconnect", self.last_disconnect)
 
@@ -497,9 +498,9 @@ class PlaySession:
         return self.process_packet(packet_id, payload)
 
     def close(self):
+        self._remove_remote_entities()
         if self.connected:
             self.connected = False
-            self._remove_remote_entities()
             self.connection.close()
 
 
