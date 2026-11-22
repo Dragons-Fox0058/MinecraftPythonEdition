@@ -1,5 +1,7 @@
 """Player persistence tests for 1.12.2 NBT inventory slot conventions."""
 import unittest
+import tempfile
+from pathlib import Path
 import uuid
 
 from engine.core import read_nbt, write_nbt
@@ -7,7 +9,7 @@ from engine.entities.player import EntityPlayer
 from engine.gameplay.items import Item, ItemRegistry, ItemStack
 from engine.gameplay.player import PlayerController
 from engine.gameplay.effects import EffectType, StatusEffect
-from engine.persistence.player import player_to_nbt, player_from_nbt
+from engine.persistence.player import player_to_nbt, player_from_nbt, save_player_data, load_player_data
 from engine.world import World
 
 
@@ -20,6 +22,20 @@ class TestPlayerPersistence(unittest.TestCase):
         self.apple = Item(260, "minecraft:apple", has_subtypes=False)
         for item in (self.blocks, self.sword, self.apple):
             self.items.register(item)
+
+    def test_playerdata_file_is_gzip_and_round_trips(self):
+        with tempfile.TemporaryDirectory() as directory:
+            player = EntityPlayer(self.world, 1, 65, 2, "Disk")
+            controller = PlayerController(player)
+            controller.inventory.set_slot(0, ItemStack(self.blocks, 12))
+            path = Path(directory) / "playerdata" / "test.dat"
+            expected = save_player_data(path, player, controller, self.items)
+            self.assertEqual(path.read_bytes()[:2], b"\x1f\x8b")
+            restored = EntityPlayer(self.world, name="Restored")
+            restored_controller = PlayerController(restored)
+            actual = load_player_data(path, restored, restored_controller, self.items)
+            self.assertEqual(actual, expected)
+            self.assertEqual(restored_controller.inventory.slots[0].count, 12)
 
     def test_inventory_armor_offhand_hunger_and_effects_round_trip(self):
         source = EntityPlayer(self.world, 12.5, 70.0, -4.25, "Saver")
