@@ -5,7 +5,7 @@ from engine.core import BlockPos, EnumFacing
 from engine.gameplay.breaking import BlockBreaking
 from engine.gameplay.crafting import CraftingGrid, RecipeManager
 from engine.gameplay.drops import ItemDropManager
-from engine.gameplay.health import HungerManager
+from engine.gameplay.health import FoodRegistry, HungerManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.interaction import InteractionManager
 from engine.gameplay.items import ItemStack
@@ -17,7 +17,8 @@ class PlayerController:
 
     def __init__(self, entity, inventory: Inventory | None = None,
                  hunger: HungerManager | None = None,
-                 difficulty: str = "normal", block_drop_resolver=None) -> None:
+                 difficulty: str = "normal", block_drop_resolver=None,
+                 food_registry: FoodRegistry | None = None) -> None:
         if not hasattr(entity, "world"):
             raise TypeError("entity must have a world")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
@@ -26,6 +27,7 @@ class PlayerController:
         self.world = entity.world
         self.inventory = inventory or Inventory()
         self.hunger = hunger or HungerManager()
+        self.food_registry = food_registry or FoodRegistry()
         self.difficulty = difficulty
         self.breaking = BlockBreaking(self.world, drop_resolver=block_drop_resolver)
         self.drops = ItemDropManager(self.world)
@@ -49,6 +51,9 @@ class PlayerController:
             natural_regeneration=self.world.game_rules.get_bool("naturalRegeneration"),
             difficulty=self.difficulty,
         )
+
+    def consume_food(self) -> bool:
+        return self.hunger.consume(self.held_item, self.food_registry)
 
     def eat(self, food_points: int, saturation_modifier: float) -> None:
         self.hunger.eat(food_points, saturation_modifier)
