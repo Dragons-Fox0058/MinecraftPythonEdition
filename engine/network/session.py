@@ -5,7 +5,13 @@ import math
 import struct
 import time
 
-from engine.core import BlockPos
+from engine.core import BlockPos, Vec3d
+from engine.entities.entity import Entity
+from engine.network.entity_packets import (
+    decode_spawn_object, decode_spawn_mob, decode_spawn_player,
+    decode_spawn_experience_orb, decode_entity_relative_move,
+    decode_entity_teleport, decode_entity_velocity, decode_destroy_entities,
+)
 from engine.network.packets import (
     decode_clientbound_chat, decode_clientbound_chunk_data,
     decode_clientbound_join_game, decode_clientbound_keep_alive,
@@ -22,6 +28,14 @@ from engine.network.play import (
     serverbound_player_abilities, serverbound_plugin_message,
     serverbound_use_entity, serverbound_teleport_confirm,
 )
+
+
+class RemoteNetworkEntity(Entity):
+    """Entity whose transform is authoritative on the remote server."""
+
+    def on_update(self):
+        self.ticks_existed += 1
+        self.prev_pos = self.pos
 
 
 class PlaySession:
@@ -58,6 +72,7 @@ class PlaySession:
         self._sent_rotation = None
         self._ticks = 0
         self._last_keep_alive_at = time.monotonic()
+        self.network_entities = {}
 
     def _emit(self, name: str, value):
         if self.on_event is not None:
@@ -67,6 +82,32 @@ class PlaySession:
     def _send(self, packet):
         packet_id, payload = packet
         self.connection.send(packet_id, payload)
+
+    def _register_remote_entity(self, entity_id: int, x: float, y: float, z: float,
+                                *, entity_uuid=None, entity_type=None):
+        if self.player is not None and getattr(self.player, "entity_id", None) == entity_id:
+            self.network_entities[entity_id] = self.player
+            return self.player
+        previous = self.network_entities.pop(entity_id, None)
+        if previous is not None and self.world is not None:
+            self.world.remove_entity(previous)
+        if self.world is None:
+            return None
+        entity = RemoteNetworkEntity(self.world, x, y, z)
+        entity.entity_id = entity_id
+        entity.entity_uuid = entity_uuid
+        entity.network_type = entity_type
+        entity.network_controlled = True
+        self.network_entities[entity_id] = entity
+        self.world.add_entity(entity)
+        return entity
+
+    def _remove_remote_entities(self):
+        if self.world is not None:
+            for entity in tuple(self.network_entities.values()):
+                if entity is not self.player:
+                    self.world.remove_entity(entity)
+        self.network_entities.clear()
 
     def send_chat(self, message: str) -> None:
         if not self.connected:
@@ -249,6 +290,7 @@ class PlaySession:
 
         if packet_id == CLIENTBOUND["respawn"]:
             self.last_respawn = decode_respawn(payload)
+            self._remove_remote_entities()
             if self.world is not None:
                 self.world.dimension = self.last_respawn.dimension
                 self.world.difficulty = self.last_respawn.difficulty
@@ -265,6 +307,99 @@ class PlaySession:
         if packet_id == CLIENTBOUND["change_game_state"]:
             self.last_game_state = decode_change_game_state(payload)
             return self._emit("game_state", self.last_game_state)
+
+        if packet_id == CLIENTBOUND["spawn_object"]:
+            spawn = decode_spawn_object(payload)
+            entity = self._register_remote_entity(
+                spawn.entity_id, spawn.x, spawn.y, spawn.z,
+                entity_uuid=spawn.entity_uuid, entity_type=spawn.object_type
+            )
+            if entity is not None:
+                entity.pitch, entity.yaw = spawn.pitch, spawn.yaw
+                entity.motion = Vec3d(*spawn.velocity)
+                entity.object_data = spawn.data
+            return self._emit("spawn_object", spawn)
+
+        if packet_id == CLIENTBOUND["spawn_mob"]:
+            spawn = decode_spawn_mob(payload)
+            entity = self._register_remote_entity(
+                spawn.entity_id, spawn.x, spawn.y, spawn.z,
+                entity_uuid=spawn.entity_uuid, entity_type=spawn.mob_type
+            )
+            if entity is not None:
+                entity.yaw, entity.pitch = spawn.yaw, spawn.pitch
+                entity.head_yaw = spawn.head_yaw
+                entity.motion = Vec3d(*spawn.velocity)
+                entity.metadata_payload = spawn.metadata
+            return self._emit("spawn_mob", spawn)
+
+        if packet_id == CLIENTBOUND["spawn_player"]:
+            spawn = decode_spawn_player(payload)
+            entity = self._register_remote_entity(
+                spawn.entity_id, spawn.x, spawn.y, spawn.z,
+                entity_uuid=spawn.player_uuid, entity_type="player"
+            )
+            if entity is not None:
+                entity.yaw, entity.pitch = spawn.yaw, spawn.pitch
+                entity.metadata_payload = spawn.metadata
+            return self._emit("spawn_player", spawn)
+
+        if packet_id == CLIENTBOUND["spawn_experience_orb"]:
+            spawn = decode_spawn_experience_orb(payload)
+            entity = self._register_remote_entity(
+                spawn.entity_id, spawn.x, spawn.y, spawn.z,
+                entity_type="experience_orb"
+            )
+            if entity is not None:
+                entity.experience_value = spawn.experience
+            return self._emit("spawn_experience_orb", spawn)
+
+        if packet_id in (
+            CLIENTBOUND["entity_relative_move"],
+            CLIENTBOUND["entity_look_and_relative_move"],
+            CLIENTBOUND["entity_look"],
+        ):
+            move = decode_entity_relative_move(
+                payload,
+                with_look=packet_id == CLIENTBOUND["entity_look_and_relative_move"],
+                look_only=packet_id == CLIENTBOUND["entity_look"],
+            )
+            entity = self.network_entities.get(move.entity_id)
+            if entity is not None:
+                entity.set_position(
+                    entity.pos.x + move.dx,
+                    entity.pos.y + move.dy,
+                    entity.pos.z + move.dz,
+                )
+                if move.yaw is not None:
+                    entity.yaw = move.yaw
+                    entity.pitch = move.pitch
+                entity.on_ground = move.on_ground
+            return self._emit("entity_move", move)
+
+        if packet_id == CLIENTBOUND["entity_teleport"]:
+            teleport = decode_entity_teleport(payload)
+            entity = self.network_entities.get(teleport.entity_id)
+            if entity is not None:
+                entity.set_position(teleport.x, teleport.y, teleport.z)
+                entity.yaw, entity.pitch = teleport.yaw, teleport.pitch
+                entity.on_ground = teleport.on_ground
+            return self._emit("entity_teleport", teleport)
+
+        if packet_id == CLIENTBOUND["entity_velocity"]:
+            velocity = decode_entity_velocity(payload)
+            entity = self.network_entities.get(velocity.entity_id)
+            if entity is not None:
+                entity.motion = Vec3d(velocity.x, velocity.y, velocity.z)
+            return self._emit("entity_velocity", velocity)
+
+        if packet_id == CLIENTBOUND["destroy_entities"]:
+            destroyed = decode_destroy_entities(payload)
+            for entity_id in destroyed.entity_ids:
+                entity = self.network_entities.pop(entity_id, None)
+                if entity is not None and entity is not self.player and self.world is not None:
+                    self.world.remove_entity(entity)
+            return self._emit("destroy_entities", destroyed)
 
         if packet_id == CLIENTBOUND["chunk_data"]:
             has_sky_light = self.world is None or getattr(self.world, "dimension", 0) == 0
@@ -364,6 +499,7 @@ class PlaySession:
     def close(self):
         if self.connected:
             self.connected = False
+            self._remove_remote_entities()
             self.connection.close()
 
 
