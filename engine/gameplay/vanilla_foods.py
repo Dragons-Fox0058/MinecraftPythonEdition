@@ -69,6 +69,9 @@ def register_vanilla_food_items(
             registry.register(item)
             created[name] = item
 
+    for name in ("minecraft:golden_apple", "minecraft:fish", "minecraft:cooked_fish"):
+        created[name].has_subtypes = True
+
     for item_id, name, stack_size, container_name in definitions:
         if container_name is not None:
             item = created[name]
