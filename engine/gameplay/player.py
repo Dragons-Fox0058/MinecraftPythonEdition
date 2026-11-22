@@ -27,7 +27,7 @@ class PlayerController:
         self.world = entity.world
         self.inventory = inventory or Inventory()
         self.hunger = hunger or HungerManager()
-        self.food_registry = food_registry or FoodRegistry()
+        self.food_registry = food_registry if food_registry is not None else FoodRegistry()
         self.difficulty = difficulty
         self.breaking = BlockBreaking(self.world, drop_resolver=block_drop_resolver)
         self.drops = ItemDropManager(self.world)
