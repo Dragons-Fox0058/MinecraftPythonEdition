@@ -263,7 +263,7 @@ class TestProtocolHandshake(unittest.TestCase):
         self.assertEqual((packet_id, struct.unpack(">h", payload)[0]), (0x19, 8))
 
         packet_id, payload = serverbound_digging(0, BlockPos(-1, 64, 2), EnumFacing.UP)
-        self.assertEqual(packet_id, 0x13)
+        self.assertEqual(packet_id, 0x14)
         reader = PacketBuffer(payload)
         self.assertEqual(reader.read_varint(), 0)
         self.assertEqual(reader.read_position(), (-1, 64, 2))
@@ -276,7 +276,7 @@ class TestProtocolHandshake(unittest.TestCase):
 
     def test_play_packet_validates_arguments(self):
         with self.assertRaises(ValueError):
-            serverbound_chat("x" * 101)
+            serverbound_chat("x" * 257)
         with self.assertRaises(ValueError):
             serverbound_held_item(9)
         with self.assertRaises(ValueError):
