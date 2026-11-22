@@ -33,7 +33,7 @@ The following code foundations have been added to the repository:
 - [x] Block placement with an explicit Item-to-Block resolver
 - [x] Shaped and shapeless crafting recipe engine
 - [x] Furnace fuel and smelting recipe engine
-- [x] Hunger, exhaustion, natural regeneration, and starvation manager
+- [x] Food properties and food registry; hunger, exhaustion, regeneration, and starvation manager
 - [x] Dropped item entities and inventory pickup
 - [x] World clock and typed game rules, integrated into World.tick
 - [x] Player gameplay controller and block ray tracing
