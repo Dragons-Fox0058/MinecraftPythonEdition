@@ -87,6 +87,28 @@ class PlayerController:
     def craft(self, grid: CraftingGrid, recipes: RecipeManager) -> ItemStack:
         return grid.craft(recipes)
 
+    def craft_to_inventory(self, grid: CraftingGrid, recipes: RecipeManager) -> ItemStack:
+        """Craft once, collect the result and overflow container items into the world."""
+        output = grid.craft(recipes)
+        if output.is_empty:
+            return output
+
+        remainder = self.inventory.insert(output)
+        if not remainder.is_empty:
+            self.drops.spawn(
+                self.entity.pos.x, self.entity.pos.y + 0.5,
+                self.entity.pos.z, remainder,
+            )
+
+        for returned in grid.take_container_returns():
+            remainder = self.inventory.insert(returned)
+            if not remainder.is_empty:
+                self.drops.spawn(
+                    self.entity.pos.x, self.entity.pos.y + 0.5,
+                    self.entity.pos.z, remainder,
+                )
+        return output
+
     def drop_item(self, stack: ItemStack, x: float | None = None,
                   y: float | None = None, z: float | None = None):
         if not isinstance(stack, ItemStack):
