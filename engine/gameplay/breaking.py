@@ -9,6 +9,7 @@ from engine.blocks import BLOCK_REGISTRY
 from engine.core import BlockPos
 from engine.gameplay.drops import ItemDropManager
 from engine.gameplay.items import ItemStack
+from engine.gameplay.tools import ToolRegistry
 
 
 @dataclass(frozen=True)
@@ -29,11 +30,15 @@ class BlockBreaking:
     by the caller until the complete 1.12.2 item/block catalogue is verified.
     """
 
-    def __init__(self, world, drop_resolver: Callable | None = None) -> None:
+    def __init__(self, world, drop_resolver: Callable | None = None,
+                 tool_registry: ToolRegistry | None = None) -> None:
         if drop_resolver is not None and not callable(drop_resolver):
             raise TypeError("drop_resolver must be callable")
         self.world = world
+        if tool_registry is not None and not isinstance(tool_registry, ToolRegistry):
+            raise TypeError("tool_registry must be a ToolRegistry or None")
         self.drop_resolver = drop_resolver
+        self.tool_registry = tool_registry
         self.drop_manager = ItemDropManager(world)
         self.target: BlockPos | None = None
         self.progress = 0.0
@@ -76,7 +81,7 @@ class BlockBreaking:
         return tuple(spawned)
 
     def damage_block(self, pos: BlockPos, dig_speed: float = 1.0,
-                     can_harvest: bool = False) -> BlockBreakResult:
+                     can_harvest: bool = False, tool_stack: ItemStack | None = None) -> BlockBreakResult:
         if not isinstance(pos, BlockPos):
             raise TypeError("pos must be a BlockPos")
         block_id = self.world.get_block_state_id(pos)
@@ -84,6 +89,13 @@ class BlockBreaking:
         if block is None or block_id == 0:
             self.reset()
             return BlockBreakResult(pos, block_id, "air", False, False, 0.0)
+
+        if tool_stack is not None and not isinstance(tool_stack, ItemStack):
+            raise TypeError("tool_stack must be an ItemStack or None")
+        if self.tool_registry is not None and tool_stack is not None:
+            tool_item = None if tool_stack.is_empty else tool_stack.item
+            dig_speed *= self.tool_registry.dig_speed(tool_item, block.registry_name)
+            can_harvest = self.tool_registry.can_harvest(tool_item, block.registry_name)
 
         if self.target != pos:
             self.target = pos
@@ -97,6 +109,10 @@ class BlockBreaking:
             )
 
         drops = self._resolve_drops(block, pos, bool(can_harvest))
+        if (self.tool_registry is not None and tool_stack is not None
+                and not tool_stack.is_empty and block.hardness != 0
+                and self.tool_registry.get(tool_stack.item) is not None):
+            tool_stack.damage_item(1)
         self.world.set_block_state_id(pos, 0)
         for stack in drops:
             self.drop_manager.spawn(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, stack)
