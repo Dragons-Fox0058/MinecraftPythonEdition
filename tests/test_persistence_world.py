@@ -17,8 +17,8 @@ class TestWorldPersistence(unittest.TestCase):
             world.world_time.day_time = 23456
             world.game_rules.set("keepInventory", True)
             world.game_rules.set("randomTickSpeed", 7)
-            world.set_block_state_id(BlockPos(-1, 70, 32), (300 << 4) | 4)
-            world.set_block_state_id(BlockPos(17, 255, -33), (54 << 4) | 2)
+            world.set_packed_block_state(BlockPos(-1, 70, 32), (300 << 4) | 4)
+            world.set_packed_block_state(BlockPos(17, 255, -33), (54 << 4) | 2)
             save_world(world, directory)
 
             loaded = load_world(directory)
@@ -28,8 +28,8 @@ class TestWorldPersistence(unittest.TestCase):
             self.assertEqual(loaded.world_time.day_time, 23456)
             self.assertTrue(loaded.game_rules.get_bool("keepInventory"))
             self.assertEqual(loaded.game_rules.get_int("randomTickSpeed"), 7)
-            self.assertEqual(loaded.get_block_state_id(BlockPos(-1, 70, 32)), (300 << 4) | 4)
-            self.assertEqual(loaded.get_block_state_id(BlockPos(17, 255, -33)), (54 << 4) | 2)
+            self.assertEqual(loaded.get_packed_block_state(BlockPos(-1, 70, 32)), (300 << 4) | 4)
+            self.assertEqual(loaded.get_packed_block_state(BlockPos(17, 255, -33)), (54 << 4) | 2)
 
     def test_missing_level_dat_is_reported(self):
         with tempfile.TemporaryDirectory() as directory:
