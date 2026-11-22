@@ -9,6 +9,12 @@ from engine.network.codec import (
     PacketBuffer, ProtocolError, encode_packet, decode_packet,
     encode_compressed_packet, decode_compressed_packet,
 )
+from engine.core import BlockPos, EnumFacing
+from engine.network.packets import (
+    serverbound_chat, serverbound_keep_alive, serverbound_position,
+    serverbound_position_look, serverbound_held_item, serverbound_digging,
+    decode_clientbound_keep_alive, decode_clientbound_chat,
+)
 from engine.network.login import login_offline
 from engine.network.status import query_server
 from engine.network.connection import (
@@ -121,6 +127,46 @@ class TestProtocolHandshake(unittest.TestCase):
             with self.assertRaises(ProtocolError):
                 login_offline("localhost", 25565, "TestPlayer")
         self.assertTrue(fake.closed)
+
+    def test_common_play_packet_payloads(self):
+        packet_id, payload = serverbound_chat("hello")
+        self.assertEqual(packet_id, 0x02)
+        self.assertEqual(PacketBuffer(payload).read_string(100), "hello")
+
+        packet_id, payload = serverbound_keep_alive(1234)
+        self.assertEqual(packet_id, 0x0B)
+        self.assertEqual(decode_clientbound_keep_alive(payload), 1234)
+
+        packet_id, payload = serverbound_position(1.0, 64.0, -2.0, True)
+        self.assertEqual(packet_id, 0x0D)
+        self.assertEqual(struct.unpack(">ddd?", payload), (1.0, 64.0, -2.0, True))
+
+        packet_id, payload = serverbound_position_look(1, 2, 3, 90, -20, False)
+        self.assertEqual(packet_id, 0x0E)
+        self.assertEqual(struct.unpack(">dddff?", payload), (1.0, 2.0, 3.0, 90.0, -20.0, False))
+
+        packet_id, payload = serverbound_held_item(8)
+        self.assertEqual((packet_id, struct.unpack(">h", payload)[0]), (0x19, 8))
+
+        packet_id, payload = serverbound_digging(0, BlockPos(-1, 64, 2), EnumFacing.UP)
+        self.assertEqual(packet_id, 0x13)
+        reader = PacketBuffer(payload)
+        self.assertEqual(reader.read_varint(), 0)
+        self.assertEqual(reader.read_position(), (-1, 64, 2))
+        self.assertEqual(reader.read(1), b"\x01")
+
+        chat = PacketBuffer()
+        chat.write_string('{"text":"hi"}')
+        chat.write(b"\x01")
+        self.assertEqual(decode_clientbound_chat(chat.to_bytes()), ('{"text":"hi"}', 1))
+
+    def test_play_packet_validates_arguments(self):
+        with self.assertRaises(ValueError):
+            serverbound_chat("x" * 101)
+        with self.assertRaises(ValueError):
+            serverbound_held_item(9)
+        with self.assertRaises(ValueError):
+            serverbound_digging(7, BlockPos(0, 0, 0), EnumFacing.UP)
 
     def test_status_query_performs_status_and_ping_exchange(self):
         status = {"version": {"name": "1.12.2", "protocol": 340},
