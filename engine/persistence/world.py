@@ -5,7 +5,7 @@ import os
 import shutil
 from pathlib import Path
 
-from engine.core import ChunkPos, NBTTag, NBTDocument, read_nbt, write_nbt, TAG_BYTE, TAG_INT, TAG_LONG
+from engine.core import BlockPos, ChunkPos, NBTTag, NBTDocument, read_nbt, write_nbt, TAG_BYTE, TAG_INT, TAG_LONG
 from engine.gameplay.time import GameRules, WorldTime
 from engine.persistence.chunk import chunk_from_nbt, chunk_to_nbt
 from engine.persistence.region import RegionFile, region_coordinates
@@ -30,9 +30,9 @@ def _metadata_document(world: World) -> NBTDocument:
         "RandomSeed": NBTTag(TAG_LONG, int(world.seed)),
         "Time": NBTTag(TAG_LONG, world.world_time.total_time),
         "DayTime": NBTTag(TAG_LONG, world.world_time.day_time),
-        "SpawnX": NBTTag(TAG_INT, 0),
-        "SpawnY": NBTTag(TAG_INT, 64),
-        "SpawnZ": NBTTag(TAG_INT, 0),
+        "SpawnX": NBTTag(TAG_INT, int(world.spawn_point.x)),
+        "SpawnY": NBTTag(TAG_INT, int(world.spawn_point.y)),
+        "SpawnZ": NBTTag(TAG_INT, int(world.spawn_point.z)),
         "version": {
             "Id": NBTTag(TAG_INT, DATA_VERSION_1_12_2),
             "Name": "1.12.2",
@@ -121,6 +121,11 @@ def load_world(directory: str | os.PathLike) -> World:
         name = str(data["LevelName"])
         world = World(name)
         world.seed = int(data["RandomSeed"])
+        world.spawn_point = BlockPos(
+            int(data.get("SpawnX", 0)),
+            int(data.get("SpawnY", 64)),
+            int(data.get("SpawnZ", 0)),
+        )
         world.world_time = WorldTime(int(data["Time"]), int(data["DayTime"]))
         for rule, value in data.get("GameRules", {}).items():
             if rule in world.game_rules.names():
