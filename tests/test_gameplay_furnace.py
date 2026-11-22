@@ -23,6 +23,10 @@ class TestFurnace(unittest.TestCase):
         with self.assertRaises(ValueError):
             SmeltingRecipe(Ingredient(self.ore), ItemStack(self.ingot, 1), experience=float("nan"))
 
+    def test_smelting_recipe_rejects_oversized_output(self):
+        with self.assertRaises(ValueError):
+            SmeltingRecipe(Ingredient(self.ore), ItemStack(self.ingot, 65))
+
     def test_fuel_registry(self):
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.coal, 1)), 1600)
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.ore, 1)), 0)
