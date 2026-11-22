@@ -59,14 +59,14 @@ def resolve_vanilla_block_drops(
         "stone", "glass", "coal_ore", "iron_ore", "gold_ore",
         "lapis_ore", "diamond_ore", "redstone_ore", "lit_redstone_ore",
         "emerald_ore", "quartz_ore", "leaves", "leaves2", "ice",
-        "glowstone",
+        "glowstone", "grass", "mycelium", "snow", "clay",
     }:
         item = block_items.get(block_id)
         return [ItemStack(item, 1)] if item is not None else []
 
     if name == "stone":
         drop_id, count, metadata = 4, 1, 0
-    elif name == "grass":
+    elif name in ("grass", "mycelium"):
         drop_id, count, metadata = 3, 1, 0
     elif name == "glass":
         return []
