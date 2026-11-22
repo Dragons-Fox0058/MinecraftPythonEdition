@@ -64,6 +64,20 @@ class World:
         chunk = self._provider.get_or_create(pos.chunk_x, pos.chunk_z)
         chunk.set_block_state_id(pos.x & 15, pos.y, pos.z & 15, state_id)
 
+    def get_packed_block_state(self, pos: BlockPos) -> int:
+        """Return the complete legacy 1.12.2 state word, including metadata."""
+        if not self.is_in_world_bounds(pos.y):
+            return 0
+        chunk = self._provider.get_or_create(pos.chunk_x, pos.chunk_z)
+        return chunk.get_packed_block_state(pos.x & 15, pos.y, pos.z & 15)
+
+    def set_packed_block_state(self, pos: BlockPos, packed_state: int) -> None:
+        """Set a packed (block_id << 4) | metadata value."""
+        if not self.is_in_world_bounds(pos.y):
+            return
+        chunk = self._provider.get_or_create(pos.chunk_x, pos.chunk_z)
+        chunk.set_packed_block_state(pos.x & 15, pos.y, pos.z & 15, packed_state)
+
     def get_block_state(self, pos: BlockPos) -> BlockState:
         sid = self.get_block_state_id(pos)
         # For now: state_id == block_id; actual property encoding comes in phase 3.5.
