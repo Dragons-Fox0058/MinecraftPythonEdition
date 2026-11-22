@@ -15,6 +15,7 @@ from engine.gameplay.items import ItemStack
 from engine.gameplay.loot import LootTableRegistry
 from engine.gameplay.placement import BlockPlacement
 from engine.gameplay.tools import ToolRegistry
+from engine.gameplay.game_mode import GameMode, stack_has_block_restriction
 
 
 class PlayerController:
@@ -26,7 +27,8 @@ class PlayerController:
                  food_registry: FoodRegistry | None = None,
                  tool_registry: ToolRegistry | None = None,
                  armor_registry: ArmorRegistry | None = None,
-                 loot_registry: LootTableRegistry | None = None) -> None:
+                 loot_registry: LootTableRegistry | None = None,
+                 game_mode: GameMode | int | str | None = None) -> None:
         if not hasattr(entity, "world"):
             raise TypeError("entity must have a world")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
@@ -37,6 +39,7 @@ class PlayerController:
         self.hunger = hunger or HungerManager()
         self.food_registry = food_registry if food_registry is not None else FoodRegistry()
         self.difficulty = difficulty
+        self.game_mode = GameMode.parse(game_mode if game_mode is not None else getattr(self.world, "default_game_mode", GameMode.SURVIVAL))
         self.death_processed = False
         self.tool_registry = tool_registry
         if armor_registry is not None and not isinstance(armor_registry, ArmorRegistry):
@@ -51,6 +54,7 @@ class PlayerController:
         entity.inventory = self.inventory
         entity.hunger = self.hunger
         entity.gameplay_controller = self
+        self._apply_game_mode_flags()
         if entity not in self.world.entities:
             self.world.add_entity(entity)
 
@@ -61,7 +65,53 @@ class PlayerController:
     def select_hotbar_slot(self, index: int) -> None:
         self.inventory.select_hotbar_slot(index)
 
+    def _apply_game_mode_flags(self) -> None:
+        self.entity.no_clip = self.game_mode is GameMode.SPECTATOR
+        self.entity.is_flying = self.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR)
+
+    def set_game_mode(self, mode: GameMode | int | str) -> GameMode:
+        self.game_mode = GameMode.parse(mode)
+        self._apply_game_mode_flags()
+        self.entity.motion = type(self.entity.motion)(0.0, 0.0, 0.0)
+        self.death_processed = False
+        return self.game_mode
+
+    def execute_command(self, command: str) -> str:
+        """Execute the local player's supported vanilla-style /gamemode command."""
+        if not isinstance(command, str):
+            raise TypeError("command must be a string")
+        parts = command.strip().split()
+        if parts and parts[0].startswith("/"):
+            parts[0] = parts[0][1:]
+        if not parts or parts[0].lower() != "gamemode":
+            return "Unknown command"
+        if len(parts) not in (2, 3):
+            return "Usage: /gamemode <survival|creative|adventure|spectator|0-3> [player]"
+        if len(parts) == 3 and parts[2] not in ("@s", getattr(self.entity, "name", "")):
+            return "This single-player session can only change your own game mode"
+        try:
+            mode = self.set_game_mode(parts[1])
+        except ValueError:
+            return "Unknown game mode. Use survival, creative, adventure, spectator, or 0-3."
+        return f"Set own game mode to {mode.display_name}"
+
+    def can_break_block(self, block_name: str, stack: ItemStack | None = None) -> bool:
+        if self.game_mode is GameMode.SPECTATOR:
+            return False
+        if self.game_mode is GameMode.ADVENTURE:
+            return stack_has_block_restriction(stack, "CanDestroy", block_name)
+        return True
+
+    def can_place_block(self, block_name: str, stack: ItemStack | None = None) -> bool:
+        if self.game_mode is GameMode.SPECTATOR:
+            return False
+        if self.game_mode is GameMode.ADVENTURE:
+            return stack_has_block_restriction(stack, "CanPlaceOn", block_name)
+        return True
+
     def tick(self) -> None:
+        if self.game_mode not in (GameMode.SURVIVAL, GameMode.ADVENTURE):
+            return
         self.hunger.tick(
             self.entity,
             natural_regeneration=self.world.game_rules.get_bool("naturalRegeneration"),
@@ -91,6 +141,8 @@ class PlayerController:
             raise TypeError("source must be a DamageSource")
         if self.entity.dead:
             return False
+        if self.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR) and source.kind not in ("void", "out_of_world"):
+            return False
         armor_stacks = tuple(self.inventory.armor)
         if self.armor_registry is not None:
             reduced = self.armor_registry.calculate_damage(amount, armor_stacks, source)
@@ -117,14 +169,27 @@ class PlayerController:
 
     def break_block(self, pos: BlockPos, dig_speed: float = 1.0,
                     can_harvest: bool = False):
+        if not self.can_break_block(self.world.get_block_state(pos).block.registry_name, self.held_item):
+            return None
+        creative = self.game_mode is GameMode.CREATIVE
         return self.breaking.damage_block(
-            pos, dig_speed, can_harvest, tool_stack=self.held_item
+            pos, dig_speed=dig_speed, can_harvest=(True if creative else can_harvest),
+            tool_stack=(None if creative else self.held_item),
+            instant=creative, drop_items=not creative,
         )
 
     def place_block(self, clicked_pos: BlockPos, face: EnumFacing,
                     block_resolver, can_place=None):
+        held = self.held_item
+        if self.game_mode is GameMode.SPECTATOR:
+            return None
+        if self.game_mode is GameMode.ADVENTURE:
+            clicked = self.world.get_block_state(clicked_pos).block.registry_name
+            if not self.can_place_block(clicked, held):
+                return None
         return BlockPlacement(self.world, block_resolver).place(
-            self.held_item, clicked_pos, face, can_place
+            held, clicked_pos, face, can_place,
+            consume=self.game_mode is not GameMode.CREATIVE,
         )
 
     def craft(self, grid: CraftingGrid, recipes: RecipeManager) -> ItemStack:
@@ -156,7 +221,7 @@ class PlayerController:
                   y: float | None = None, z: float | None = None):
         if not isinstance(stack, ItemStack):
             raise TypeError("stack must be an ItemStack")
-        if stack.is_empty:
+        if self.game_mode is GameMode.SPECTATOR or stack.is_empty:
             return None
         x = self.entity.pos.x if x is None else x
         y = self.entity.pos.y + 0.5 if y is None else y
@@ -167,14 +232,15 @@ class PlayerController:
         return entity
 
     def try_pickup(self, item_entity) -> bool:
-        return item_entity.try_pickup(self.inventory)
+        return False if self.game_mode is GameMode.SPECTATOR else item_entity.try_pickup(self.inventory)
 
     def on_death(self) -> tuple:
         """Drop carried items once unless keepInventory is enabled."""
         if self.death_processed:
             return ()
         self.death_processed = True
-        if (self.world.game_rules.get_bool("keepInventory")
+        if (self.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR)
+                or self.world.game_rules.get_bool("keepInventory")
                 or not self.world.game_rules.get_bool("doEntityDrops")):
             return ()
         spawned = []
