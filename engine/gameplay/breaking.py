@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
-from typing import Callable, Iterable
+from typing import Callable
 
 from engine.blocks import BLOCK_REGISTRY
 from engine.core import BlockPos
@@ -56,7 +56,7 @@ class BlockBreaking:
         self.target = None
         self.progress = 0.0
 
-    def _spawn_drops(self, block, pos: BlockPos, can_harvest: bool) -> tuple[ItemStack, ...]:
+    def _resolve_drops(self, block, pos: BlockPos, can_harvest: bool) -> tuple[ItemStack, ...]:
         if not can_harvest or self.drop_resolver is None:
             return ()
         rules = getattr(self.world, "game_rules", None)
@@ -72,7 +72,6 @@ class BlockBreaking:
             if stack.is_empty:
                 continue
             copied = stack.copy()
-            self.drop_manager.spawn(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, copied)
             spawned.append(copied)
         return tuple(spawned)
 
@@ -97,8 +96,10 @@ class BlockBreaking:
                 pos, block_id, block.registry_name, False, bool(can_harvest), self.progress
             )
 
+        drops = self._resolve_drops(block, pos, bool(can_harvest))
         self.world.set_block_state_id(pos, 0)
-        drops = self._spawn_drops(block, pos, bool(can_harvest))
+        for stack in drops:
+            self.drop_manager.spawn(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, stack)
         result = BlockBreakResult(
             pos, block_id, block.registry_name, True, bool(can_harvest), 1.0, drops
         )
