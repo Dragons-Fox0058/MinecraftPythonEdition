@@ -4,6 +4,7 @@ import unittest
 from engine.core import BlockPos
 from engine.gameplay.breaking import BlockBreaking
 from engine.gameplay.items import Item, ItemStack
+from engine.gameplay.tools import ToolDefinition, ToolMaterial, ToolRegistry
 from engine.world import World
 import engine.blocks.vanilla_blocks as VB
 
@@ -102,6 +103,50 @@ class TestBlockBreaking(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             breaking.damage_block(self.pos, dig_speed=1000, can_harvest=True)
         self.assertEqual(self.world.get_block_state_id(self.pos), VB.DIRT.block_id)
+
+    def test_tool_registry_controls_harvest_and_durability(self):
+        material = ToolMaterial("stone", 131, 4.0, 1)
+        pickaxe = Item(910, "test:stone_pickaxe", max_stack_size=1, max_damage=131)
+        tools = ToolRegistry()
+        tools.register(ToolDefinition(
+            pickaxe, "pickaxe", material, frozenset({"stone"})
+        ))
+        tools.set_harvest_requirement("stone", "pickaxe", 1)
+        item = Item(911, "test:stone_drop")
+        breaking = BlockBreaking(
+            self.world,
+            drop_resolver=lambda block, pos: [ItemStack(item, 1)],
+            tool_registry=tools,
+        )
+        held = ItemStack(pickaxe, 1)
+        self.world.set_block_state_id(self.pos, VB.STONE.block_id)
+        result = breaking.damage_block(self.pos, dig_speed=1000, tool_stack=held)
+        self.assertTrue(result.broken)
+        self.assertTrue(result.can_harvest)
+        self.assertEqual(held.damage, 1)
+        self.assertEqual(len(result.drops), 1)
+
+    def test_wrong_tool_cannot_harvest_required_block(self):
+        wood = ToolMaterial("wood", 59, 2.0, 0)
+        pickaxe = Item(912, "test:wood_pickaxe", max_stack_size=1, max_damage=59)
+        tools = ToolRegistry()
+        tools.register(ToolDefinition(
+            pickaxe, "pickaxe", wood, frozenset({"stone"})
+        ))
+        tools.set_harvest_requirement("stone", "pickaxe", 1)
+        item = Item(913, "test:stone_drop")
+        breaking = BlockBreaking(
+            self.world,
+            drop_resolver=lambda block, pos: [ItemStack(item, 1)],
+            tool_registry=tools,
+        )
+        held = ItemStack(pickaxe, 1)
+        self.world.set_block_state_id(self.pos, VB.STONE.block_id)
+        result = breaking.damage_block(self.pos, dig_speed=1000, tool_stack=held)
+        self.assertTrue(result.broken)
+        self.assertFalse(result.can_harvest)
+        self.assertEqual(result.drops, ())
+        self.assertEqual(held.damage, 1)
 
     def test_do_tile_drops_rule_disables_drops(self):
         item = Item(902, "test:disabled_drop")
