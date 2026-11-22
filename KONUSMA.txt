@@ -816,3 +816,69 @@ DOĞRULAMA EKİ — ORE / TOOL IMPLEMENTATION — 2026-11-22:
 - Desktop entegrasyon commit'i 593e533 için Windows launcher build run 45025750661 SUCCESS; "Build launcher EXE" ve "Upload launcher" adımları başarılı.
 - Ara commit 6b00163 üzerindeki test başarısızlığı, Fortune RNG çağrı sırası düzeltildikten sonra testte eski rastgele değer dizisinin kalmasından kaynaklandı. Test beklentisi be631c4 commit'inde güncellendi; sonraki tam Python test çalışması 443/443 başarılı.
 - Otomatik test ve EXE paketleme başarılıdır. Gerçek Windows GPU oturumunda oynanış testi ve Java 1.12.2 istemcisiyle yan yana runtime karşılaştırması yapılmamıştır.
+
+
+============================================================
+GPT-6 — ENCHANTMENT NBT, CRAFTING UI, TREES AND SURVIVAL DROPS
+2026-11-22
+============================================================
+
+IMPLEMENTED ON main:
+
+1) Enchantment integration
+- Added engine/gameplay/vanilla_enchantments.py.
+- Reads legacy 1.12.2 enchantment IDs from ItemStack NBT: Fortune=35, Silk Touch=33.
+- Supports ench and StoredEnchantments, unwraps parsed compound/list NBT, ignores malformed entries.
+- Desktop block breaking passes selected-item Fortune/Silk Touch values to the existing drop resolver.
+- Silk Touch returns supported block items including ores, glass, leaves, ice, glowstone, grass, mycelium, snow, and clay where registered.
+
+2) Crafting progression
+- Added engine/gameplay/vanilla_recipes.py.
+- 2x2 inventory crafting: logs -> planks (wood species metadata preserved), planks -> sticks, 2x2 planks -> crafting table.
+- 3x3 crafting-table recipes for all 15 pickaxes, axes, and shovels across wooden, stone, iron, diamond, and golden materials.
+- E opens the player inventory/crafting panel; right-clicking a crafting table opens the 3x3 grid.
+- Crafting output is added to inventory before ingredients are consumed; full inventory prevents crafting.
+- Closing the crafting UI or saving returns remaining ingredients to inventory; overflow becomes a world item.
+- Existing crafting grid supports mirrored shaped recipes and ingredient metadata matching.
+
+3) World and drop progression
+- engine/worldgen/generator.py adds deterministic, chunk-local oak tree features using the population RNG. This is a playable subset, not a byte-identical vanilla BiomeDecorator/WorldGenTrees implementation.
+- engine/gameplay/vanilla_drops.py adds logs, saplings/leaves, tall grass seeds, dead bush sticks, flowers/mushrooms, clay balls, snowballs, glowstone dust, and the existing ore drop rules.
+- Desktop registers the required item/block forms, including crafting table, logs, leaves, seeds, sticks, snowballs, clay balls, and glowstone dust.
+- Removed the temporary starter tool kit: new players start empty-handed, matching survival progression better.
+
+FILES UPDATED:
+- engine/gameplay/vanilla_enchantments.py
+- engine/gameplay/vanilla_recipes.py
+- engine/gameplay/vanilla_drops.py
+- engine/app/client.py
+- engine/render/opengl.py
+- engine/worldgen/generator.py
+- tests/test_vanilla_tool_registry.py
+- tests/test_vanilla_recipes.py
+- tests/test_worldgen.py
+- PHASE_9_PLAN.md
+
+IMPORTANT COMMITS:
+- c0b495f5c06ba5359c1c925549b6a850710979a9 — enchantment NBT parser.
+- 19c74886b70eaefc04296927c611d5be0dcbd360 — connect enchantment levels to drops.
+- 744608d66a13b0cf25edcf4e34bf48f5a7dccb20 — vanilla tool recipes module.
+- 89947b2d11634d505e160753645d189b4ed3b7a4 — crafting UI input path.
+- de4f5aba8c744204f19b236e8ac7035335263041 — render crafting grid/output.
+- 233b92a824c93fed5dc0cc0c29ce9ca611a793b2 — wood/stick/table recipes.
+- 3587f7629ac8719faf234038c94cc90b39d8168d — 2x2 player + 3x3 table grids.
+- d7ec92251998e88ef38df870856ac9b39f63dfed — plant/utility drop expansion.
+- 4daa2141b74f893a033d4df4b6af84d9b652e4d7 — deterministic tree generation.
+- 3084d75d634e784933dad764a7850bbe3c622251 — empty-handed survival start.
+- b2273e7e044da1b039ec0d726d7d0d0ce912d141 — return crafting grid contents on close/save.
+- Latest tested drop expansion commit: a93f4c14118a5ef27d95b56497073845d2ccff12.
+
+TESTS / BUILD:
+- Python workflow run 45026923437: SUCCESS, 456 tests passed.
+- Windows launcher build run 45026847416: SUCCESS; EXE build and artifact upload both succeeded.
+- Subsequent commit 3084d75d removed the temporary starter kit; its Python tests passed.
+- Latest commit b2273e7e adds crafting-grid return/drop handling; its Python and Windows workflows must be checked before declaring final verification.
+- No physical Windows GPU play session or side-by-side Java 1.12.2 runtime comparison is claimed.
+
+KNOWN TECHNICAL BOUNDARY:
+- This implementation adds a playable crafting/wood/ore progression slice. It does not claim full Java 1.12.2 worldgen, full block metadata behavior, all loot tables, mob AI, full texture/audio parity, or complete client parity.
