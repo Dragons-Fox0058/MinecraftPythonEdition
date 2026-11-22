@@ -74,7 +74,10 @@ class PlayerController:
         x = self.entity.pos.x if x is None else x
         y = self.entity.pos.y + 0.5 if y is None else y
         z = self.entity.pos.z if z is None else z
-        return self.drops.spawn(x, y, z, stack)
+        dropped_stack = stack.copy()
+        entity = self.drops.spawn(x, y, z, dropped_stack)
+        stack.shrink(stack.count)
+        return entity
 
     def try_pickup(self, item_entity) -> bool:
         return item_entity.try_pickup(self.inventory)
