@@ -882,3 +882,10 @@ TESTS / BUILD:
 
 KNOWN TECHNICAL BOUNDARY:
 - This implementation adds a playable crafting/wood/ore progression slice. It does not claim full Java 1.12.2 worldgen, full block metadata behavior, all loot tables, mob AI, full texture/audio parity, or complete client parity.
+
+
+FINAL CI CONFIRMATION — 2026-11-22:
+- Python tests run 45027053771 on code commit b2273e7e: SUCCESS, 456 tests passed.
+- Windows launcher build run 45027053772 on the same code commit: "Build launcher EXE" SUCCESS and "Upload launcher" SUCCESS. The workflow was still completing its post-job cleanup at the time of this note; both substantive build/artifact steps were successful.
+- The later documentation commits 4898624b and 0f128b2a also passed the Python tests workflow.
+- No claim is made that the GUI was manually played on a physical Windows desktop; this verification covers automated tests and Windows EXE packaging.
