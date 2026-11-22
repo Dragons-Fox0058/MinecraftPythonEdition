@@ -218,7 +218,7 @@ class TestVanillaToolRegistry(unittest.TestCase):
     def test_enchantment_levels_read_legacy_nbt(self):
         stack = ItemStack(
             Item(270, "minecraft:wooden_pickaxe", max_stack_size=1, max_damage=59),
-            nbt={"ench": [{"id": 35, "lvl": 3}, {"id": 34, "lvl": 2}]},
+            count=1, nbt={"ench": [{"id": 35, "lvl": 3}, {"id": 34, "lvl": 2}]},
         )
         self.assertEqual(get_enchantment_level(stack, "fortune"), 3)
         self.assertEqual(get_enchantment_level(stack, 34), 2)
@@ -227,7 +227,7 @@ class TestVanillaToolRegistry(unittest.TestCase):
     def test_silk_touch_and_stored_enchantments(self):
         stack = ItemStack(
             Item(403, "minecraft:enchanted_book"),
-            nbt={"StoredEnchantments": [{"id": 33, "lvl": 1}]},
+            count=1, nbt={"StoredEnchantments": [{"id": 33, "lvl": 1}]},
         )
         self.assertTrue(get_tool_enchantments(stack)[1])
         self.assertEqual(get_enchantment_level(ItemStack.empty(), "fortune"), 0)
@@ -235,7 +235,7 @@ class TestVanillaToolRegistry(unittest.TestCase):
     def test_enchantment_parser_ignores_malformed_entries(self):
         stack = ItemStack(
             Item(270, "minecraft:wooden_pickaxe", max_stack_size=1, max_damage=59),
-            nbt={"ench": [{"id": "bad", "lvl": 3}, {"id": 35, "lvl": "2"}]},
+            count=1, nbt={"ench": [{"id": "bad", "lvl": 3}, {"id": 35, "lvl": "2"}]},
         )
         self.assertEqual(get_enchantment_level(stack, "fortune"), 2)
 
