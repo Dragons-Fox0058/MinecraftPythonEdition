@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import uuid
+import os
+from pathlib import Path
 
-from engine.core import NBTTag, NBTDocument, NBTList, Vec3d
+from engine.core import NBTTag, NBTDocument, NBTList, Vec3d, write_nbt, read_nbt
 from engine.core.nbt import TAG_BYTE, TAG_SHORT, TAG_INT, TAG_LONG, TAG_FLOAT, TAG_DOUBLE, TAG_COMPOUND
 from engine.gameplay.effects import EffectType, StatusEffect
 from engine.gameplay.items import ItemRegistry, ItemStack
@@ -31,6 +33,7 @@ def player_to_nbt(entity, controller: PlayerController, items: ItemRegistry,
     player_uuid = player_uuid or getattr(entity, "uuid", None) or uuid.uuid4()
     if not isinstance(player_uuid, uuid.UUID):
         player_uuid = uuid.UUID(str(player_uuid))
+    entity.uuid = player_uuid
 
     inventory = []
     def add_stack(slot: int, stack: ItemStack):
@@ -168,5 +171,34 @@ def player_from_nbt(document: NBTDocument, entity, controller: PlayerController,
             raise
         raise PlayerDataError("malformed player NBT") from exc
 
+def save_player_data(path, entity, controller: PlayerController,
+                     items: ItemRegistry, *, player_uuid: uuid.UUID | None = None) -> uuid.UUID:
+    document = player_to_nbt(entity, controller, items, player_uuid=player_uuid)
+    uid = entity.uuid
+    target = Path(path)
+    target.parent.mkdir(parents=True, exist_ok=True)
+    temporary = target.with_name(target.name + ".tmp")
+    try:
+        with open(temporary, "wb") as handle:
+            handle.write(write_nbt(document, compression="gzip"))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, target)
+    finally:
+        try:
+            temporary.unlink()
+        except FileNotFoundError:
+            pass
+    return uid
 
-__all__ = ["PlayerDataError", "player_to_nbt", "player_from_nbt"]
+
+def load_player_data(path, entity, controller: PlayerController,
+                     items: ItemRegistry) -> uuid.UUID:
+    try:
+        document = read_nbt(Path(path).read_bytes(), compression="gzip")
+    except (OSError, ValueError) as exc:
+        raise PlayerDataError("unable to read player data file") from exc
+    return player_from_nbt(document, entity, controller, items)
+
+
+__all__ = ["PlayerDataError", "player_to_nbt", "player_from_nbt", "save_player_data", "load_player_data"]
