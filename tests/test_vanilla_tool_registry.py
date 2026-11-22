@@ -271,6 +271,48 @@ class TestVanillaToolRegistry(unittest.TestCase):
         self.assertEqual(rng.stop, 14)
         self.assertEqual(drops[0].item.item_id, 6)
 
+    def test_clay_snow_and_glowstone_drop_items(self):
+        class FixedRandom:
+            def __init__(self, values):
+                self.values = iter(values)
+            def randrange(self, stop):
+                value = next(self.values)
+                if not 0 <= value < stop:
+                    raise AssertionError(f"{value} outside randrange({stop})")
+                return value
+
+        clay = SimpleNamespace(block_id=82, registry_name="clay")
+        clay_drop = resolve_vanilla_block_drops(
+            clay, {337: Item(337, "minecraft:clay_ball")}
+        )
+        self.assertEqual((clay_drop[0].item.item_id, clay_drop[0].count), (337, 4))
+
+        snow = SimpleNamespace(block_id=80, registry_name="snow")
+        snow_drop = resolve_vanilla_block_drops(
+            snow, {332: Item(332, "minecraft:snowball")}
+        )
+        self.assertEqual((snow_drop[0].item.item_id, snow_drop[0].count), (332, 4))
+
+        glowstone = SimpleNamespace(block_id=89, registry_name="glowstone")
+        dust = Item(348, "minecraft:glowstone_dust")
+        glow_drop = resolve_vanilla_block_drops(
+            glowstone, {348: dust}, fortune=0, rng=FixedRandom([2])
+        )
+        self.assertEqual((glow_drop[0].item.item_id, glow_drop[0].count), (348, 4))
+
+    def test_silk_touch_preserves_grass_and_glowstone_blocks(self):
+        grass = SimpleNamespace(block_id=2, registry_name="grass")
+        glowstone = SimpleNamespace(block_id=89, registry_name="glowstone")
+        items = {
+            2: Item(2, "minecraft:grass"),
+            89: Item(89, "minecraft:glowstone"),
+            348: Item(348, "minecraft:glowstone_dust"),
+        }
+        for block in (grass, glowstone):
+            drops = resolve_vanilla_block_drops(block, items, silk_touch=True)
+            self.assertEqual([(drop.item.item_id, drop.count) for drop in drops],
+                             [(block.block_id, 1)])
+
     def test_vanilla_harvest_levels(self):
         self.assertFalse(
             self.registry.can_harvest(self.items["wooden_pickaxe"], "iron_ore")
