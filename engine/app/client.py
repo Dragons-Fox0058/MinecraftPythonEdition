@@ -138,6 +138,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
 
     block_breaking = BlockBreaking(world, drop_resolver=resolve_block_drop)
     mouse_left_down = False
+    paused = False
 
     mesh_builder = ChunkMeshBuilder()
     meshes = {}
@@ -152,7 +153,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot
+            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused
             if action == glfw.PRESS:
                 input_state.key_down(key)
                 if key == glfw.KEY_SPACE:
@@ -163,7 +164,17 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     label = "empty" if stack.is_empty else f"{stack.item.name} x{stack.count}"
                     glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}: {label}")
                 if key == glfw.KEY_ESCAPE:
-                    glfw.set_window_should_close(window, True)
+                    paused = not paused
+                    input_state.set_focus(False)
+                    input_state.set_focus(True)
+                    input_state.mouse_x = input_state.mouse_y = 0.0
+                    input_state.mouse_dx = input_state.mouse_dy = 0.0
+                    glfw.set_input_mode(
+                        window, glfw.CURSOR,
+                        glfw.CURSOR_NORMAL if paused else glfw.CURSOR_DISABLED,
+                    )
+                    title = "Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}"
+                    glfw.set_window_title(window, title)
                 elif key == glfw.KEY_F6:
                     try:
                         if lan_server is not None and lan_server.running:
@@ -288,7 +299,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 now = time.perf_counter()
                 frame_dt = min(now - previous, 0.1)
                 previous = now
-                camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
+                if not paused:
+                    camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
 
                 forward = camera.forward.copy()
                 forward[1] = 0.0
@@ -306,14 +318,16 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 move_z = (float(input_state.is_key_down(glfw.KEY_W))
                           - float(input_state.is_key_down(glfw.KEY_S)))
                 move_length = math.hypot(move_x, move_z)
+                if paused:
+                    move_x = move_z = move_length = 0.0
                 if move_length:
                     move_x /= move_length
                     move_z /= move_length
                 speed = PLAYER_SPRINT_SPEED if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else PLAYER_WALK_SPEED
                 horizontal = (right * move_x + forward * move_z) * (speed / TICK_RATE)
 
-                tick_accumulator += frame_dt
-                while tick_accumulator >= tick_duration:
+                tick_accumulator += frame_dt if not paused else 0.0
+                while not paused and tick_accumulator >= tick_duration:
                     if jump_requested and player.on_ground:
                         player.motion = Vec3d(player.motion.x, PLAYER_JUMP_VELOCITY, player.motion.z)
                         player.on_ground = False
@@ -387,6 +401,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             "selected_slot": selected_hotbar_slot,
                             "health": player.health,
                             "food": controller.hunger.food_level,
+                            "paused": paused,
                         },
                     )
         finally:
