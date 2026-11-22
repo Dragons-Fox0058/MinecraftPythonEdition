@@ -32,7 +32,8 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 - [x] Hunger, saturation, exhaustion, natural regeneration, and starvation thresholds by difficulty.
 - [x] Dropped item entities, inventory pickup, lifetime, pickup delay, and vanilla-style partial stack merging with remainder preservation.
 - [x] World clock and typed game rules integrated with world ticking.
-- [x] Player controller joining inventory, block interaction, food consumption, crafting, item drops, pickup, and death handling.
+- [x] Player controller joining inventory, block interaction, food consumption, crafting, item drops, pickup, death handling, and armor-aware damage.
+- [x] Damage-source flags, armor/toughness reduction, armor durability wear, and player-controller integration; armor catalogue values remain caller-supplied.
 - [x] keepInventory, doEntityDrops, and doTileDrops handling in the implemented paths.
 - [x] GitHub Actions unittest workflow.
 
@@ -50,7 +51,7 @@ This is repository CI evidence, not a claim that the game has been tested agains
 - [ ] Build and verify the complete 1.12.2 item/block-item catalogue and properties; the global item registry is intentionally not auto-populated.
 - [ ] Add vanilla block loot tables and correct tool/harvest-level rules.
 - [ ] Populate the complete vanilla tool classes/materials and block effectiveness/harvest-level mappings; enchantment modifiers are still pending.
-- [ ] Complete damage sources, armor reduction, invulnerability frames, status effects, and potion effects.
+- [ ] Complete vanilla invulnerability-frame rules, status effects, potion effects, and source-specific damage behavior.
 - [ ] Complete item entity motion, pickup events/sounds, and vanilla collision/merge behavior.
 - [ ] Complete block placement state orientation, entity collision, and tile-entity placement.
 - [ ] Complete crafting/furnace recipe coverage beyond the explicitly registered safe subset.
