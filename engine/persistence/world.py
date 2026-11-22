@@ -8,6 +8,7 @@ from pathlib import Path
 
 from engine.core import BlockPos, ChunkPos, NBTTag, NBTDocument, read_nbt, write_nbt, TAG_BYTE, TAG_INT, TAG_LONG
 from engine.gameplay.time import GameRules, WorldTime
+from engine.gameplay.game_mode import GameMode
 from engine.persistence.chunk import chunk_from_nbt, chunk_to_nbt
 from engine.persistence.region import RegionFile, region_coordinates
 from engine.persistence.player import save_player_data, load_player_data
@@ -44,6 +45,8 @@ def _metadata_document(world: World) -> NBTDocument:
             "Snapshot": NBTTag(TAG_BYTE, 0),
         },
         "GameRules": _game_rules_to_nbt(world.game_rules),
+        "GameType": NBTTag(TAG_INT, int(world.default_game_mode)),
+        "defaultGameType": NBTTag(TAG_INT, int(world.default_game_mode)),
         "initialized": NBTTag(TAG_BYTE, 1),
         "allowCommands": NBTTag(TAG_BYTE, 0),
         "hardcore": NBTTag(TAG_BYTE, 0),
@@ -126,6 +129,7 @@ def load_world(directory: str | os.PathLike) -> World:
         name = str(data["LevelName"])
         world = World(name)
         world.seed = int(data["RandomSeed"])
+        world.default_game_mode = GameMode.parse(int(data.get("GameType", data.get("defaultGameType", 0))))
         # Continue generating missing chunks with the saved world's seed.
         world._provider = ChunkProviderOverworld(world.seed)
         world.spawn_point = BlockPos(
