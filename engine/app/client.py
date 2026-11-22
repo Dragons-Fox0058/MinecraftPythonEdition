@@ -200,6 +200,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     mouse_left_down = False
     paused = False
     inventory_open = False
+    crafting_open = False
 
     mesh_builder = ChunkMeshBuilder()
     meshes = {}
@@ -214,7 +215,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open, mouse_left_down
+            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open, crafting_open, mouse_left_down
             if action == glfw.PRESS:
                 input_state.key_down(key)
                 if key == glfw.KEY_SPACE:
@@ -232,6 +233,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 if key == glfw.KEY_ESCAPE:
                     if inventory_open:
                         inventory_open = False
+                        crafting_open = False
                     else:
                         paused = not paused
                     input_state.set_focus(False)
@@ -242,10 +244,11 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         window, glfw.CURSOR,
                         glfw.CURSOR_NORMAL if (paused or inventory_open) else glfw.CURSOR_DISABLED,
                     )
-                    title = "Minecraft Python Edition — INVENTORY" if inventory_open else ("Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}")
+                    title = ("Minecraft Python Edition — CRAFTING" if crafting_open else "Minecraft Python Edition — INVENTORY") if inventory_open else ("Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}")
                     glfw.set_window_title(window, title)
                 elif key == glfw.KEY_E and not paused:
                     inventory_open = not inventory_open
+                    crafting_open = False
                     mouse_left_down = False
                     block_breaking.reset()
                     input_state.set_focus(False)
@@ -315,8 +318,25 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     if window_w > 0 and window_h > 0:
                         nx = cursor_x * 2.0 / window_w - 1.0
                         ny = 1.0 - cursor_y * 2.0 / window_h
-                        col = math.floor((nx + 0.3915) / 0.087)
-                        row = math.floor((0.245 - ny) / 0.13)
+                        if crafting_open:
+                            grid_col = math.floor((nx + 0.32) / 0.077)
+                            grid_row = math.floor((0.22 - ny) / 0.087)
+                            if 0 <= grid_col < 3 and 0 <= grid_row < 3:
+                                grid_slot = grid_row * 3 + grid_col
+                                inventory.slots[selected_hotbar_slot], crafting_grid.slots[grid_slot] = (
+                                    crafting_grid.slots[grid_slot], inventory.slots[selected_hotbar_slot]
+                                )
+                                return
+                            if 0.15 <= nx <= 0.25 and 0.12 <= ny <= 0.22:
+                                recipe = crafting_grid.find_recipe(tool_recipes)
+                                if recipe is not None and inventory.add_item(recipe.output):
+                                    crafting_grid.craft(tool_recipes)
+                                return
+                            col = math.floor((nx + 0.37) / 0.078)
+                            row = math.floor((-0.015 - ny) / 0.08)
+                        else:
+                            col = math.floor((nx + 0.3915) / 0.087)
+                            row = math.floor((0.245 - ny) / 0.13)
                         if 0 <= col < 9 and 0 <= row < 4:
                             slot = row * 9 + col
                             if slot < 9:
@@ -333,7 +353,19 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 hit = interaction.ray_trace_blocks(
                     Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 4.5
                 )
-                if hit is None or hit.side_hit is None:
+                if hit is None:
+                    return
+                hit_block_id = world.get_block_state_id(hit.pos)
+                hit_block = BLOCK_REGISTRY.by_id(hit_block_id)
+                if hit_block is not None and hit_block.registry_name == "crafting_table":
+                    inventory_open = True
+                    crafting_open = True
+                    mouse_left_down = False
+                    block_breaking.reset()
+                    glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_NORMAL)
+                    glfw.set_window_title(window, "Minecraft Python Edition — CRAFTING")
+                    return
+                if hit.side_hit is None:
                     return
                 target = hit.pos.offset(hit.side_hit)
                 if (target.chunk_x, target.chunk_z) not in chunks or not world.is_in_world_bounds(target.y):
@@ -511,6 +543,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             "food": controller.hunger.food_level,
                             "paused": paused or inventory_open,
                             "inventory_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in inventory.slots] if inventory_open else None,
+                            "crafting_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in crafting_grid.slots] if crafting_open else None,
+                            "crafting_open": crafting_open,
+                            "crafting_result": (0, 0) if crafting_grid.find_recipe(tool_recipes) is None else (crafting_grid.find_recipe(tool_recipes).output.item.item_id, crafting_grid.find_recipe(tool_recipes).output.count),
                         },
                     )
         finally:
