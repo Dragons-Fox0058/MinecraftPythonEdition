@@ -60,7 +60,7 @@ def create_vanilla_tool_registry(items: Mapping[str, Item]) -> ToolRegistry:
                          if b.material in (Material.WOOD, Material.PLANT)} | set(_AXE_EFFECTIVE)
         else:
             effective = {b.registry_name for b in BLOCK_REGISTRY
-                         if b.material in (Material.GROUND, Material.SAND, Material.SNOW, Material.CLAY)} | set(_SHOVEL_EFFECTIVE)
+                         if b.material in (Material.GRASS, Material.GROUND, Material.SAND, Material.SNOW, Material.CLAY)} | set(_SHOVEL_EFFECTIVE)
         registry.register(ToolDefinition(item, tool_class, material, frozenset(effective)))
 
     tiers = {
