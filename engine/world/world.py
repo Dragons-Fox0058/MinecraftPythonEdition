@@ -5,6 +5,7 @@ from engine.core import BlockPos, AxisAlignedBB
 from engine.blocks import BLOCK_REGISTRY, BlockState
 import engine.blocks.vanilla_blocks as VB
 from engine.world.chunk_provider import ChunkProvider
+from engine.gameplay.time import GameRules, WorldTime
 
 AIR_ID = 0
 
@@ -14,9 +15,28 @@ class World:
         self.name = name
         self._provider = ChunkProvider()
         self._entities = []
-        # Placeholder for future: scheduled ticks, weather, time, seed.
         self.seed = 0
-        self.time_of_day = 6000  # noon
+        self.game_rules = GameRules()
+        self.world_time = WorldTime(day_time=6000)  # noon
+
+    @property
+    def time_of_day(self) -> int:
+        return self.world_time.time_of_day
+
+    @time_of_day.setter
+    def time_of_day(self, value: int) -> None:
+        self.world_time.set_day_time(value)
+
+    def tick(self) -> None:
+        """Advance world time and update a snapshot of loaded entities."""
+        self.world_time.tick(self.game_rules.get_bool("doDaylightCycle"))
+        for entity in tuple(self._entities):
+            if getattr(entity, "dead", False):
+                self.remove_entity(entity)
+                continue
+            update = getattr(entity, "on_update", None)
+            if callable(update):
+                update()
 
     @property
     def chunk_provider(self) -> ChunkProvider:
