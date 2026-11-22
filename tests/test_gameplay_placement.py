@@ -2,6 +2,7 @@
 import unittest
 
 from engine.core import BlockPos, EnumFacing
+from engine.blocks import Block
 from engine.gameplay.items import Item, ItemStack
 from engine.gameplay.placement import BlockPlacement
 from engine.world import World
@@ -52,9 +53,7 @@ class TestBlockPlacement(unittest.TestCase):
         self.assertEqual(result.reason, "not_a_block_item")
 
     def test_unregistered_block_rejected(self):
-        unregistered = __import__("engine.blocks", fromlist=["Block"]).Block(
-            "test:unregistered", 9999, VB.STONE.material
-        )
+        unregistered = Block("test:unregistered", 9999, VB.STONE.material)
         placement = BlockPlacement(self.world, lambda item: unregistered)
         result = placement.place(self.stack, self.pos, EnumFacing.UP)
         self.assertFalse(result.placed)
