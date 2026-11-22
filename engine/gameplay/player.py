@@ -1,6 +1,8 @@
 """Player-facing gameplay controller joining inventory and world actions."""
 from __future__ import annotations
 
+import math
+
 from engine.core import BlockPos, EnumFacing
 from engine.gameplay.breaking import BlockBreaking
 from engine.gameplay.crafting import CraftingGrid, RecipeManager
@@ -77,6 +79,9 @@ class PlayerController:
 
     def damage(self, amount: float, source: DamageSource | None = None) -> bool:
         """Apply damage through equipped armor; return whether health decreased."""
+        if (isinstance(amount, bool) or not isinstance(amount, (int, float))
+                or not math.isfinite(amount) or amount < 0):
+            raise ValueError("amount must be finite and non-negative")
         if source is None:
             source = DamageSource("generic")
         if not isinstance(source, DamageSource):
