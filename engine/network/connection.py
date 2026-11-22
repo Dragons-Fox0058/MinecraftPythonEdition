@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import math
 import socket
 import struct
 from enum import Enum
@@ -112,7 +113,15 @@ class MinecraftConnection:
         return cls(sock)
 
     def close(self):
-        self.socket.close()
+        try:
+            self.socket.close()
+        except OSError:
+            pass
+
+    def set_timeout(self, timeout: float | None) -> None:
+        if timeout is not None and (not math.isfinite(timeout) or timeout <= 0):
+            raise ValueError("timeout must be positive and finite, or None")
+        self.socket.settimeout(timeout)
 
     def _recv_exact(self, size: int) -> bytes:
         chunks = bytearray()
@@ -131,6 +140,8 @@ class MinecraftConnection:
         for index in range(5):
             byte = self._recv_exact(1)[0]
             raw.append(byte)
+            if index == 4 and (byte & 0xF0):
+                raise ProtocolError("incoming frame length VarInt overflows 32 bits")
             result |= (byte & 0x7F) << (7 * index)
             if not byte & 0x80:
                 if result > MAX_PACKET_LENGTH:
@@ -140,6 +151,8 @@ class MinecraftConnection:
 
     def receive(self) -> tuple[int, bytes]:
         length, prefix = self._recv_varint()
+        if length <= 0:
+            raise ProtocolError("incoming frame length must be positive")
         frame = self._recv_exact(length)
         if self.compression_threshold is None:
             return decode_packet(prefix + frame)
