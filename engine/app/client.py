@@ -154,9 +154,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     drop_items.update(ordinary_drop_items)
     item_to_block = {item: block_id for block_id, item in block_items.items()}
 
-    # Register the complete vanilla pickaxe/axe/shovel item subset. A small
-    # wooden-tool bootstrap is supplied only to brand-new local test worlds;
-    # existing player saves retain their own inventory unchanged.
+    # Register the complete vanilla pickaxe/axe/shovel item subset. New
+    # survival players start empty-handed; trees and the 2x2 crafting grid
+    # provide the normal wood-to-tools progression.
     tool_items = create_vanilla_tool_items()
     for item in tool_items.values():
         item_registry.register(item)
@@ -186,10 +186,6 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     player_file = save_directory / "playerdata" / f"{player_uuid}.dat"
     if player_file.is_file():
         load_world_player(save_directory, player_uuid, player, controller, item_registry)
-    else:
-        inventory.set_slot(0, ItemStack(tool_items["wooden_pickaxe"]))
-        inventory.set_slot(1, ItemStack(tool_items["wooden_axe"]))
-        inventory.set_slot(2, ItemStack(tool_items["wooden_shovel"]))
     interaction = InteractionManager(world)
 
     def resolve_block_drop(block, pos):
