@@ -96,7 +96,8 @@ class BlockBreaking:
         return tuple(spawned)
 
     def damage_block(self, pos: BlockPos, dig_speed: float = 1.0,
-                     can_harvest: bool = False, tool_stack: ItemStack | None = None) -> BlockBreakResult:
+                     can_harvest: bool = False, tool_stack: ItemStack | None = None,
+                     *, instant: bool = False, drop_items: bool = True) -> BlockBreakResult:
         if not isinstance(pos, BlockPos):
             raise TypeError("pos must be a BlockPos")
         block_id = self.world.get_block_state_id(pos)
@@ -116,7 +117,7 @@ class BlockBreaking:
             self.target = pos
             self.progress = 0.0
 
-        increment = self.relative_hardness(block.hardness, dig_speed, can_harvest)
+        increment = 1.0 if instant else self.relative_hardness(block.hardness, dig_speed, can_harvest)
         self.progress = min(1.0, self.progress + increment)
         if self.progress < 1.0:
             return BlockBreakResult(
