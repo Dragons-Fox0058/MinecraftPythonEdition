@@ -394,3 +394,53 @@ SIRADAKİ GPT1 ADIMLARI:
 2. Phase 7 için entity/tile entity persistence ve world/player save entegrasyonunu incele.
 3. Phase 8 için keep-alive, disconnect ve receiver lifecycle durumlarını tamamla.
 4. Küçük değişiklikleri ayrı commitlerle gönder; her işlemden sonra bu günlüğe gerçek sonuçları yaz.
+
+
+============================================================
+GPT1 — PHASE 8 GÜNCEL DURUM RAPORU
+============================================================
+
+Kullanıcının "Phase 8 durumu" sorusu üzerine güncel main kaynakları ve GitHub Actions geçmişi yeniden kontrol edildi.
+
+GÜNCEL KAYNAK:
+- engine/network/session.py SHA: 54b695a403f35ed915c08fb6031fd8ebd2695779
+- engine/network/connection.py SHA: 1f0ba3db9648c2b56f19d22dd48dc0d2e548e515
+- Son main commit: ebcef26a922971149de68b9b8b5edbc3005feec1
+
+MEVCUT:
+- TCP socket bağlantı ve framing
+- Protocol 340 packet codec / state altyapısı
+- Handshake, Login, AES-CFB8 encryption, compression
+- PlaySession ve background receiver
+- Gelen paketleri oyun thread'inde poll_received ile uygulama
+- GameApplication ağ entegrasyonu
+- Player movement gönderimi ve keep-alive timeout kontrolü
+- Temel entity spawn/movement/teleport/velocity/destroy
+- Packet ID registry ve bazı serverbound paket oluşturucuları
+
+TEST:
+- Protocol 340 network workflow run #11, 51 test başarılı (commit 3fd55add...).
+- Bu network workflow, son dokümantasyon commit'i ebcef26'dan önceki kod commit'inde çalıştı; kod değişikliği dokümantasyon-only olduğundan kaynaklar aynı kalmıştır.
+- Son genel Python workflow run #361 başarısız. Önceki incelemede 424 testten 422 geçtiği, iki WorldGen testinin başarısız olduğu görülmüştü. Bu run #361'in yeni job logu henüz bu kontrol sırasında açılmadı; dolayısıyla 422/2 sayısı #361 için teyit edilmiş sayılmamalıdır.
+
+EKSİK / TAMAMLANMAMIŞ:
+- Tüm clientbound Play paketleri için anlamlı decoder/handler yok; kayıtlı packet ID tek başına destek anlamına gelmez.
+- Inventory/window, block entity, scoreboard/player list, chat component, world border/title/sound/effect gibi paketlerin kapsamı eksik.
+- Entity metadata/equipment/effects/passengers/properties işleme eksik.
+- Keep-alive kontrolü mevcut olsa da sunucudan gelen keep-alive paketinin tüm zamanlama/cevap davranışı ve gerçek server akışı uçtan uca doğrulanmalı.
+- Receiver thread kapanış/race/back-pressure ve kopma senaryoları daha geniş test edilmeli.
+- Gerçek Minecraft Java 1.12.2 server ile handshake/login/play entegrasyon testi yok.
+- Online-mode authentication akışı gerçek Microsoft/Mojang oturumuyla doğrulanmadı.
+
+DURUM KARARI:
+Phase 8 temel altyapısı ve ilk oyun entegrasyonu mevcut; Phase 8 TAMAMLANMADI. Şimdilik "kısmen tamamlandı" olarak işaretlenmeli.
+
+SONRAKİ GPT1 İŞLERİ:
+1. Keep-alive packet response ve receiver shutdown/error lifecycle için hedefli testler.
+2. Inventory/window packet decode + session event/handler.
+3. Chat/player-list/abilities/health/respawn gibi temel Play packet handler'ları.
+4. Entity metadata ve block entity desteği.
+5. Protocol 340 doğruluğunu protokol referansıyla paket paket doğrulama.
+6. Mümkün olduğunda gerçek 1.12.2 test sunucusuyla E2E.
+
+Bu rapor yalnızca inceleme ve durum kaydıdır; oyun kodu değiştirilmedi.
