@@ -44,7 +44,7 @@ def get_enchantment_level(stack, enchantment: str | int) -> int:
     else:
         raise TypeError("enchantment must be a known name or non-negative numeric ID")
 
-    tag = getattr(stack, "nbt", None)
+    tag = _plain(getattr(stack, "nbt", None))
     if not isinstance(tag, Mapping):
         return 0
     highest = 0
@@ -55,6 +55,7 @@ def get_enchantment_level(stack, enchantment: str | int) -> int:
         if not isinstance(entries, (list, tuple)):
             continue
         for entry in entries:
+            entry = _plain(entry)
             if not isinstance(entry, Mapping):
                 continue
             raw_id = _as_int(entry.get("id"))
