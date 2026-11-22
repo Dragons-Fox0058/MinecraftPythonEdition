@@ -65,6 +65,16 @@ class TestPlayerController(unittest.TestCase):
         self.assertEqual(self.controller.hunger.food_level, 14)
         self.assertEqual(self.controller.held_item.count, 1)
 
+    def test_consuming_stew_returns_bowl_to_inventory(self):
+        bowl = Item(502, "test:bowl")
+        stew = Item(503, "test:stew", max_stack_size=1, container_item=bowl)
+        self.controller.food_registry.register(stew, FoodProperties(6, 1.2))
+        self.controller.hunger.food_level = 10
+        self.controller.inventory.set_slot(0, ItemStack(stew, 1))
+        self.assertTrue(self.controller.consume_food())
+        self.assertIs(self.controller.held_item.item, bowl)
+        self.assertEqual(self.controller.inventory.count_item(bowl), 1)
+
     def test_death_drops_inventory_and_equipment(self):
         self.controller.inventory.set_slot(0, ItemStack(self.stone_item, 5))
         self.controller.inventory.set_armor_slot(0, ItemStack(self.stone_item, 1))
