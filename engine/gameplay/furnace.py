@@ -1,6 +1,8 @@
 """Furnace fuel and smelting logic with explicit registries."""
 from __future__ import annotations
 
+import math
+
 from engine.gameplay.crafting import Ingredient
 from engine.gameplay.items import Item, ItemStack
 
@@ -28,7 +30,7 @@ class SmeltingRecipe:
             raise TypeError("ingredient must be an Ingredient")
         if not isinstance(output, ItemStack) or output.is_empty:
             raise ValueError("output must be a non-empty ItemStack")
-        if isinstance(experience, bool) or not isinstance(experience, (int, float)) or experience < 0:
+        if isinstance(experience, bool) or not isinstance(experience, (int, float)) or not math.isfinite(experience) or experience < 0:
             raise ValueError("experience must be a non-negative number")
         self.ingredient = ingredient
         self.output = output.copy()
@@ -111,7 +113,6 @@ class Furnace:
 
     def update(self) -> bool:
         """Advance one furnace tick; return True if one item was smelted."""
-        was_burning = self.is_burning
         if self.burn_time > 0:
             self.burn_time -= 1
 
