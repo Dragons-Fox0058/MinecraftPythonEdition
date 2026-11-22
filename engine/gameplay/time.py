@@ -7,6 +7,8 @@ class GameRules:
 
     DEFAULTS = {
         "doDaylightCycle": True,
+        "announceAdvancements": True,
+        "gameLoopFunction": "",
         "keepInventory": False,
         "doMobSpawning": True,
         "doMobLoot": True,
@@ -33,7 +35,7 @@ class GameRules:
     def __init__(self) -> None:
         self._rules = dict(self.DEFAULTS)
 
-    def add_rule(self, name: str, default: bool | int) -> None:
+    def add_rule(self, name: str, default: bool | int | str) -> None:
         if not isinstance(name, str) or not name:
             raise ValueError("rule name must be a non-empty string")
         if name in self._rules:
@@ -42,14 +44,19 @@ class GameRules:
             self._rules[name] = default
         elif isinstance(default, int):
             self._rules[name] = default
+        elif isinstance(default, str):
+            self._rules[name] = default
         else:
-            raise TypeError("game rule defaults must be bool or int")
+            raise TypeError("game rule defaults must be bool, int, or str")
 
     def set(self, name: str, value: bool | int | str) -> None:
         if name not in self._rules:
             raise KeyError(f"unknown game rule: {name}")
         current = self._rules[name]
-        if isinstance(current, bool):
+        if isinstance(current, str):
+            if not isinstance(value, str):
+                raise TypeError("this game rule requires a string")
+        elif isinstance(current, bool):
             if isinstance(value, str):
                 normalized = value.strip().lower()
                 if normalized not in ("true", "false"):
@@ -67,7 +74,7 @@ class GameRules:
                 raise TypeError("this game rule requires an int")
         self._rules[name] = value
 
-    def get(self, name: str) -> bool | int:
+    def get(self, name: str) -> bool | int | str:
         if name not in self._rules:
             raise KeyError(f"unknown game rule: {name}")
         return self._rules[name]
@@ -82,6 +89,12 @@ class GameRules:
         value = self.get(name)
         if isinstance(value, bool) or not isinstance(value, int):
             raise TypeError(f"game rule {name} is not an integer")
+        return value
+
+    def get_str(self, name: str) -> str:
+        value = self.get(name)
+        if not isinstance(value, str):
+            raise TypeError(f"game rule {name} is not a string")
         return value
 
     def names(self) -> tuple[str, ...]:
