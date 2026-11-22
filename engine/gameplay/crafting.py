@@ -44,6 +44,8 @@ class ShapedRecipe:
             raise TypeError("ingredients must be Ingredient or None")
         if not isinstance(output, ItemStack) or output.is_empty:
             raise ValueError("recipe output must be a non-empty ItemStack")
+        if output.count > output.item.max_stack_size:
+            raise ValueError("recipe output exceeds max_stack_size")
         if not isinstance(mirrored, bool):
             raise ValueError("mirrored must be a bool")
         self.width = width
