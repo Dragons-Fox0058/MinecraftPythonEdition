@@ -24,7 +24,8 @@ The Python unit-test workflow is the automated evidence. It does not by itself p
 
 - [ ] Add fixtures from genuine 1.12.2 worlds and verify byte-level NBT/region compatibility.
 - [ ] Verify the complete 1.12.2 chunk schema, including real biome arrays, heightmap semantics, lighting, populated flags, and tile entities.
-- [ ] Persist and restore all supported entities, dropped items, tile entities, scheduled block ticks, and world-specific metadata.
+- [ ] Persist and restore all supported entities, dropped items, tile entities, scheduled block ticks, and remaining world-specific metadata.
+- [x] Persist and restore the world's SpawnX/SpawnY/SpawnZ coordinates in level.dat.
 - [ ] Verify crash recovery and backup/old-level.dat behavior against vanilla save semantics.
 - [ ] Verify opening, modifying, and reopening a real world with the official 1.12.2 server/client.
 
