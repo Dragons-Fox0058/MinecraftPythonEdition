@@ -9,7 +9,8 @@ from engine.network.play import (
     serverbound_teleport_confirm, serverbound_client_status,
     serverbound_client_settings, decode_block_change, decode_unload_chunk,
     decode_disconnect, decode_update_health, decode_time_update,
-    decode_player_abilities,
+    decode_player_abilities, decode_respawn, decode_plugin_message,
+    decode_change_game_state,
 )
 
 
@@ -79,6 +80,18 @@ class TestPlayPackets(unittest.TestCase):
         with self.assertRaises(ProtocolError):
             decode_player_abilities(struct.pack(">Bff", 0x80, 0.05, 0.1))
 
+    def test_respawn_plugin_message_and_game_state(self):
+        respawn = struct.pack(">iBB", -1, 2, 1) + _string("default")
+        result = decode_respawn(respawn)
+        self.assertEqual((result.dimension, result.difficulty, result.game_mode), (-1, 2, 1))
+        plugin = _string("MC|Brand") + b"vanilla"
+        message = decode_plugin_message(plugin)
+        self.assertEqual((message.channel, message.data), ("MC|Brand", b"vanilla"))
+        state = decode_change_game_state(struct.pack(">Bf", 3, 1.0))
+        self.assertEqual((state.reason, state.value), (3, 1.0))
+        with self.assertRaises(ProtocolError):
+            decode_change_game_state(b"bad")
+
     def test_dispatcher_known_and_unknown_packets(self):
         dispatcher = create_clientbound_dispatcher()
         buf = PacketBuffer()
@@ -92,6 +105,12 @@ class TestPlayPackets(unittest.TestCase):
         self.assertEqual(custom.dispatch(1, b"abc"), b"ABC")
         with self.assertRaises(ValueError):
             custom.register(1, lambda data: data)
+
+
+def _string(value):
+    buf = PacketBuffer()
+    buf.write_string(value)
+    return buf.to_bytes()
 
 
 if __name__ == "__main__":
