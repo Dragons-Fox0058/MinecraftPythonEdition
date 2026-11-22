@@ -121,11 +121,14 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     jump_requested = False
     inventory = Inventory()
     selected_hotbar_slot = inventory.selected_hotbar_slot
-    hotbar_block_ids = (1, 2, 3, 4, 5, 12, 13, 14, 15, 16, 20, 21, 24, 49, 56, 73, 74, 129, 153)
+    hotbar_block_ids = (1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 20, 21, 24, 31, 37, 38, 49, 56, 58, 73, 74, 129, 153)
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
-        block_id: Item(block_id, BLOCK_REGISTRY.by_id(block_id).registry_name)
+        block_id: Item(
+            block_id, f"minecraft:{BLOCK_REGISTRY.by_id(block_id).registry_name}",
+            has_subtypes=block_id in (5, 6, 17, 18),
+        )
         for block_id in hotbar_block_ids if BLOCK_REGISTRY.by_id(block_id) is not None
     }
     for item in block_items.values():
@@ -160,11 +163,15 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         "diamond": ordinary_drop_items[264],
         "gold_ingot": Item(266, "minecraft:gold_ingot"),
         "stick": Item(280, "minecraft:stick"),
+        "log": block_items[17],
+        "crafting_table": block_items[58],
     }
     for item in (ingredient_items["iron_ingot"], ingredient_items["gold_ingot"], ingredient_items["stick"]):
         item_registry.register(item)
     tool_recipes = create_vanilla_tool_recipes(tool_items, ingredient_items)
-    crafting_grid = CraftingGrid(3, 3)
+    personal_crafting_grid = CraftingGrid(2, 2)
+    table_crafting_grid = CraftingGrid(3, 3)
+    crafting_grid = personal_crafting_grid
     controller = PlayerController(
         player, inventory=inventory, difficulty="normal",
         tool_registry=tool_registry,
@@ -215,7 +222,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open, crafting_open, mouse_left_down
+            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open, crafting_open, crafting_grid, mouse_left_down
             if action == glfw.PRESS:
                 input_state.key_down(key)
                 if key == glfw.KEY_SPACE:
@@ -234,6 +241,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     if inventory_open:
                         inventory_open = False
                         crafting_open = False
+                        crafting_grid = personal_crafting_grid
                     else:
                         paused = not paused
                     input_state.set_focus(False)
@@ -248,7 +256,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     glfw.set_window_title(window, title)
                 elif key == glfw.KEY_E and not paused:
                     inventory_open = not inventory_open
-                    crafting_open = False
+                    crafting_open = inventory_open
+                    crafting_grid = personal_crafting_grid
                     mouse_left_down = False
                     block_breaking.reset()
                     input_state.set_focus(False)
@@ -310,7 +319,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 renderer.upload_chunk_mesh(key, mesh_builder.build(chunk, neighbors=neighbors))
 
         def on_mouse_button(_window, button, action, _mods):
-            nonlocal mouse_left_down, selected_hotbar_slot, crafting_open
+            nonlocal mouse_left_down, selected_hotbar_slot, crafting_open, crafting_grid
             if inventory_open:
                 if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
                     cursor_x, cursor_y = glfw.get_cursor_pos(window)
@@ -321,8 +330,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         if crafting_open:
                             grid_col = math.floor((nx + 0.32) / 0.077)
                             grid_row = math.floor((0.22 - ny) / 0.087)
-                            if 0 <= grid_col < 3 and 0 <= grid_row < 3:
-                                grid_slot = grid_row * 3 + grid_col
+                            if 0 <= grid_col < crafting_grid.width and 0 <= grid_row < crafting_grid.height:
+                                grid_slot = grid_row * crafting_grid.width + grid_col
                                 inventory.slots[selected_hotbar_slot], crafting_grid.slots[grid_slot] = (
                                     crafting_grid.slots[grid_slot], inventory.slots[selected_hotbar_slot]
                                 )
@@ -360,6 +369,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 if hit_block is not None and hit_block.registry_name == "crafting_table":
                     inventory_open = True
                     crafting_open = True
+                    crafting_grid = table_crafting_grid
                     mouse_left_down = False
                     block_breaking.reset()
                     glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_NORMAL)
