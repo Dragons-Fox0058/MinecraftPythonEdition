@@ -909,3 +909,21 @@ Commits:
 - 34a442c — integrate equipment into desktop survival client.
 
 CI is running for the integration commit; its result must be checked before this stage is marked verified. No physical Windows GPU playtest is claimed.
+
+
+
+ENTITY AI LIFECYCLE CORRECTION — 2026-11-22
+
+- Reworked engine/entities/ai.py: goals now start once, update on subsequent ticks, and reset only when their continuation condition ends.
+- AIWander now keeps its destination across ticks, observes a cooldown, and accepts an injected RNG for deterministic tests.
+- Added scheduler duplicate-registration checks and is_running() inspection.
+- Added tests for start/update/reset lifecycle and stable wander targets.
+
+Commits:
+- d127e9d — fix persistent entity AI goal scheduling.
+- 03753eb — test persistent entity AI goal lifecycle.
+
+Verification:
+- Python workflow 45028188916: SUCCESS, 464 tests passed.
+- Windows launcher workflow 45028039556: SUCCESS; EXE build and artifact upload both passed.
+- Manual Windows GPU playtest is still not claimed.
