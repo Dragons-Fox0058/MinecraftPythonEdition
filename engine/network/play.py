@@ -25,8 +25,15 @@ SERVERBOUND = {
     "player_position": 0x0D,
     "player_position_look": 0x0E,
     "player_look": 0x0F,
-    "player_digging": 0x13,
+    "player_abilities": 0x13,
+    "player_digging": 0x14,
     "held_item_change": 0x19,
+    "creative_inventory_action": 0x1A,
+    "update_sign": 0x1B,
+    "animation": 0x1C,
+    "spectate": 0x1D,
+    "player_block_placement": 0x1E,
+    "use_item": 0x1F,
 }
 CLIENTBOUND = {
     "chat": 0x0F,
@@ -35,15 +42,81 @@ CLIENTBOUND = {
     "disconnect": 0x1A,
     "unload_chunk": 0x1D,
     "keep_alive": 0x1F,
+    "entity_status": 0x1B,
+    "explosion": 0x1C,
     "chunk_data": 0x20,
+    "effect": 0x21,
+    "particle": 0x22,
     "join_game": 0x23,
-    "player_abilities": 0x2B,
+    "map": 0x24,
+    "entity": 0x25,
+    "entity_relative_move": 0x26,
+    "entity_look_and_relative_move": 0x27,
+    "entity_look": 0x28,
+    "vehicle_move": 0x29,
+    "open_sign_editor": 0x2A,
+    "craft_recipe_response": 0x2B,
+    "player_abilities": 0x2C,
+    "combat_event": 0x2D,
+    "player_list_item": 0x2E,
     "player_position_look": 0x2F,
+    "use_bed": 0x30,
+    "unlock_recipes": 0x31,
+    "destroy_entities": 0x32,
+    "remove_entity_effect": 0x33,
+    "resource_pack_send": 0x34,
     "respawn": 0x35,
-    "update_health": 0x41,
+    "entity_head_look": 0x36,
+    "select_advancement_tab": 0x37,
+    "world_border": 0x38,
+    "camera": 0x39,
+    "held_item_change": 0x3A,
+    "display_scoreboard": 0x3B,
+    "entity_metadata": 0x3C,
+    "attach_entity": 0x3D,
+    "entity_velocity": 0x3E,
+    "entity_equipment": 0x3F,
+    "set_experience": 0x40,
+    "scoreboard_objective": 0x42,
+    "set_passengers": 0x43,
+    "teams": 0x44,
+    "update_score": 0x45,
+    "spawn_position": 0x46,
     "time_update": 0x47,
+    "title": 0x48,
+    "sound_effect": 0x49,
+    "player_list_header_footer": 0x4A,
+    "collect_item": 0x4B,
+    "entity_teleport": 0x4C,
+    "advancements": 0x4D,
+    "entity_properties": 0x4E,
+    "entity_effect": 0x4F,
+    "update_health": 0x41,
+    "spawn_object": 0x00,
+    "spawn_experience_orb": 0x01,
+    "spawn_global_entity": 0x02,
+    "spawn_mob": 0x03,
+    "spawn_painting": 0x04,
+    "spawn_player": 0x05,
+    "animation": 0x06,
+    "statistics": 0x07,
+    "block_break_animation": 0x08,
+    "update_block_entity": 0x09,
+    "block_action": 0x0A,
     "block_change": 0x0B,
+    "boss_bar": 0x0C,
+    "server_difficulty": 0x0D,
+    "tab_complete": 0x0E,
+    "multi_block_change": 0x10,
+    "confirm_transaction": 0x11,
+    "close_window": 0x12,
+    "open_window": 0x13,
+    "window_items": 0x14,
+    "window_property": 0x15,
+    "set_slot": 0x16,
+    "set_cooldown": 0x17,
     "plugin_message": 0x18,
+    "named_sound_effect": 0x19,
     "change_game_state": 0x1E,
 }
 
@@ -58,8 +131,8 @@ def serverbound_teleport_confirm(teleport_id: int) -> tuple[int, bytes]:
 
 def serverbound_client_status(action: int) -> tuple[int, bytes]:
     # 0 = respawn, 1 = request statistics, 2 = open inventory achievement (legacy).
-    if isinstance(action, bool) or not isinstance(action, int) or action not in (0, 1, 2):
-        raise ValueError("client status action must be 0, 1, or 2")
+    if isinstance(action, bool) or not isinstance(action, int) or action not in (0, 1):
+        raise ValueError("client status action must be 0 or 1")
     out = PacketBuffer()
     out.write_varint(action)
     return SERVERBOUND["client_status"], out.to_bytes()
@@ -126,7 +199,7 @@ class TimeUpdate:
 class PlayerAbilities:
     flags: int
     flying_speed: float
-    walking_speed: float
+    fov_modifier: float
 
 
 @dataclass(frozen=True)
@@ -202,7 +275,7 @@ def decode_player_abilities(payload: bytes) -> PlayerAbilities:
     if flags & ~0x0F or not math.isfinite(flying) or not math.isfinite(walking):
         raise ProtocolError("invalid Player Abilities values")
     if flying < 0 or walking < 0:
-        raise ProtocolError("player ability speeds cannot be negative")
+        raise ProtocolError("player ability modifiers cannot be negative")
     return PlayerAbilities(flags, flying, walking)
 
 
