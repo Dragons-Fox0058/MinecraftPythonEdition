@@ -19,6 +19,7 @@ from engine.gameplay.vanilla_food_recipes import register_vanilla_food_recipe_it
 from engine.gameplay.tools import ToolDefinition, ToolMaterial, ToolRegistry
 from engine.gameplay.damage import DamageSource, ArmorDefinition, ArmorRegistry
 from engine.gameplay.vanilla_armor import VANILLA_ARMOR_MATERIALS, create_vanilla_armor_registry
+from engine.gameplay.vanilla_equipment import EquipmentStats, create_vanilla_equipment_items, create_vanilla_equipment_recipes
 from engine.gameplay.vanilla_tools import VANILLA_TOOL_MATERIALS, create_vanilla_tool_registry
 from engine.gameplay.time import GameRules, WorldTime
 from engine.gameplay.player import PlayerController
@@ -41,6 +42,7 @@ __all__ = [
     "DamageSource", "ArmorDefinition", "ArmorRegistry",
     "VANILLA_ARMOR_MATERIALS", "create_vanilla_armor_registry",
     "VANILLA_TOOL_MATERIALS", "create_vanilla_tool_registry",
+    "EquipmentStats", "create_vanilla_equipment_items", "create_vanilla_equipment_recipes",
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
     "EffectType", "StatusEffect", "StatusEffectManager",
