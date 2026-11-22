@@ -87,7 +87,7 @@ class TestChunkGenerator(unittest.TestCase):
         c = g.generate_chunk(0, 0)
         for x in range(16):
             for z in range(16):
-                self.assertEqual(c.blocks[x, z, 0], 7)  # bedrock
+                self.assertEqual(c.get_block_state_id(x, 0, z), 7)  # bedrock
 
     def test_terrain_has_air_at_top(self):
         g = ChunkGeneratorOverworld(0)
@@ -110,7 +110,7 @@ class TestChunkGenerator(unittest.TestCase):
     def test_terrain_has_stone_somewhere(self):
         g = ChunkGeneratorOverworld(0)
         c = g.generate_chunk(0, 0)
-        self.assertTrue((c.blocks == 1).any())
+        self.assertTrue((c.blocks == (1 << 4)).any())
 
     def test_different_seeds_differ(self):
         g1 = ChunkGeneratorOverworld(0)
