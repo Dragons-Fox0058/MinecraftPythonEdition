@@ -23,6 +23,7 @@ from engine.gameplay.vanilla_equipment import EquipmentStats, create_vanilla_equ
 from engine.gameplay.vanilla_tools import VANILLA_TOOL_MATERIALS, create_vanilla_tool_registry
 from engine.gameplay.time import GameRules, WorldTime
 from engine.gameplay.player import PlayerController
+from engine.gameplay.game_mode import GameMode
 from engine.gameplay.interaction import InteractionManager, BlockRayHit
 
 __all__ = [
@@ -44,7 +45,7 @@ __all__ = [
     "VANILLA_TOOL_MATERIALS", "create_vanilla_tool_registry",
     "EquipmentStats", "create_vanilla_equipment_items", "create_vanilla_equipment_recipes",
     "GameRules", "WorldTime",
-    "PlayerController", "InteractionManager", "BlockRayHit",
+    "PlayerController", "GameMode", "InteractionManager", "BlockRayHit",
     "EffectType", "StatusEffect", "StatusEffectManager",
     "LootEntry", "BlockLootTable", "LootTableRegistry",
 ]
