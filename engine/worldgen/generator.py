@@ -64,6 +64,11 @@ class ChunkGeneratorOverworld:
     def __init__(self, seed: int):
         self.seed = seed
         self.biome_provider = BiomeProvider(seed)
+        # Seeded domain offsets prevent nearby seed values from quantizing to
+        # identical low-relief heightmaps in this simplified terrain model.
+        seed_value = int(seed) & 0xFFFFFFFFFFFFFFFF
+        self._seed_offset_x = ((seed_value * 0x9E3779B1) & 0xFFFF) / 257.0
+        self._seed_offset_z = ((seed_value * 0x85EBCA77) & 0xFFFF) / 263.0
         rng = JavaRandom(seed)
         self.noise_min = NoiseGeneratorOctaves(rng, 16)
         self.noise_max = NoiseGeneratorOctaves(rng, 16)
@@ -78,8 +83,8 @@ class ChunkGeneratorOverworld:
                 wx = cx * 16 + lx
                 wz = cz * 16 + lz
                 biome = self.biome_provider.get_biome_at(wx, wz)
-                n_min = self.noise_min.noise3(wx * 0.03, 0, wz * 0.03)
-                n_max = self.noise_max.noise3(wx * 0.03, 0, wz * 0.03)
+                n_min = self.noise_min.noise3((wx + self._seed_offset_x) * 0.03, 0, (wz + self._seed_offset_z) * 0.03)
+                n_max = self.noise_max.noise3((wx + self._seed_offset_x) * 0.03, 0, (wz + self._seed_offset_z) * 0.03)
                 base = biome.base_height * 30.0
                 var = biome.height_variation * 80.0
                 avg = (n_min + n_max) * 0.5
