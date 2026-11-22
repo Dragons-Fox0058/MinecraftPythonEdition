@@ -203,14 +203,16 @@ def serverbound_use_entity(entity_id: int, action: int, *,
 
 def serverbound_entity_action(entity_id: int, action: int,
                               jump_boost: int = 0) -> tuple[int, bytes]:
-    if isinstance(entity_id, bool) or not isinstance(entity_id, int):
-        raise ValueError("entity_id must be an integer")
+    # Protocol 340 encodes all three fields as VarInts.
+    if (isinstance(entity_id, bool) or not isinstance(entity_id, int)
+            or entity_id < 0):
+        raise ValueError("entity_id must be a non-negative integer")
     if isinstance(action, bool) or not isinstance(action, int) or not 0 <= action <= 8:
         raise ValueError("entity action must be 0..8")
     if isinstance(jump_boost, bool) or not isinstance(jump_boost, int) or jump_boost < 0:
         raise ValueError("jump_boost must be non-negative")
     out = PacketBuffer()
-    out.write(struct.pack(">i", entity_id))
+    out.write_varint(entity_id)
     out.write_varint(action)
     out.write_varint(jump_boost)
     return SERVERBOUND["entity_action"], out.to_bytes()
