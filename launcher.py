@@ -49,7 +49,7 @@ class Launcher:
         self._button("STOP SERVER", self.stop_server).pack(fill="x", padx=90, pady=7)
         tk.Label(self.root, textvariable=self.status, bg="#151923", fg="#c7cfdd",
                  font=("Segoe UI", 9), wraplength=430).pack(pady=18)
-        tk.Label(self.root, text="Python Edition clients only • Java Edition is not supported",
+        tk.Label(self.root, text="PYTHON EDITION • SINGLEPLAYER AND PYTHON LAN",
                  bg="#151923", fg="#8993a5", font=("Segoe UI", 8)).pack(side="bottom", pady=15)
         self.root.protocol("WM_DELETE_WINDOW", self.close)
 
