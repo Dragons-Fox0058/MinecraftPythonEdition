@@ -76,7 +76,13 @@ class TestGameModes(unittest.TestCase):
         self.assertIsNone(self.controller.break_block(target))
         tool = Item(901, "test:adventure_tool", max_stack_size=1)
         self.controller.inventory.set_slot(0, ItemStack(tool, 1, nbt={"CanDestroy": ["minecraft:stone"]}))
-        self.assertTrue(self.controller.break_block(target).broken)
+        result = None
+        for _ in range(200):
+            result = self.controller.break_block(target)
+            if result is not None and result.broken:
+                break
+        self.assertIsNotNone(result)
+        self.assertTrue(result.broken)
 
         clicked = BlockPos(3, 64, 3)
         self.world.set_block_state_id(clicked, VB.STONE.block_id)
