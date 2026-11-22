@@ -555,6 +555,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             "inventory_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in inventory.slots] if inventory_open else None,
                             "crafting_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in crafting_grid.slots] if crafting_open else None,
                             "crafting_open": crafting_open,
+                            "crafting_width": crafting_grid.width,
+                            "crafting_height": crafting_grid.height,
                             "crafting_result": (0, 0) if crafting_grid.find_recipe(tool_recipes) is None else (crafting_grid.find_recipe(tool_recipes).output.item.item_id, crafting_grid.find_recipe(tool_recipes).output.count),
                         },
                     )
