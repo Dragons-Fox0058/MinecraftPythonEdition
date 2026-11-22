@@ -10,6 +10,7 @@ from engine.gameplay.inventory import Inventory
 from engine.gameplay.interaction import InteractionManager
 from engine.gameplay.items import ItemStack
 from engine.gameplay.placement import BlockPlacement
+from engine.gameplay.tools import ToolRegistry
 
 
 class PlayerController:
@@ -18,7 +19,8 @@ class PlayerController:
     def __init__(self, entity, inventory: Inventory | None = None,
                  hunger: HungerManager | None = None,
                  difficulty: str = "normal", block_drop_resolver=None,
-                 food_registry: FoodRegistry | None = None) -> None:
+                 food_registry: FoodRegistry | None = None,
+                 tool_registry: ToolRegistry | None = None) -> None:
         if not hasattr(entity, "world"):
             raise TypeError("entity must have a world")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
@@ -30,7 +32,10 @@ class PlayerController:
         self.food_registry = food_registry if food_registry is not None else FoodRegistry()
         self.difficulty = difficulty
         self.death_processed = False
-        self.breaking = BlockBreaking(self.world, drop_resolver=block_drop_resolver)
+        self.tool_registry = tool_registry
+        self.breaking = BlockBreaking(
+            self.world, drop_resolver=block_drop_resolver, tool_registry=tool_registry
+        )
         self.drops = ItemDropManager(self.world)
         self.interaction = InteractionManager(self.world)
         entity.inventory = self.inventory
@@ -76,7 +81,9 @@ class PlayerController:
 
     def break_block(self, pos: BlockPos, dig_speed: float = 1.0,
                     can_harvest: bool = False):
-        return self.breaking.damage_block(pos, dig_speed, can_harvest)
+        return self.breaking.damage_block(
+            pos, dig_speed, can_harvest, tool_stack=self.held_item
+        )
 
     def place_block(self, clicked_pos: BlockPos, face: EnumFacing,
                     block_resolver, can_place=None):
