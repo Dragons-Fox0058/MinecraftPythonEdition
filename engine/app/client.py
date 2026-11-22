@@ -22,6 +22,7 @@ from engine.gameplay.vanilla_drops import resolve_vanilla_block_drops
 from engine.gameplay.vanilla_enchantments import get_tool_enchantments
 from engine.gameplay.crafting import CraftingGrid
 from engine.gameplay.vanilla_recipes import create_vanilla_tool_recipes
+from engine.gameplay.vanilla_equipment import create_vanilla_equipment_items, create_vanilla_equipment_recipes
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
@@ -160,6 +161,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     tool_items = create_vanilla_tool_items()
     for item in tool_items.values():
         item_registry.register(item)
+    equipment_items, _equipment_stats = create_vanilla_equipment_items()
+    for item in equipment_items.values():
+        item_registry.register(item)
     tool_registry = create_vanilla_tool_registry(tool_items)
     ingredient_items = {
         "planks": block_items[5],
@@ -175,6 +179,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         item_registry.register(item)
     drop_items[280] = ingredient_items["stick"]
     tool_recipes = create_vanilla_tool_recipes(tool_items, ingredient_items)
+    equipment_recipes = create_vanilla_equipment_recipes(equipment_items, ingredient_items)
+    tool_recipes.extend(equipment_recipes)
     personal_crafting_grid = CraftingGrid(2, 2)
     table_crafting_grid = CraftingGrid(3, 3)
     crafting_grid = personal_crafting_grid
