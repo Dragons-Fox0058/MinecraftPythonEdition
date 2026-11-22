@@ -101,6 +101,8 @@ class MinecraftConnection:
         self.socket = sock
         self.state = ConnectionState.HANDSHAKE
         self.compression_threshold: int | None = None
+        self._encryptor = None
+        self._decryptor = None
 
     @classmethod
     def connect(cls, host: str, port: int, timeout: float = 10.0):
@@ -116,6 +118,8 @@ class MinecraftConnection:
             part = self.socket.recv(size - len(chunks))
             if not part:
                 raise EOFError("Minecraft server closed the connection")
+            if self._decryptor is not None:
+                part = self._decryptor.update(part)
             chunks.extend(part)
         return bytes(chunks)
 
@@ -144,7 +148,23 @@ class MinecraftConnection:
             frame = encode_packet(packet_id, payload)
         else:
             frame = encode_compressed_packet(packet_id, payload, self.compression_threshold)
-        self.socket.sendall(frame)
+        self.send_raw(frame)
+
+    def send_raw(self, data: bytes):
+        if self._encryptor is not None:
+            data = self._encryptor.update(data)
+        self.socket.sendall(data)
+
+    def enable_encryption(self, shared_secret: bytes):
+        if not isinstance(shared_secret, bytes) or len(shared_secret) != 16:
+            raise ValueError("Minecraft shared secret must be exactly 16 bytes")
+        try:
+            from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+        except ImportError as exc:
+            raise RuntimeError("online-mode login requires the cryptography package") from exc
+        cipher = Cipher(algorithms.AES(shared_secret), modes.CFB8(shared_secret))
+        self._encryptor = cipher.encryptor()
+        self._decryptor = cipher.decryptor()
 
     def set_compression(self, threshold: int):
         if isinstance(threshold, bool) or not isinstance(threshold, int) or threshold < 0:
@@ -152,7 +172,7 @@ class MinecraftConnection:
         self.compression_threshold = threshold
 
     def send_handshake(self, host: str, port: int, next_state: ConnectionState):
-        self.socket.sendall(encode_handshake(host, port, next_state))
+        self.send_raw(encode_handshake(host, port, next_state))
         self.state = next_state
 
 
