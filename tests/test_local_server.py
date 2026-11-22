@@ -36,7 +36,7 @@ class TestPythonEditionServer(unittest.TestCase):
         client = socket.create_connection((host, port), timeout=2)
         stream = client.makefile("rwb")
         try:
-            stream.write(b'{"type":"hello","edition":"Java","protocol":340,"username":"Nope"}\\n')
+            stream.write(b'{"type":"hello","edition":"Java","protocol":340,"username":"Nope"}\n')
             stream.flush()
             response = json.loads(stream.readline())
             self.assertEqual(response["type"], "disconnect")
