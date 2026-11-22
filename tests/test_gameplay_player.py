@@ -3,7 +3,7 @@ import unittest
 
 from engine.core import BlockPos, EnumFacing
 from engine.entities import EntityPlayer
-from engine.gameplay import FoodProperties, Item, ItemStack
+from engine.gameplay import FoodProperties, FoodRegistry, Item, ItemStack
 from engine.gameplay.player import PlayerController
 from engine.world import World
 import engine.blocks.vanilla_blocks as VB
@@ -51,6 +51,12 @@ class TestPlayerController(unittest.TestCase):
         )
         self.assertTrue(result.placed)
         self.assertEqual(self.controller.held_item.count, 1)
+
+    def test_explicit_empty_food_registry_is_preserved(self):
+        registry = FoodRegistry()
+        player = EntityPlayer(self.world, 4, 64, 4)
+        controller = PlayerController(player, food_registry=registry)
+        self.assertIs(controller.food_registry, registry)
 
     def test_consume_food_from_selected_hotbar_slot(self):
         self.controller.hunger.food_level = 10
