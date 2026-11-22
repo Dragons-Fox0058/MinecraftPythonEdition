@@ -30,7 +30,10 @@ class TestPlayPackets(unittest.TestCase):
     def test_serverbound_player_abilities_and_plugin_message(self):
         packet_id, payload = serverbound_player_abilities(0x06, 0.08, 0.12)
         self.assertEqual(packet_id, 0x13)
-        self.assertEqual(struct.unpack(">Bff", payload), (0x06, 0.08, 0.12))
+        flags, flying_speed, walking_speed = struct.unpack(">Bff", payload)
+        self.assertEqual(flags, 0x06)
+        self.assertAlmostEqual(flying_speed, 0.08, places=6)
+        self.assertAlmostEqual(walking_speed, 0.12, places=6)
         packet_id, payload = serverbound_plugin_message("MC|Brand", b"vanilla")
         self.assertEqual(packet_id, 0x09)
         buf = PacketBuffer(payload)
