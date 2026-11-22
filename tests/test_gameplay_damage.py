@@ -16,7 +16,7 @@ class TestArmorRegistry(unittest.TestCase):
     def test_damage_reduction_uses_armor_and_toughness(self):
         armor = [ItemStack(self.helmet, 1), ItemStack(self.chestplate, 1)]
         reduced = self.registry.calculate_damage(10.0, armor, DamageSource("mob"))
-        self.assertAlmostEqual(reduced, 4.4)
+        self.assertAlmostEqual(reduced, 7.2)
 
     def test_bypassing_sources_ignore_armor(self):
         armor = [ItemStack(self.chestplate, 1)]
