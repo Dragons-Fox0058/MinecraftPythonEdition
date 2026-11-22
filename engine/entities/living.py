@@ -3,6 +3,7 @@ from __future__ import annotations
 import math
 from engine.entities.entity import Entity
 from engine.core import Vec3d
+from engine.gameplay.effects import StatusEffectManager
 
 JUMP_VELOCITY = 0.42
 
@@ -18,6 +19,7 @@ class EntityLivingBase(Entity):
         self.last_damage = 0.0
         self.death_time = 0
         self.jump_cooldown = 0
+        self.status_effects = StatusEffectManager()
 
     def jump(self):
         if self.on_ground and self.jump_cooldown == 0:
@@ -59,4 +61,6 @@ class EntityLivingBase(Entity):
             self.hurt_resistant_time -= 1
         if self.jump_cooldown > 0:
             self.jump_cooldown -= 1
+        if not self.dead:
+            self.status_effects.tick(self)
         super().on_update()
