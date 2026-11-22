@@ -164,6 +164,10 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     stack = inventory.get_hotbar_slot(selected_hotbar_slot)
                     label = "empty" if stack.is_empty else f"{stack.item.name} x{stack.count}"
                     glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}: {label}")
+                if key == glfw.KEY_Q and paused and not inventory_open:
+                    # The pause screen's save-and-quit action; the finally block
+                    # persists world and player data before the window exits.
+                    glfw.set_window_should_close(window, True)
                 if key == glfw.KEY_ESCAPE:
                     if inventory_open:
                         inventory_open = False
