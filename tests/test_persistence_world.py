@@ -42,5 +42,27 @@ class TestWorldPersistence(unittest.TestCase):
             self.assertEqual((Path(directory) / "level.dat").read_bytes()[:2], b"\x1f\x8b")
 
 
+    def test_second_save_keeps_previous_level_dat_backup(self):
+        with tempfile.TemporaryDirectory() as directory:
+            world = World("first")
+            save_world(world, directory)
+            original = (Path(directory) / "level.dat").read_bytes()
+            world.name = "second"
+            save_world(world, directory)
+            self.assertEqual((Path(directory) / "level.dat_old").read_bytes(), original)
+            self.assertEqual(load_world(directory).name, "second")
+
+    def test_chunk_is_not_marked_clean_before_metadata_save_succeeds(self):
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as directory:
+            world = World("failure")
+            world.set_block_state_id(BlockPos(0, 64, 0), 1)
+            chunk = world.chunk_provider.get_or_create(0, 0)
+            with patch("engine.persistence.world._atomic_write", side_effect=OSError("disk full")):
+                with self.assertRaises(OSError):
+                    save_world(world, directory)
+            self.assertTrue(chunk.dirty)
+
+
 if __name__ == "__main__":
     unittest.main()
