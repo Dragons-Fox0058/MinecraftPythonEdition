@@ -2,12 +2,14 @@
 import json
 import struct
 import unittest
+from unittest.mock import patch
 import uuid
 
 from engine.network.codec import (
     PacketBuffer, ProtocolError, encode_packet, decode_packet,
     encode_compressed_packet, decode_compressed_packet,
 )
+from engine.network.status import query_server
 from engine.network.connection import (
     ConnectionState, decode_handshake, encode_handshake,
     encode_login_start, decode_status_response, MinecraftConnection,
@@ -94,6 +96,28 @@ class TestProtocolHandshake(unittest.TestCase):
                 json.dumps({"version": {"name": "1.12.2", "protocol": 340}})
             )
         )["version"]["protocol"], 340)
+
+    def test_status_query_performs_status_and_ping_exchange(self):
+        status = {"version": {"name": "1.12.2", "protocol": 340},
+                  "players": {"max": 20, "online": 3},
+                  "description": {"text": "Test server"}}
+        status_payload = PacketBuffer()
+        status_payload.write_string(json.dumps(status))
+        stamp = 123456789
+        pong_payload = struct.pack(">q", stamp)
+        fake = FakeSocket(
+            encode_packet(0x00, status_payload.to_bytes())
+            + encode_packet(0x01, pong_payload)
+        )
+        connection = MinecraftConnection(fake)
+        with patch("engine.network.status.MinecraftConnection.connect",
+                   return_value=connection), patch("engine.network.status.time.time",
+                   return_value=stamp / 1000):
+            result = query_server("localhost", 25565)
+        self.assertEqual(result.protocol, 340)
+        self.assertEqual(result.online_players, 3)
+        self.assertEqual(result.version_name, "1.12.2")
+        self.assertTrue(fake.closed)
 
     def test_connection_receive_send_and_compression_switch(self):
         incoming = encode_packet(0x00, b"first")
