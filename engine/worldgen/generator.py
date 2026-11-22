@@ -70,7 +70,7 @@ class ChunkGeneratorOverworld:
         self._seed_offset_x = ((seed_value * 0x9E3779B1) & 0xFFFF) / 257.0
         self._seed_offset_z = ((seed_value * 0x85EBCA77) & 0xFFFF) / 263.0
         seed_mix = ((seed_value & 0xFFFFFFFF) * 1664525 + 1013904223) & 0xFFFFFFFF
-        self._seed_height_bias = (seed_mix / 0xFFFFFFFF) * 12.0 - 6.0
+        self._seed_height_bias = (seed_mix / 0xFFFFFFFF) * 64.0 - 32.0
         rng = JavaRandom(seed)
         self.noise_min = NoiseGeneratorOctaves(rng, 16)
         self.noise_max = NoiseGeneratorOctaves(rng, 16)
