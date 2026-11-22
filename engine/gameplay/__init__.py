@@ -12,6 +12,7 @@ from engine.gameplay.furnace import (
     FuelRegistry, SmeltingRecipe, SmeltingRecipeManager, Furnace,
 )
 from engine.gameplay.health import FoodProperties, FoodRegistry, HungerManager
+from engine.gameplay.vanilla_foods import register_vanilla_food_items, register_vanilla_foods
 from engine.gameplay.time import GameRules, WorldTime
 from engine.gameplay.player import PlayerController
 from engine.gameplay.interaction import InteractionManager, BlockRayHit
@@ -25,6 +26,7 @@ __all__ = [
     "Ingredient", "ShapedRecipe", "ShapelessRecipe", "RecipeManager", "CraftingGrid",
     "FuelRegistry", "SmeltingRecipe", "SmeltingRecipeManager", "Furnace",
     "FoodProperties", "FoodRegistry", "HungerManager",
+    "register_vanilla_food_items", "register_vanilla_foods",
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
 ]
