@@ -14,43 +14,54 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 9. World time and game rules
 10. Integration and regression tests
 
-## Requirements
-- Preserve existing Phase 1–5 code unless an integration fix is necessary.
-- Compare behavior against Java 1.12.2 references.
-- Add tests for every implemented feature.
-- Do not claim compatibility without verification.
-- Produce a detailed handoff report at the end of Phase 6.
-- Perform the comprehensive Phase 1–6 audit afterward.
+## Implemented foundations
 
+- [x] Item, ItemRegistry, and ItemStack with metadata, durability, NBT copying, splitting, merging, and registry freezing.
+- [x] Inventory with 36 main slots, hotbar, armor slots, offhand, insertion, extraction, and item counting.
+- [x] Block-breaking progress with harvest flag and injectable drop resolver.
+- [x] Block placement with explicit item-to-block resolver, replaceability, world bounds, and optional collision predicate.
+- [x] Shaped and shapeless recipes, mirrored patterns, alternatives, subtype metadata, output validation, and container-item returns.
+- [x] Player crafting result insertion and overflow drops.
+- [x] Furnace fuel registry, smelting recipes, cook/burn progress, output limits, fuel container returns, fractional XP collection, and cook-progress decay.
+- [x] Source-derived 1.12.2 food item properties and metadata variants.
+- [x] Source-derived non-weapon furnace fuel durations and smelting recipes.
+- [x] Source-backed food crafting recipes: bread, cookie, cake, pumpkin pie, mushroom stew, and beetroot soup.
+- [x] Hunger, saturation, exhaustion, natural regeneration, and starvation thresholds by difficulty.
+- [x] Dropped item entities, inventory pickup, lifetime, pickup delay, and compatible-stack merging.
+- [x] World clock and typed game rules integrated with world ticking.
+- [x] Player controller joining inventory, block interaction, food consumption, crafting, item drops, pickup, and death handling.
+- [x] keepInventory, doEntityDrops, and doTileDrops handling in the implemented paths.
+- [x] GitHub Actions unittest workflow.
 
-## Implementation status — 2026-11-22
+## Current automated verification
 
-The following code foundations have been added to the repository:
+Latest successful GitHub Actions run observed during this update:
+- Commit: 3719e2d374f7b8fb879c9a24cb1b9429d74d7505
+- Result: 286 tests passed
+- Runtime: approximately 0.94 s
 
-- [x] Item, ItemRegistry, ItemStack (verified vanilla item catalogue still pending)
-- [x] Inventory, hotbar, armor slots, and offhand
-- [x] Block breaking progress and optional injected loot resolver
-- [x] Block placement with an explicit Item-to-Block resolver
-- [x] Shaped and shapeless crafting recipe engine with alternative ingredients, output stack validation, and container-item returns
-- [x] Furnace fuel and smelting recipe engine with source-derived 1.12.2 non-weapon fuel/smelting catalogues, container returns, XP accounting, slot insertion/extraction, and progress state
-- [x] Metadata-aware food properties and food registry; source-derived 1.12.2 food IDs/values, hunger, exhaustion, regeneration, and starvation manager
-- [x] Source-backed food crafting recipes (bread, cookie, cake, pumpkin pie, mushroom stew, beetroot soup)
-- [x] Dropped item entities and inventory pickup
-- [x] World clock and typed game rules, integrated into World.tick
-- [x] Player gameplay controller, block ray tracing, food use, and death drops honoring keepInventory
-- [x] Cross-system break → drop → pickup → place regression test
-- [x] GitHub Actions unittest workflow
+This is repository CI evidence, not a claim that the game has been tested against a running Java server.
 
-### Not yet complete / not to be claimed as vanilla-compatible
+## Remaining work before Phase 6 can be called complete
 
-- The global item registry is intentionally empty until item IDs and item properties are verified against the 1.12.2 data.
-- Vanilla recipe, fuel, food, and block-loot catalogues have not been populated.
-- Tool speed, harvest-level requirements, enchantments, potion effects, armor reduction, and damage-source rules are not yet fully implemented.
-- Furnace container-item returns and smelting experience collection are not yet implemented.
-- Item entity merging, randomized toss motion, pickup sound/events, and complete collision behavior are not yet implemented.
-- Placement does not yet include all vanilla block-state orientation, player collision, or tile-entity rules.
-- Ray tracing currently uses the engine's available block collision boxes; complex partial block shapes and entity ray tracing remain future work.
-- World ticking does not yet implement scheduled block ticks, random ticks, weather simulation, or full vanilla tile-entity ticking.
-- Persistence integration and the full Phase 1–6 audit remain deferred until Phase 6 is finished.
+- [ ] Build and verify the complete 1.12.2 item/block-item catalogue and properties; the global item registry is intentionally not auto-populated.
+- [ ] Add vanilla block loot tables and correct tool/harvest-level rules.
+- [ ] Implement tool classes, material speeds, enchantment modifiers, and durability use during block breaking.
+- [ ] Complete damage sources, armor reduction, invulnerability frames, status effects, and potion effects.
+- [ ] Complete item entity motion, pickup events/sounds, and vanilla collision/merge behavior.
+- [ ] Complete block placement state orientation, entity collision, and tile-entity placement.
+- [ ] Complete crafting/furnace recipe coverage beyond the explicitly registered safe subset.
+- [ ] Integrate scheduled block ticks, random ticks, weather, and tile-entity ticking with gameplay rules.
+- [ ] Add integration coverage for the completed catalogue and gameplay interactions.
 
-The checklist records implementation progress only. Compatibility claims require reference-based verification and passing regression tests.
+## Compatibility boundary
+
+The current code is a tested gameplay foundation with selected source-backed 1.12.2 catalogues. It is not yet full vanilla gameplay compatibility. Do not mark Phase 6 complete until every remaining-work item is either implemented and tested or explicitly scoped out with a documented reason.
+
+## Required next phases and final verification
+
+- Finish Phase 6 before moving on.
+- Phase 7 is persistence (level.dat, NBT, Anvil region/chunk save-load).
+- Phase 8 is networking/protocol support.
+- After Phase 8, perform the comprehensive Phase 1–8 audit, then test against a real Minecraft Java 1.12.2 server/client. Record exact versions, commands, logs, passed cases, and known incompatibilities.
+- Produce a detailed handoff report at the end of each phase.
