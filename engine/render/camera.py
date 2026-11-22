@@ -60,9 +60,9 @@ class Camera:
         up = np.asarray((0.0, 1.0, 0.0), dtype=np.float64)
         forward = target - eye
         forward /= np.linalg.norm(forward)
-        side = np.cross(forward, up)
+        side = np.cross(up, forward)
         side /= np.linalg.norm(side)
-        camera_up = np.cross(side, forward)
+        camera_up = np.cross(forward, side)
         matrix = np.identity(4, dtype=np.float64)
         matrix[0, :3] = side
         matrix[1, :3] = camera_up
