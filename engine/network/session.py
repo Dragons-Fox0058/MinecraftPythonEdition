@@ -233,8 +233,48 @@ class PlaySession:
             return self._emit("game_state", self.last_game_state)
 
         if packet_id == CLIENTBOUND["chunk_data"]:
-            chunk = decode_clientbound_chunk_data(payload)
-            return self._emit("chunk_data", chunk)
+            has_sky_light = self.world is None or getattr(self.world, "dimension", 0) == 0
+            chunk_packet = decode_clientbound_chunk_data(
+                payload, has_sky_light=has_sky_light
+            )
+            if self.world is not None:
+                provider = self.world.chunk_provider
+                if chunk_packet.ground_up:
+                    chunk = provider.get_or_create(
+                        chunk_packet.chunk_x, chunk_packet.chunk_z
+                    )
+                    chunk.blocks.fill(0)
+                    chunk.light.fill(0)
+                    chunk.biomes.fill(0)
+                    if chunk_packet.biomes is not None:
+                        for z in range(16):
+                            for x in range(16):
+                                chunk.biomes[x, z] = chunk_packet.biomes[z * 16 + x]
+                else:
+                    chunk = provider.get_chunk(
+                        chunk_packet.chunk_x, chunk_packet.chunk_z
+                    )
+                if chunk is not None:
+                    for section in chunk_packet.sections:
+                        base_y = section.section_y * 16
+                        for index, state_id in enumerate(section.block_states):
+                            x = index & 15
+                            z = (index >> 4) & 15
+                            y = base_y + (index >> 8)
+                            block_light = (
+                                section.block_light[index >> 1]
+                                >> (4 if index & 1 else 0)
+                            ) & 0x0F
+                            sky_light = 0
+                            if section.sky_light:
+                                sky_light = (
+                                    section.sky_light[index >> 1]
+                                    >> (4 if index & 1 else 0)
+                                ) & 0x0F
+                            chunk.blocks[x, z, y] = state_id
+                            chunk.light[x, z, y] = (sky_light << 4) | block_light
+                    chunk._dirty = True
+            return self._emit("chunk_data", chunk_packet)
 
         return self._emit("unknown_packet", (packet_id, bytes(payload)))
 
