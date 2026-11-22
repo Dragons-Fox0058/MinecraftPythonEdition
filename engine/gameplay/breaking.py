@@ -3,12 +3,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+import random
 from typing import Callable
 
 from engine.blocks import BLOCK_REGISTRY
 from engine.core import BlockPos
 from engine.gameplay.drops import ItemDropManager
 from engine.gameplay.items import ItemStack
+from engine.gameplay.loot import LootTableRegistry
 from engine.gameplay.tools import ToolRegistry
 
 
@@ -31,13 +33,17 @@ class BlockBreaking:
     """
 
     def __init__(self, world, drop_resolver: Callable | None = None,
-                 tool_registry: ToolRegistry | None = None) -> None:
+                 tool_registry: ToolRegistry | None = None,
+                 loot_registry: LootTableRegistry | None = None) -> None:
         if drop_resolver is not None and not callable(drop_resolver):
             raise TypeError("drop_resolver must be callable")
         self.world = world
         if tool_registry is not None and not isinstance(tool_registry, ToolRegistry):
             raise TypeError("tool_registry must be a ToolRegistry or None")
+        if loot_registry is not None and not isinstance(loot_registry, LootTableRegistry):
+            raise TypeError("loot_registry must be a LootTableRegistry or None")
         self.drop_resolver = drop_resolver
+        self.loot_registry = loot_registry
         self.tool_registry = tool_registry
         self.drop_manager = ItemDropManager(world)
         self.target: BlockPos | None = None
@@ -62,12 +68,21 @@ class BlockBreaking:
         self.progress = 0.0
 
     def _resolve_drops(self, block, pos: BlockPos, can_harvest: bool) -> tuple[ItemStack, ...]:
-        if not can_harvest or self.drop_resolver is None:
+        if not can_harvest:
             return ()
         rules = getattr(self.world, "game_rules", None)
         if rules is not None and not rules.get_bool("doTileDrops"):
             return ()
-        resolved = self.drop_resolver(block, pos)
+        if self.drop_resolver is not None:
+            resolved = self.drop_resolver(block, pos)
+        elif self.loot_registry is not None:
+            seed = (getattr(self.world, "seed", 0) ^ (pos.x * 341873128712)
+                    ^ (pos.y * 132897987541) ^ (pos.z * 42317861))
+            resolved = self.loot_registry.generate(
+                block.registry_name, can_harvest, random.Random(seed)
+            )
+        else:
+            return ()
         if resolved is None:
             return ()
         spawned: list[ItemStack] = []
