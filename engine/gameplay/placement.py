@@ -4,7 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Callable
 
-from engine.blocks import Block
+from engine.blocks import Block, BLOCK_REGISTRY
 from engine.core import BlockPos, EnumFacing
 from engine.gameplay.items import ItemStack
 
@@ -46,6 +46,8 @@ class BlockPlacement:
             return PlacementResult(False, clicked_pos, None, "not_a_block_item")
         if not isinstance(block, Block):
             raise TypeError("block_resolver must return a Block or None")
+        if BLOCK_REGISTRY.by_id(block.block_id) is not block:
+            return PlacementResult(False, clicked_pos, block.block_id, "unregistered_block")
 
         clicked_state = self.world.get_block_state(clicked_pos)
         if clicked_state.block.is_replaceable():
