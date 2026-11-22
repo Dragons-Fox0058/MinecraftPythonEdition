@@ -19,6 +19,7 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 - [x] Item, ItemRegistry, and ItemStack with metadata, durability, NBT copying, splitting, merging, and registry freezing.
 - [x] Inventory with 36 main slots, hotbar, armor slots, offhand, insertion, extraction, and item counting.
 - [x] Block-breaking progress with harvest flag and injectable drop resolver.
+- [x] Explicit tool materials, item-to-tool definitions, harvest-level requirements, tool-speed modifiers, and durability use; complete vanilla block/tool mappings remain pending.
 - [x] Block placement with explicit item-to-block resolver, replaceability, world bounds, and optional collision predicate.
 - [x] Shaped and shapeless recipes, mirrored patterns, alternatives, subtype metadata, output validation, and container-item returns.
 - [x] Player crafting result insertion and overflow drops.
@@ -36,8 +37,8 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 ## Current automated verification
 
 Latest successful GitHub Actions run observed during this update:
-- Commit: 3719e2d374f7b8fb879c9a24cb1b9429d74d7505
-- Result: 286 tests passed
+- Commit: 9cf8b719fa1e502055b60343f8cdde440ee18b1e
+- Result: 293 tests passed
 - Runtime: approximately 0.94 s
 
 This is repository CI evidence, not a claim that the game has been tested against a running Java server.
@@ -46,7 +47,7 @@ This is repository CI evidence, not a claim that the game has been tested agains
 
 - [ ] Build and verify the complete 1.12.2 item/block-item catalogue and properties; the global item registry is intentionally not auto-populated.
 - [ ] Add vanilla block loot tables and correct tool/harvest-level rules.
-- [ ] Implement tool classes, material speeds, enchantment modifiers, and durability use during block breaking.
+- [ ] Populate the complete vanilla tool classes/materials and block effectiveness/harvest-level mappings; enchantment modifiers are still pending.
 - [ ] Complete damage sources, armor reduction, invulnerability frames, status effects, and potion effects.
 - [ ] Complete item entity motion, pickup events/sounds, and vanilla collision/merge behavior.
 - [ ] Complete block placement state orientation, entity collision, and tile-entity placement.
