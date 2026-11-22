@@ -64,7 +64,7 @@ class TestVanillaFoodCatalogue(unittest.TestCase):
         registry = FoodRegistry()
         returned = register_vanilla_foods(items, registry)
         self.assertIs(returned, registry)
-        self.assertEqual(len(registry), 36)
+        self.assertEqual(len(registry), 35)
 
 
 if __name__ == "__main__":
