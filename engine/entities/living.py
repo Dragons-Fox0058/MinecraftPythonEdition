@@ -34,16 +34,16 @@ class EntityLivingBase(Entity):
 
         # Vanilla's 20-tick hurt-resistance window rejects weaker hits but
         # permits a stronger hit to apply only the difference.
+        applied = float(amount)
         if self.hurt_resistant_time > self.max_hurt_resistant_time // 2:
             if amount <= self.last_damage:
                 return False
-            amount -= self.last_damage
+            applied = float(amount) - self.last_damage
 
-        self.last_damage = float(amount if self.hurt_resistant_time <= self.max_hurt_resistant_time // 2
-                                 else amount + self.last_damage)
+        self.last_damage = float(amount)
         self.hurt_resistant_time = self.max_hurt_resistant_time
         self.hurt_time = self.max_hurt_resistant_time // 2
-        self.health -= amount
+        self.health -= applied
         if self.health <= 0:
             self.health = 0
             self.dead = True
