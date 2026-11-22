@@ -2,7 +2,9 @@
 from __future__ import annotations
 
 import math
+import queue
 import struct
+import threading
 import time
 
 from engine.core import BlockPos, Vec3d
@@ -83,6 +85,14 @@ class PlaySession:
         self.window_items = {}
         self.window_properties = {}
         self.cursor_item = EMPTY_SLOT
+        # Socket reads happen on a daemon thread; packet application remains on
+        # the caller/game thread so World and Entity state are never mutated
+        # from the network worker.
+        self._incoming_packets = queue.Queue(maxsize=1024)
+        self._receiver_thread = None
+        self._receiver_stop = threading.Event()
+        self._receiver_error = None
+        self._receiver_error_lock = threading.Lock()
 
     def _emit(self, name: str, value):
         if self.on_event is not None:
@@ -548,18 +558,85 @@ class PlaySession:
                 self.send_player_state()
         return True
 
+    @property
+    def receiver_running(self) -> bool:
+        return self._receiver_thread is not None and self._receiver_thread.is_alive()
+
+    def start_receiver(self) -> None:
+        """Start background socket reads without applying world changes off-thread."""
+        if not self.connected:
+            raise RuntimeError("play session is disconnected")
+        if self.receiver_running:
+            return
+        if self._receiver_thread is not None:
+            raise RuntimeError("network receiver has already stopped")
+        self._receiver_stop.clear()
+        self._receiver_thread = threading.Thread(
+            target=self._receive_loop,
+            name="MinecraftNetworkReceiver",
+            daemon=True,
+        )
+        self._receiver_thread.start()
+
+    def _receive_loop(self) -> None:
+        while not self._receiver_stop.is_set():
+            try:
+                packet = self.connection.receive()
+            except Exception as exc:
+                if not self._receiver_stop.is_set():
+                    with self._receiver_error_lock:
+                        self._receiver_error = exc
+                return
+            while not self._receiver_stop.is_set():
+                try:
+                    self._incoming_packets.put(packet, timeout=0.1)
+                    break
+                except queue.Full:
+                    # Back-pressure: stop reading the socket until the game
+                    # thread has drained queued packets. Never silently drop.
+                    continue
+
+    def poll_received(self, *, max_packets: int = 100) -> int:
+        """Apply up to max_packets queued packets on the calling thread."""
+        if not self.connected:
+            return 0
+        if isinstance(max_packets, bool) or not isinstance(max_packets, int) or max_packets < 1:
+            raise ValueError("max_packets must be a positive integer")
+        if self._receiver_thread is None:
+            raise RuntimeError("network receiver has not been started")
+        processed = 0
+        while processed < max_packets:
+            try:
+                packet_id, payload = self._incoming_packets.get_nowait()
+            except queue.Empty:
+                break
+            self.process_packet(packet_id, payload)
+            processed += 1
+
+        with self._receiver_error_lock:
+            receiver_error = self._receiver_error
+        if receiver_error is not None and self._incoming_packets.empty():
+            self.close()
+            raise ConnectionError("Minecraft network receiver stopped") from receiver_error
+        return processed
+
     def process_next(self, *, timeout: float = 20.0):
         if not self.connected:
             raise RuntimeError("play session is disconnected")
+        if self.receiver_running:
+            raise RuntimeError("process_next cannot be used while the background receiver is running")
         if not math.isfinite(timeout) or timeout <= 0:
             raise ValueError("timeout must be positive and finite")
         if hasattr(self.connection, "set_timeout"):
             self.connection.set_timeout(timeout)
         try:
             packet_id, payload = self.connection.receive()
-        except (TimeoutError, OSError) as exc:
+        except TimeoutError as exc:
             self.close()
             raise TimeoutError("Minecraft server did not send a packet in time") from exc
+        except (OSError, EOFError):
+            self.close()
+            raise
         finally:
             if hasattr(self.connection, "set_timeout"):
                 try:
@@ -570,9 +647,14 @@ class PlaySession:
 
     def close(self):
         self._remove_remote_entities()
-        if self.connected:
-            self.connected = False
+        was_connected = self.connected
+        self.connected = False
+        self._receiver_stop.set()
+        if was_connected:
             self.connection.close()
+        thread = self._receiver_thread
+        if thread is not None and thread is not threading.current_thread():
+            thread.join(timeout=0.5)
 
 
 __all__ = ["PlaySession"]
