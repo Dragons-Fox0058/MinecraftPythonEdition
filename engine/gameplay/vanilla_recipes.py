@@ -30,7 +30,7 @@ def create_vanilla_tool_recipes(tool_items: dict[str, Item],
     ))
     manager.register(ShapedRecipe(
         2, 2, tuple(Ingredient(ingredient_items["planks"]) for _ in range(4)),
-        ItemStack(ingredient_items["crafting_table"]),
+        ItemStack(ingredient_items["crafting_table"], 1),
     ))
     for material, ingredient in materials.items():
         for tool_class in ("pickaxe", "axe", "shovel"):
@@ -56,7 +56,7 @@ def create_vanilla_tool_recipes(tool_items: dict[str, Item],
                     None, stick, None,
                     None, stick, None,
                 )
-            manager.register(ShapedRecipe(3, 3, pattern, ItemStack(output_item)))
+            manager.register(ShapedRecipe(3, 3, pattern, ItemStack(output_item, 1)))
     return manager
 
 
