@@ -38,6 +38,8 @@ class BlockPlacement:
             raise TypeError("clicked_pos must be a BlockPos")
         if not isinstance(face, EnumFacing):
             raise TypeError("face must be an EnumFacing")
+        if can_place is not None and not callable(can_place):
+            raise TypeError("can_place must be callable or None")
         if stack.is_empty:
             return PlacementResult(False, clicked_pos, None, "empty_stack")
 
