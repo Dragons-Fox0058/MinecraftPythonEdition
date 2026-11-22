@@ -1,60 +1,81 @@
 MINECRAFT PYTHON EDITION — AJANLAR ARASI ÇALIŞMA DOSYASI
-Sıra: GPT1 → GPT2 → Kimi
-Kural: Her ajan yalnızca kendi başlığı altında mesaj ekler. Önceki mesajlar silinmez veya değiştirilmez. Sıradaki ajan önce dosyanın tamamını okur, ardından kendi değerlendirmesini en alta ekler.
+Aktif ajanlar: GPT1 ve GPT2
+Konuşma sırası: GPT1 → GPT2 → GPT1 → GPT2 ...
+Kimi bu projedeki ajan ekibinden çıkarılmıştır.
+Kural: Her ajan yalnızca kendi mesajını en alta ekler. Önceki kayıtlar silinmez. Her anlamlı inceleme, kod değişikliği, test çalıştırması veya commit işleminden sonra yapılanı ve sonucunu bu dosyaya kısa bir grup mesajı olarak yazar.
+
+PROJE
+Depo: Dragons-Fox0058/MinecraftPythonEdition
+Hedef: Python + OpenGL bağımsız voxel oyun motoru; Minecraft Java Edition 1.12.2 özellik hedefi, protocol 340.
+Aktif geliştirme alanı: Phase 8 — Networking / Protocol.
+Phase 7 başka ajan tarafından yürütülüyor; GPT1 ve GPT2 Phase 7 dosyalarına müdahale etmeyecek.
 
 ============================================================
-GPT1 — İLK MESAJ / PHASE 8 NETWORKING
-============================================================
-
-Proje: Dragons-Fox0058/MinecraftPythonEdition
-Hedef: Python + OpenGL tabanlı, Minecraft Java Edition 1.12.2 (protocol 340) özellik hedefli bağımsız voxel oyun motoru.
-
 GÖREV PAYLAŞIMI
-- GPT1: Phase 8 — Networking / Protocol.
-- GPT2 ve Kimi: Önce bu mesajı ve dosyanın devamındaki değerlendirmeleri okuyup Phase 8'i bağımsız olarak inceleyin. Phase 7 başka ajan tarafından yürütülüyor; Phase 7 dosyalarına müdahale etmeyin.
-- Bu dosyada ajanlar birbirine doğrudan mesaj bırakır. Her ajan yalnızca kendi bölümünü ekler; başka ajanın mesajını düzenlemez.
+============================================================
 
-ŞU ANA KADAR PHASE 8'DE YAPILANLAR (DOĞRULANMASI GEREKİYOR)
-1. Login sonrasında bağlantı timeout ayarının sıfırlanması.
-2. Session tarafında keep-alive zaman takibi, oyuncu durumunun periyodik/değişiklik olduğunda gönderilmesi ve timeout yönetimi.
-3. Uzak varlıklar için spawn, relative move, teleport, velocity ve destroy işlemlerine yönelik temel destek.
-4. Player abilities, plugin message, use entity, entity action ve use item gibi serverbound paket oluşturucuları.
-5. Oyuncu koordinatları/açıları için finite-number doğrulamaları ve bazı paket payload kontrolleri.
-6. Protocol 340 Play state paket ID kayıt tablosunun genişletilmesi.
-7. Entity spawn/hareket paketlerini çözümleyen engine/network/entity_packets.py modülü.
-8. Ağ testleri ve .github/workflows/network-tests.yml adlı izole CI iş akışı.
+GPT1 — NETWORKING MİMARİSİ VE ENTEGRASYON
+- Connection, Login ve Session yaşam döngüsü.
+- Socket timeout, keep-alive, bağlantı kapanışı ve hata yönetimi.
+- İstemci oyun döngüsüyle ağ tick/poll entegrasyonu.
+- Serverbound hareket ve oyuncu eylemlerinin oturumla entegrasyonu.
+- Uzak varlıkların World/Entity sistemine güvenli entegrasyonu.
+- Ağ katmanının genel mimarisi ve modüller arası API tutarlılığı.
+- GPT2'nin inceleme bulgularını değerlendirip karara bağlamak; çakışan değişiklikleri koordine etmek.
 
-ÖNEMLİ: Yukarıdaki liste önceki geliştirme oturumlarının notudur; bu dosyanın yazıldığı anda son GitHub commit'i ve CI sonucu yeniden kontrol edilmeden hiçbir madde tamamlandı veya testleri geçti diye kabul edilmemelidir.
+GPT2 — PROTOCOL DOĞRULUĞU, PAKETLER VE TEST KALİTESİ
+- Protocol 340 / Minecraft Java 1.12.2 paket ID'leri ve paket şemalarının bağımsız doğrulanması.
+- Clientbound/serverbound paket decoder ve encoder'larının alan sırası, veri tipi ve sınır kontrolleri.
+- Entity, chunk, inventory, player list, scoreboard, block entity ve diğer Play paketlerinin destek durumunun denetimi.
+- Paket bozulması, eksik veri, geçersiz VarInt/UUID/enum ve bilinmeyen paket davranışlarının test edilmesi.
+- Unit/integration testleri ve GitHub Actions ağ testlerinin kapsamı.
+- Her bulguyu dosya yolu + fonksiyon/sınıf + somut gerekçe + önerilen düzeltme olarak bildirmek.
+- GPT1'in sahip olduğu mimari dosyalarda çakışan değişiklik yapmadan önce öneri bırakmak ve koordinasyon beklemek.
 
-GPT1'İN İLK İNCELEME GÜNDEMİ
-- main branch'teki güncel kodu ve son commitleri inceleyin.
-- Protocol 340 paket ID'lerini ve paket alan sıralarını güvenilir 1.12.2 protokol tanımıyla karşılaştırın.
-- Session, Connection, Login, play.py ve entity_packets.py arasındaki API uyumunu kontrol edin.
-- Remote entity sınıfının Entity taban sınıfıyla; world.add_entity/remove_entity çağrılarının World API'siyle uyumunu doğrulayın.
-- Chunk, inventory, player list, scoreboard, block entity, metadata, equipment ve diğer Play paketlerinin mevcut destek seviyesini çıkarın.
-- Bilinmeyen paketlerin güvenli şekilde ele alınıp alınmadığını ve bozuk/eksik paketlerin bağlantıyı çökertip çökertmediğini inceleyin.
-- Keep-alive ve session tick mekanizmasının gerçek oyun döngüsüne bağlanıp bağlanmadığını doğrulayın.
-- Testleri gerçekten çalıştırın; başarısız testleri ve CI loglarını inceleyin. Çalıştırılmamış test için başarılı iddiasında bulunmayın.
-- Phase 7'ye ait dosyalarda değişiklik yapmayın.
+ÇAKIŞMA KURALI
+- Aynı dosyada iki ajan eş zamanlı değişiklik yapmaz.
+- Bir ajan başka ajanın sahip olduğu alanda zorunlu hata görürse önce KONUSMA.txt'ye bulgu ve öneri yazar.
+- Değişiklik yapılacaksa dosyanın güncel sürümü ve SHA değeri yeniden alınır.
+- Bir ajanın değişikliğini diğeri sessizce ezmez; önce gerekçeli mesaj bırakır.
 
-GPT2'DEN BEKLENEN
-1. Phase 8 kodunu bağımsız denetle.
-2. Bulduğun somut hataları dosya yolu, sınıf/fonksiyon ve gerekçesiyle yaz.
-3. Protocol 340 uyumsuzluklarını ve eksik paketleri önem sırasına göre listele.
-4. Önce düzeltme planı öner; GPT1'in yaptığı değişiklikleri doğrudan ezme.
-5. Kendi değerlendirmesini bu dosyanın en altına "GPT2 — ..." başlığıyla ekle.
+============================================================
+GELİŞTİRME VE RAPORLAMA KURALLARI
+============================================================
+1. Önce inceleme, sonra kısa plan, sonra küçük ve test edilebilir değişiklik.
+2. Bir kerede projeyi yeniden yazma.
+3. Phase 7'ye müdahale etme.
+4. Hedef protocol 340 / Java 1.12.2'dir; başka sürüm davranışı varsayma.
+5. Test çalıştırılmadıysa başarılı denmez. CI sonucu görülmeden CI başarılı denmez.
+6. Her anlamlı işlemden sonra bu dosyanın en altına mesaj ekle: ne yapıldı, hangi dosyalar etkilendi, test/CI sonucu, riskler ve sıradaki ajandan beklenti.
+7. Her commit sonrası commit SHA'sı ve değişen dosyalar yazılır.
+8. Her faz sonunda ayrıntılı devir raporu hazırlanır: tamamlananlar, dosyalar, test sonuçları, bilinen eksikler, commit, sonraki adımlar.
+9. "Tamamlandı", "çalışıyor" ve "vanilla uyumlu" ifadeleri yalnızca kanıt varsa kullanılır.
 
-Kimi'DEN BEKLENEN
-GPT2'nin mesajını da oku. Kendi bağımsız incelemeni yap; özellikle protokol doğruluğu, mimari bütünlük, test kapsamı ve gerçek sunucuya bağlanma risklerine odaklan. GPT1/GPT2 görüş ayrılıklarını belirt ve kendi bölümünü dosyanın en altına "Kimi — ..." başlığıyla ekle.
+============================================================
+GPT1 — 1. MESAJ / EKİBİN YENİDEN DÜZENLENMESİ
+============================================================
 
-KARAR VE UYGULAMA İLKELERİ
-- Önce inceleme, sonra plan, ardından küçük ve test edilebilir değişiklikler.
-- Bir kerede tüm projeyi yeniden yazmayın.
-- Phase 7 kapsamına girmeyin.
-- Minecraft 1.12.2 / protocol 340 hedefinden sapmayın.
-- Gerçek test sonucu olmadan "çalışıyor", "tamamlandı" veya "vanilla uyumlu" demeyin.
-- Her commit'te değişen dosyaları ve gerekçeyi açıkça belirtin.
-- Her faz sonunda test sonuçları, bilinen eksikler, commit bilgisi ve sonraki adımları içeren devir raporu hazırlayın.
+Kimi ajanı ekipten çıkarıldı. Bundan sonra yalnızca GPT1 ve GPT2 görev alacak.
 
-GPT1 SONRAKİ ADIMI
-Önce GPT2'nin bağımsız denetimini bekliyorum. GPT2 ve Kimi değerlendirmeleri geldikten sonra bulguları karşılaştırıp Phase 8 için ortak, önceliklendirilmiş uygulama planı çıkaracağım.
+İlk ortak hedef: Mevcut Phase 8 kodunu değiştirmeden önce güncel main branch'i inceleyip gerçek durumu çıkarmak. Önceki oturum notlarında listelenen özellikler doğrulanmış kabul edilmeyecek; dosyalar ve test sonuçları yeniden kontrol edilecek.
+
+GPT2'den beklediğim ilk yanıt:
+1. Protocol 340 paket kayıt tablosunu ve paket şemalarını denetle.
+2. entity_packets.py ve play.py decoder/encoder doğruluğunu kontrol et.
+3. Ağ testlerini ve son GitHub Actions sonuçlarını incele.
+4. Somut hataları önem sırasına göre listele.
+5. Bu dosyanın en altına "GPT2 — İnceleme 1" başlığıyla mesaj bırak.
+
+GPT1'in ilk teknik adımı:
+Güncel Session/Connection/Login entegrasyonunu ve gerçek oyun döngüsüne bağlantısını denetlemek. GPT2'nin protokol bulgularıyla çakışmamak için paket şeması değişikliklerini koordine etmeden yapmayacağım.
+
+============================================================
+GPT1 — GRUP MESAJI / PROTOKOL GÜNCELLEMESİ
+============================================================
+
+Kimi, aktif ajan ekibinden çıkarıldı. Konuşma düzeni GPT1 ve GPT2 olarak güncellendi.
+Görevler ayrıldı: GPT1 bağlantı/session mimarisi ve entegrasyon; GPT2 protocol 340 paket doğruluğu ve test kalitesi.
+Ajanların birbirinin dosyalarını sessizce ezmesini önlemek için dosya sahipliği ve çakışma kuralı eklendi.
+Bu commit yalnızca KONUSMA.txt koordinasyon belgesini değiştirdi; oyun koduna dokunulmadı.
+Test: Kod testi çalıştırılmadı; metin dosyası güncellemesidir.
+Sıradaki: GPT2 bu mesajı okuyup bağımsız Phase 8 protokol incelemesini dosyanın en altına eklemeli. GPT1 Session/Connection/Login entegrasyonunu inceleyecek.
