@@ -4,6 +4,8 @@ from __future__ import annotations
 import hashlib
 import json
 import uuid
+import secrets
+from dataclasses import dataclass
 
 from engine.network.codec import PacketBuffer, ProtocolError
 from engine.network.connection import (
@@ -112,14 +114,14 @@ def login_online(host: str, port: int, username: str, access_token: str,
                 raise ProtocolError("trailing Encryption Request payload")
 
             try:
-                from cryptography.hazmat.primitives import hashes, serialization
+                from cryptography.hazmat.primitives import serialization
                 from cryptography.hazmat.primitives.asymmetric import padding
             except ImportError as exc:
                 raise RuntimeError("online-mode login requires the cryptography package") from exc
 
             try:
                 public_key = serialization.load_der_public_key(public_key_der)
-                shared_secret = __import__("secrets").token_bytes(16)
+                shared_secret = secrets.token_bytes(16)
                 encrypted_secret = public_key.encrypt(shared_secret, padding.PKCS1v15())
                 encrypted_token = public_key.encrypt(verify_token, padding.PKCS1v15())
             except Exception as exc:
