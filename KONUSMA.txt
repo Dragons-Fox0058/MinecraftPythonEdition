@@ -593,3 +593,43 @@ EK İLERLEME — 2026-11-22:
 - Windows EXE build run 45022725036 (c09d3ed...) bu kayıt sırasında hâlâ Build launcher EXE adımındaydı; artifact henüz oluşmadı.
 
 Yeni kalanlar: crafting/furnace UI, texture atlas, gerçek item icon/count text, tam vanilla item katalog/loot/tool kuralları, mob AI, audio, ayarlar ve tam dünya yönetimi ekranı.
+
+
+============================================================
+GPT-6 — PYTHON EDITION UI BRANDING / PAUSE MENU FOLLOW-UP
+============================================================
+2026-11-22
+
+DEĞİŞİKLİKLER:
+- engine/render/opengl.py:
+  - 5×7 bitmap font ile gerçek HUD yazı çizimi eklendi.
+  - Ekranda "MINECRAFT PYTHON EDITION" ürün adı görünür.
+  - Can/açlık göstergelerine HEALTH ve FOOD etiketleri eklendi.
+  - Envanter paneline INVENTORY başlığı eklendi.
+  - Pause paneline GAME MENU, RESUME, OPTIONS ve Q ile kaydet/çık metinleri eklendi.
+- engine/app/client.py:
+  - Pause durumunda Q tuşu pencereyi kapatma akışına alır; mevcut finally bloğu dünya ve oyuncu verisini kaydeder.
+- launcher.py:
+  - Alt bilgi Python Edition ve tek oyunculu/LAN odağıyla yeniden yazıldı; Java Edition ifadesi launcher kullanıcı arayüzünden çıkarıldı.
+- tests/test_render_camera.py:
+  - HUD bitmap metin geometrisinin de üretildiğini kontrol eden ek assertion.
+
+COMMITLER:
+- 074681308d953f8e8fa60a7a29fea754e11e9506 — HUD bitmap font ve Python Edition görünür marka adı.
+- 43f05ae598babff25ac63520fe93e65c92f4fa75 — HUD metin geometrisi testi.
+- 7f577343f0a2a5a766dc3c18e4e380d9a003a1e2 — pause menüsünden Q ile kaydet/çık.
+- d4fc6d19239583330cf57a28f0b607f932cee063 — launcher alt bilgi metni.
+- 3946aaa99b6621c0e7b6d30faf1860bd19741f68 — pause ekranında Q kısayolunun açıklaması.
+
+TEST:
+- Python tests run 45023151592, commit 43f05ae... SUCCESS.
+- Python tests run 45023149180, commit 074681... SUCCESS.
+- 7f577..., d4fc6... ve 3946aaa... için CI sonuçları bu not yazılırken devam ediyor/queued; başarılı oldukları henüz iddia edilmiyor.
+- Windows build run 45023149182/45023186500/45023194137 henüz tamamlanmadı.
+- Gerçek Windows GPU açılış testi hâlâ yapılmadı.
+
+KALAN:
+- Pause panelindeki OPTIONS metni henüz gerçek ayarlar ekranına bağlı değil.
+- Envanter paneli hâlâ temel slot paneli; crafting grid, gerçek item icon/count yazıları ve fareyle stack taşıma yok.
+- Texture atlas/resource-pack yükleme, moblar, ses ve tam Survival döngüsü tamamlanmadı.
+- Tek oyunculu sistem tamamlandı olarak işaretlenmeyecek; bu commitler yalnızca UI okunabilirliği ve kaydet/çık davranışını ilerletti.
