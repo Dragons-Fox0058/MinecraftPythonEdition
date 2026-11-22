@@ -96,6 +96,14 @@ class TestPlayerController(unittest.TestCase):
         self.assertTrue(self.controller.inventory.get_slot(0).count == 5)
         self.assertFalse(any(hasattr(e, "stack") for e in self.world.entities))
 
+    def test_do_entity_drops_disables_player_death_drops(self):
+        self.controller.inventory.set_slot(0, ItemStack(self.stone_item, 5))
+        self.world.game_rules.set("doEntityDrops", False)
+        self.player.dead = True
+        self.world.tick()
+        self.assertEqual(self.controller.inventory.get_slot(0).count, 5)
+        self.assertFalse(any(hasattr(e, "stack") for e in self.world.entities))
+
     def test_death_drops_are_processed_only_once(self):
         self.controller.inventory.set_slot(0, ItemStack(self.stone_item, 5))
         self.player.dead = True
