@@ -13,6 +13,7 @@ class TestWorldPersistence(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             world = World("Persistence Test")
             world.seed = 987654321
+            world.spawn_point = BlockPos(-128, 72, 255)
             world.world_time.total_time = 12345
             world.world_time.day_time = 23456
             world.game_rules.set("keepInventory", True)
@@ -24,6 +25,7 @@ class TestWorldPersistence(unittest.TestCase):
             loaded = load_world(directory)
             self.assertEqual(loaded.name, world.name)
             self.assertEqual(loaded.seed, world.seed)
+            self.assertEqual(loaded.spawn_point, world.spawn_point)
             self.assertEqual(loaded.world_time.total_time, 12345)
             self.assertEqual(loaded.world_time.day_time, 23456)
             self.assertTrue(loaded.game_rules.get_bool("keepInventory"))
