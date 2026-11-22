@@ -10,10 +10,10 @@ from engine.network.connection import ConnectionState, PACKET_IDS
 
 
 def serverbound_chat(message: str) -> tuple[int, bytes]:
-    if not isinstance(message, str) or len(message) > 100:
-        raise ValueError("chat message must contain at most 100 characters")
+    if not isinstance(message, str) or len(message) > 256:
+        raise ValueError("chat message must contain at most 256 characters")
     payload = PacketBuffer()
-    payload.write_string(message, max_chars=100)
+    payload.write_string(message, max_chars=256)
     return PACKET_IDS[ConnectionState.PLAY]["serverbound_chat"], payload.to_bytes()
 
 
