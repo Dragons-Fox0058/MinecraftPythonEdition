@@ -197,7 +197,11 @@ class PlayerController:
 
     def craft_to_inventory(self, grid: CraftingGrid, recipes: RecipeManager) -> ItemStack:
         """Craft once, collect the result and overflow container items into the world."""
-        output = grid.craft(recipes)
+        if self.game_mode is GameMode.CREATIVE:
+            recipe = grid.find_recipe(recipes)
+            output = ItemStack.empty() if recipe is None else recipe.output.copy()
+        else:
+            output = grid.craft(recipes)
         if output.is_empty:
             return output
 
