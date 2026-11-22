@@ -121,7 +121,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     jump_requested = False
     inventory = Inventory()
     selected_hotbar_slot = inventory.selected_hotbar_slot
-    hotbar_block_ids = (1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 20, 21, 24, 31, 37, 38, 49, 56, 58, 73, 74, 129, 153)
+    hotbar_block_ids = (1, 2, 3, 4, 5, 6, 12, 13, 14, 15, 16, 17, 18, 20, 21, 24, 31, 32, 37, 38, 39, 40, 49, 56, 58, 73, 74, 80, 82, 89, 129, 153)
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
@@ -143,6 +143,11 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         388: Item(388, "minecraft:emerald"),
         406: Item(406, "minecraft:quartz"),
         318: flint_item,
+        260: Item(260, "minecraft:apple"),
+        295: Item(295, "minecraft:wheat_seeds"),
+        332: Item(332, "minecraft:snowball"),
+        337: Item(337, "minecraft:clay_ball"),
+        348: Item(348, "minecraft:glowstone_dust"),
     }
     for item in ordinary_drop_items.values():
         item_registry.register(item)
@@ -168,6 +173,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     }
     for item in (ingredient_items["iron_ingot"], ingredient_items["gold_ingot"], ingredient_items["stick"]):
         item_registry.register(item)
+    drop_items[280] = ingredient_items["stick"]
     tool_recipes = create_vanilla_tool_recipes(tool_items, ingredient_items)
     personal_crafting_grid = CraftingGrid(2, 2)
     table_crafting_grid = CraftingGrid(3, 3)
