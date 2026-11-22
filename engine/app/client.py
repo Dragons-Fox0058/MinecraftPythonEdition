@@ -119,7 +119,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
-        block_id: Item(10000 + block_id, BLOCK_REGISTRY.by_id(block_id).registry_name)
+        block_id: Item(block_id, BLOCK_REGISTRY.by_id(block_id).registry_name)
         for block_id in hotbar_block_ids if BLOCK_REGISTRY.by_id(block_id) is not None
     }
     for item in block_items.values():
