@@ -55,8 +55,7 @@ def main(*, seed: int = 0) -> None:
             now = time.perf_counter()
             dt = min(now - previous, 0.05)
             previous = now
-            input_state.begin_frame()
-            # GLFW callbacks update held keys; mouse deltas are consumed below.
+            # GLFW callbacks from the previous event poll are consumed before reset.
             speed = 18.0 if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else 6.0
             right = float(input_state.is_key_down(glfw.KEY_D)) - float(input_state.is_key_down(glfw.KEY_A))
             forward = float(input_state.is_key_down(glfw.KEY_W)) - float(input_state.is_key_down(glfw.KEY_S))
@@ -67,6 +66,7 @@ def main(*, seed: int = 0) -> None:
             camera.move_local(right=right * speed * dt, up=up * speed * dt,
                               forward=forward * speed * dt)
             camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
+            input_state.begin_frame()
             width, height = glfw.get_framebuffer_size(window)
             if width > 0 and height > 0:
                 renderer.gl.glViewport(0, 0, width, height)
