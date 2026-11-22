@@ -7,7 +7,7 @@ from engine.gameplay.items import Item, ItemStack
 
 def create_vanilla_tool_recipes(tool_items: dict[str, Item],
                                 ingredient_items: dict[str, Item]) -> RecipeManager:
-    required = {"planks", "cobblestone", "iron_ingot", "diamond", "gold_ingot", "stick"}
+    required = {"planks", "cobblestone", "iron_ingot", "diamond", "gold_ingot", "stick", "log", "crafting_table"}
     missing = required - set(ingredient_items)
     if missing:
         raise ValueError(f"missing crafting ingredients: {sorted(missing)}")
@@ -20,6 +20,18 @@ def create_vanilla_tool_recipes(tool_items: dict[str, Item],
     }
     stick = Ingredient(ingredient_items["stick"])
     manager = RecipeManager()
+    manager.register(ShapedRecipe(
+        1, 1, (Ingredient(ingredient_items["log"]),),
+        ItemStack(ingredient_items["planks"], 4),
+    ))
+    manager.register(ShapedRecipe(
+        1, 2, (Ingredient(ingredient_items["planks"]), Ingredient(ingredient_items["planks"])),
+        ItemStack(ingredient_items["stick"], 4),
+    ))
+    manager.register(ShapedRecipe(
+        2, 2, tuple(Ingredient(ingredient_items["planks"]) for _ in range(4)),
+        ItemStack(ingredient_items["crafting_table"]),
+    ))
     for material, ingredient in materials.items():
         for tool_class in ("pickaxe", "axe", "shovel"):
             name = material + "_" + tool_class
