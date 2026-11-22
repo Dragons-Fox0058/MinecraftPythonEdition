@@ -97,6 +97,16 @@ class TestChunkGenerator(unittest.TestCase):
             for z in range(16):
                 self.assertEqual(c.blocks[x, z, 255], 0)
 
+    def test_generated_chunk_stores_biomes_and_heightmap(self):
+        generator = ChunkGeneratorOverworld(12345)
+        chunk = generator.generate_chunk(-2, 3)
+        heights = generator.generate_heightmap(-2, 3)
+        for x in range(16):
+            for z in range(16):
+                biome = generator.biome_provider.get_biome_at(-32 + x, 48 + z)
+                self.assertEqual(int(chunk.biomes[x, z]), biome.biome_id)
+                self.assertEqual(int(chunk.heightmap[x, z]), int(heights[x, z]) + 1)
+
     def test_terrain_has_stone_somewhere(self):
         g = ChunkGeneratorOverworld(0)
         c = g.generate_chunk(0, 0)
