@@ -19,6 +19,10 @@ class TestFurnace(unittest.TestCase):
         )
         self.furnace = Furnace(self.fuels, self.recipes, cook_time=3)
 
+    def test_non_finite_experience_rejected(self):
+        with self.assertRaises(ValueError):
+            SmeltingRecipe(Ingredient(self.ore), ItemStack(self.ingot, 1), experience=float("nan"))
+
     def test_fuel_registry(self):
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.coal, 1)), 1600)
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.ore, 1)), 0)
