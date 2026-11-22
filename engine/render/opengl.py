@@ -199,7 +199,7 @@ class OpenGLRenderer:
         self.gl.glDeleteVertexArrays(1, [gpu.vao])
 
     @staticmethod
-    def _hud_vertices(selected_slot: int, health: float, food: int) -> np.ndarray:
+    def _hud_vertices(selected_slot: int, health: float, food: int, paused: bool = False) -> np.ndarray:
         vertices = []
 
         def rect(x0, y0, x1, y1, color):
@@ -227,6 +227,11 @@ class OpenGLRenderer:
         # Health and hunger indicators as compact bars.
         rect(-0.88, -0.66, -0.88 + 0.16 * max(0.0, min(1.0, health / 20.0)), -0.635, (0.85, 0.12, 0.14))
         rect(0.72, -0.66, 0.72 + 0.16 * max(0, min(20, food)) / 20.0, -0.635, (0.78, 0.48, 0.16))
+        if paused:
+            rect(-0.34, -0.27, 0.34, 0.27, (0.08, 0.10, 0.14))
+            rect(-0.18, 0.08, 0.18, 0.13, (0.22, 0.48, 0.72))
+            rect(-0.18, -0.02, 0.18, 0.03, (0.34, 0.38, 0.45))
+            rect(-0.18, -0.12, 0.18, -0.07, (0.34, 0.38, 0.45))
         return np.asarray(vertices, dtype=np.float32)
 
     def render(self, mvp: np.ndarray, *, clear_color=(0.52, 0.72, 0.92, 1.0),
@@ -248,9 +253,10 @@ class OpenGLRenderer:
             selected = int(hud_state.get("selected_slot", 0))
             health = float(hud_state.get("health", 20.0))
             food = int(hud_state.get("food", 20))
+            paused = bool(hud_state.get("paused", False))
             if not 0 <= selected < 9:
                 raise ValueError("selected hotbar slot must be in [0, 8]")
-            hud = self._hud_vertices(selected, health, food)
+            hud = self._hud_vertices(selected, health, food, paused)
             gl.glDisable(gl.GL_DEPTH_TEST)
             gl.glDisable(gl.GL_CULL_FACE)
             gl.glUseProgram(self.hud_program)
