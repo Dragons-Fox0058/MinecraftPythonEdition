@@ -1,6 +1,8 @@
 """Player hunger, exhaustion, natural regeneration, and starvation."""
 from __future__ import annotations
 
+import math
+
 
 class HungerManager:
     """Minecraft-style food and saturation state for a living player."""
@@ -8,7 +10,7 @@ class HungerManager:
     def __init__(self, food_level: int = 20, saturation: float = 5.0) -> None:
         if isinstance(food_level, bool) or not isinstance(food_level, int) or not 0 <= food_level <= 20:
             raise ValueError("food_level must be an integer from 0 to 20")
-        if isinstance(saturation, bool) or not isinstance(saturation, (int, float)) or saturation < 0:
+        if isinstance(saturation, bool) or not isinstance(saturation, (int, float)) or not math.isfinite(saturation) or saturation < 0:
             raise ValueError("saturation must be a non-negative number")
         self.food_level = food_level
         self.saturation = min(float(saturation), float(food_level))
@@ -17,7 +19,7 @@ class HungerManager:
         self.tick_count = 0
 
     def add_exhaustion(self, amount: float) -> None:
-        if isinstance(amount, bool) or not isinstance(amount, (int, float)) or amount < 0:
+        if isinstance(amount, bool) or not isinstance(amount, (int, float)) or not math.isfinite(amount) or amount < 0:
             raise ValueError("exhaustion must be a non-negative number")
         self.exhaustion = min(40.0, self.exhaustion + float(amount))
 
@@ -26,7 +28,7 @@ class HungerManager:
             raise ValueError("food_points must be a non-negative integer")
         if (isinstance(saturation_modifier, bool)
                 or not isinstance(saturation_modifier, (int, float))
-                or saturation_modifier < 0):
+                or not math.isfinite(saturation_modifier) or saturation_modifier < 0):
             raise ValueError("saturation_modifier must be a non-negative number")
         self.food_level = min(20, self.food_level + food_points)
         self.saturation = min(
