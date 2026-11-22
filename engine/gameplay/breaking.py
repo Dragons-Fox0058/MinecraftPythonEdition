@@ -1,11 +1,14 @@
-"""Block breaking progress and harvesting decisions."""
+"""Block breaking progress, harvesting decisions, and optional loot drops."""
 from __future__ import annotations
 
 from dataclasses import dataclass
 import math
+from typing import Callable, Iterable
 
 from engine.blocks import BLOCK_REGISTRY
 from engine.core import BlockPos
+from engine.gameplay.drops import ItemDropManager
+from engine.gameplay.items import ItemStack
 
 
 @dataclass(frozen=True)
@@ -14,19 +17,24 @@ class BlockBreakResult:
     block_id: int
     block_name: str
     broken: bool
-    harvested: bool
+    can_harvest: bool
     progress: float
+    drops: tuple[ItemStack, ...] = ()
 
 
 class BlockBreaking:
     """Tracks vanilla-style relative block damage for one active target.
 
-    Tool effectiveness and harvest requirements are supplied by the caller
-    until the tool/item catalogue is implemented.
+    Tool effectiveness, harvest requirements, and the loot table are supplied
+    by the caller until the complete 1.12.2 item/block catalogue is verified.
     """
 
-    def __init__(self, world) -> None:
+    def __init__(self, world, drop_resolver: Callable | None = None) -> None:
+        if drop_resolver is not None and not callable(drop_resolver):
+            raise TypeError("drop_resolver must be callable")
         self.world = world
+        self.drop_resolver = drop_resolver
+        self.drop_manager = ItemDropManager(world)
         self.target: BlockPos | None = None
         self.progress = 0.0
 
@@ -48,6 +56,26 @@ class BlockBreaking:
         self.target = None
         self.progress = 0.0
 
+    def _spawn_drops(self, block, pos: BlockPos, can_harvest: bool) -> tuple[ItemStack, ...]:
+        if not can_harvest or self.drop_resolver is None:
+            return ()
+        rules = getattr(self.world, "game_rules", None)
+        if rules is not None and not rules.get_bool("doTileDrops"):
+            return ()
+        resolved = self.drop_resolver(block, pos)
+        if resolved is None:
+            return ()
+        spawned: list[ItemStack] = []
+        for stack in resolved:
+            if not isinstance(stack, ItemStack):
+                raise TypeError("drop_resolver must yield ItemStack values")
+            if stack.is_empty:
+                continue
+            copied = stack.copy()
+            self.drop_manager.spawn(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5, copied)
+            spawned.append(copied)
+        return tuple(spawned)
+
     def damage_block(self, pos: BlockPos, dig_speed: float = 1.0,
                      can_harvest: bool = False) -> BlockBreakResult:
         if not isinstance(pos, BlockPos):
@@ -66,14 +94,13 @@ class BlockBreaking:
         self.progress = min(1.0, self.progress + increment)
         if self.progress < 1.0:
             return BlockBreakResult(
-                pos, block_id, block.registry_name, False, False, self.progress
+                pos, block_id, block.registry_name, False, bool(can_harvest), self.progress
             )
 
-        # The world API currently stores block IDs, so this removes the block
-        # without pretending that block drops or tile-entity handling exist.
         self.world.set_block_state_id(pos, 0)
+        drops = self._spawn_drops(block, pos, bool(can_harvest))
         result = BlockBreakResult(
-            pos, block_id, block.registry_name, True, bool(can_harvest), 1.0
+            pos, block_id, block.registry_name, True, bool(can_harvest), 1.0, drops
         )
         self.reset()
         return result
