@@ -4,3 +4,5 @@ from engine.network.codec import (PROTOCOL_VERSION, ProtocolError, PacketBuffer,
 from engine.network.connection import (ConnectionState, PACKET_IDS, MinecraftConnection, encode_handshake, decode_handshake, encode_login_start, decode_status_response)
 
 from engine.network.status import ServerStatus, query_server
+
+from engine.network.login import LoginIdentity, login_offline
