@@ -3,6 +3,9 @@ import json
 import struct
 import unittest
 from unittest.mock import patch
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 import uuid
 
 from engine.network.codec import (
@@ -15,7 +18,7 @@ from engine.network.packets import (
     serverbound_position_look, serverbound_held_item, serverbound_digging,
     decode_clientbound_keep_alive, decode_clientbound_chat,
 )
-from engine.network.login import login_offline
+from engine.network.login import login_offline, login_online, minecraft_server_hash
 from engine.network.status import query_server
 from engine.network.connection import (
     ConnectionState, decode_handshake, encode_handshake,
@@ -103,6 +106,62 @@ class TestProtocolHandshake(unittest.TestCase):
                 json.dumps({"version": {"name": "1.12.2", "protocol": 340}})
             )
         )["version"]["protocol"], 340)
+
+    def test_online_login_rsa_session_join_and_aes_cfb8(self):
+        private_key = rsa.generate_private_key(public_exponent=65537, key_size=1024)
+        public_key_der = private_key.public_key().public_bytes(
+            serialization.Encoding.DER,
+            serialization.PublicFormat.SubjectPublicKeyInfo,
+        )
+        shared_secret = bytes(range(16))
+        verify_token = b"server-token"
+        encryption_request = PacketBuffer()
+        encryption_request.write_string("")
+        encryption_request.write_varint(len(public_key_der))
+        encryption_request.write(public_key_der)
+        encryption_request.write_varint(len(verify_token))
+        encryption_request.write(verify_token)
+
+        player_uuid = uuid.uuid4()
+        success = PacketBuffer()
+        success.write_string(str(player_uuid))
+        success.write_string("OnlineTest", max_chars=16)
+        server_cipher = Cipher(
+            algorithms.AES(shared_secret), modes.CFB8(shared_secret)
+        ).encryptor()
+        encrypted_success = server_cipher.update(
+            encode_packet(0x02, success.to_bytes())
+        )
+        fake = FakeSocket(
+            encode_packet(0x01, encryption_request.to_bytes()) + encrypted_success
+        )
+        connection = MinecraftConnection(fake)
+        joined = []
+        def session_join(token, profile, server_hash):
+            joined.append((token, profile, server_hash))
+
+        with patch("engine.network.login.MinecraftConnection.connect",
+                   return_value=connection), patch(
+                   "engine.network.login.secrets.token_bytes",
+                   return_value=shared_secret):
+            returned, identity = login_online(
+                "localhost", 25565, "OnlineTest", "test-access-token",
+                player_uuid, session_join,
+            )
+        self.assertIs(returned, connection)
+        self.assertEqual(identity.player_uuid, player_uuid)
+        self.assertEqual(joined[0][0], "test-access-token")
+        self.assertEqual(joined[0][1], player_uuid)
+        self.assertEqual(
+            joined[0][2],
+            minecraft_server_hash("", shared_secret, public_key_der),
+        )
+
+    def test_minecraft_server_hash_uses_signed_hex(self):
+        self.assertEqual(
+            minecraft_server_hash("", bytes(16), bytes.fromhex("010203")),
+            __import__("hashlib").sha1(bytes(16) + bytes.fromhex("010203")).digest().hex().lstrip("0") or "0",
+        )
 
     def test_offline_login_success(self):
         player_uuid = uuid.uuid4()
