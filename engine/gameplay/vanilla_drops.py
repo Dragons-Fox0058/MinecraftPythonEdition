@@ -1,7 +1,7 @@
-"""Small, source-backed vanilla 1.12.2 block-drop rules.
+"""Source-backed block drops for the supported Minecraft Java 1.12.2 subset.
 
-This intentionally covers only the starter desktop block catalogue. Unknown
-blocks return no drops rather than receiving an incorrect same-ID item.
+Unknown blocks intentionally produce no drops. The resolver models BlockOre's
+Fortune multiplier and the special vanilla ore item/count rules.
 """
 from __future__ import annotations
 
@@ -11,10 +11,16 @@ from collections.abc import Mapping
 from engine.gameplay.items import Item, ItemStack
 
 
-# Blocks whose normal drop is the corresponding block item.
 _SAME_ID_DROPS = frozenset({
     "dirt", "cobblestone", "planks", "sand", "sandstone", "obsidian",
 })
+
+
+def _fortune_multiplier(rng, fortune: int) -> int:
+    """Block.quantityDroppedWithBonus from 1.12.2."""
+    if fortune <= 0:
+        return 1
+    return max(0, rng.randrange(fortune + 2) - 1) + 1
 
 
 def resolve_vanilla_block_drops(
@@ -26,14 +32,14 @@ def resolve_vanilla_block_drops(
     fortune: int = 0,
     silk_touch: bool = False,
 ) -> list[ItemStack]:
-    """Resolve drops for supported 1.12.2 blocks.
+    """Resolve drops for registered 1.12.2 blocks.
 
-    Harvest eligibility is checked by BlockBreaking before this function is
-    called. Fortune and Silk Touch are accepted for the small rules implemented
-    here; callers must pass verified enchantment levels.
+    block_items maps legacy numeric item IDs to registered Item objects (it
+    includes both placeable block-items and ordinary drops). Harvest eligibility
+    is checked by BlockBreaking before this function is called.
     """
     if not isinstance(block_items, Mapping):
-        raise TypeError("block_items must map legacy block IDs to Item values")
+        raise TypeError("block_items must map legacy item IDs to Item values")
     if isinstance(fortune, bool) or not isinstance(fortune, int) or not 0 <= fortune <= 3:
         raise ValueError("fortune must be an integer from 0 to 3")
     if not isinstance(silk_touch, bool):
@@ -44,31 +50,56 @@ def resolve_vanilla_block_drops(
         raise TypeError("rng must provide randrange(stop)")
 
     name = getattr(block, "registry_name", None)
-    drop_item_id: int | None = None
+    block_id = getattr(block, "block_id", None)
+
+    # Silk Touch takes precedence over Fortune for these blocks.
+    if silk_touch and name in {
+        "stone", "glass", "coal_ore", "iron_ore", "gold_ore",
+        "lapis_ore", "diamond_ore", "redstone_ore", "lit_redstone_ore",
+        "emerald_ore", "quartz_ore",
+    }:
+        item = block_items.get(block_id)
+        return [ItemStack(item, 1)] if item is not None else []
 
     if name == "stone":
-        drop_item_id = 4  # cobblestone, unless Silk Touch is used
-        if silk_touch:
-            drop_item_id = 1
+        drop_id, count, metadata = 4, 1, 0
     elif name == "grass":
-        drop_item_id = 3  # dirt
+        drop_id, count, metadata = 3, 1, 0
     elif name == "glass":
-        drop_item_id = 20 if silk_touch else None
-    elif name == "gravel":
-        # BlockGravel: nextInt(10 - fortune * 3) == 0
-        bound = 10 - fortune * 3
-        if rng.randrange(bound) == 0:
-            if flint_item is None:
-                return []
-            return [ItemStack(flint_item, 1)]
-        drop_item_id = 13
-    elif name in _SAME_ID_DROPS:
-        drop_item_id = getattr(block, "block_id", None)
-
-    if drop_item_id is None:
         return []
-    item = block_items.get(drop_item_id)
-    return [ItemStack(item, 1)] if item is not None else []
+    elif name == "gravel":
+        # BlockGravel: nextInt(10 - fortune * 3) == 0 drops flint.
+        if rng.randrange(10 - fortune * 3) == 0:
+            return [ItemStack(flint_item, 1)] if flint_item is not None else []
+        drop_id, count, metadata = 13, 1, 0
+    elif name == "coal_ore":
+        drop_id, count, metadata = 263, _fortune_multiplier(rng, fortune), 0
+    elif name == "diamond_ore":
+        drop_id, count, metadata = 264, _fortune_multiplier(rng, fortune), 0
+    elif name == "emerald_ore":
+        drop_id, count, metadata = 388, _fortune_multiplier(rng, fortune), 0
+    elif name == "lapis_ore":
+        drop_id = 351  # dye item; metadata 4 is lapis lazuli
+        count = (4 + rng.randrange(5)) * _fortune_multiplier(rng, fortune)
+        metadata = 4
+    elif name in ("redstone_ore", "lit_redstone_ore"):
+        drop_id = 331
+        count = (4 + rng.randrange(2)) * _fortune_multiplier(rng, fortune)
+        metadata = 0
+    elif name == "quartz_ore":
+        drop_id, count, metadata = 406, _fortune_multiplier(rng, fortune), 0
+    elif name in ("iron_ore", "gold_ore"):
+        # These ores drop themselves; Fortune does not multiply their block drop.
+        drop_id, count, metadata = block_id, 1, 0
+    elif name in _SAME_ID_DROPS:
+        drop_id, count, metadata = block_id, 1, 0
+    else:
+        return []
+
+    item = block_items.get(drop_id)
+    if item is None:
+        return []
+    return [ItemStack(item, count, metadata=metadata)]
 
 
 __all__ = ["resolve_vanilla_block_drops"]
