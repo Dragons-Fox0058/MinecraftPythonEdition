@@ -15,6 +15,8 @@
 - [x] GLFW window/context creation and platform lifecycle implemented; actual desktop smoke testing remains outstanding.
 - [x] OpenGL GPU buffers, basic shaders, externally supplied MVP camera matrix, depth/cull state, and draw submission.
 - [ ] Texture atlas and resource-pack loading; replace placeholder colors with 1.12.2 textures.
+- [x] Built-in 5×7 bitmap font for visible Python Edition branding, HUD labels, inventory title, and pause-menu labels.
+- [x] Pause-menu Q shortcut saves world/player data through the normal shutdown path.
 - [x] Basic render-distance management and nearby chunk mesh streaming (5×5 around the player); frustum culling and asynchronous scheduling remain.
 - [x] First-person player camera, mouse capture, fixed-tick WASD movement, gravity, jump, sprint, block raycast, mining, and block placement (temporary block palette).
 - [x] Basic rendered crosshair, nine-slot hotbar frame, and health/hunger bars; item icons/count labels and full inventory screen remain.
