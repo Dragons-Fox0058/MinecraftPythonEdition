@@ -163,6 +163,7 @@ class CraftingGrid:
         self.width = width
         self.height = height
         self.slots = [ItemStack.empty() for _ in range(width * height)]
+        self.container_returns: list[ItemStack] = []
 
     def get_slot(self, index: int) -> ItemStack:
         if isinstance(index, bool) or not isinstance(index, int) or not 0 <= index < len(self.slots):
@@ -186,13 +187,30 @@ class CraftingGrid:
         if recipe is None:
             return ItemStack.empty()
         output = recipe.output.copy()
-        for stack in self.slots:
-            if not stack.is_empty:
-                stack.shrink(1)
+        self.container_returns.clear()
+        for index, stack in enumerate(self.slots):
+            if stack.is_empty:
+                continue
+            container_item = stack.item.container_item
+            container_metadata = stack.item.container_item_metadata
+            stack.shrink(1)
+            if container_item is not None:
+                returned = ItemStack(container_item, 1, metadata=container_metadata)
+                if stack.is_empty:
+                    self.slots[index] = returned
+                else:
+                    self.container_returns.append(returned)
         return output
+
+    def take_container_returns(self) -> tuple[ItemStack, ...]:
+        """Return and clear container items that did not fit back into their input slot."""
+        returned = tuple(stack.copy() for stack in self.container_returns)
+        self.container_returns.clear()
+        return returned
 
     def clear(self) -> None:
         self.slots = [ItemStack.empty() for _ in self.slots]
+        self.container_returns.clear()
 
 
 __all__ = [
