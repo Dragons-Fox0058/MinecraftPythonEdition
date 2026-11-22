@@ -102,3 +102,14 @@ CI verification — 2026-11-22:
 - [x] Expand supported drops to logs, saplings, leaves, tall grass, dead bushes, flowers/mushrooms, clay, snow, glowstone, and Silk Touch block returns.
 - [x] Preserve the current supported drop set through dedicated regression tests.
 - [ ] A full Java 1.12.2 block-state/metadata and mob loot catalogue is not claimed; current supported block and worldgen subsets are explicit.
+
+
+## Survival equipment expansion — 2026-11-22
+
+- [x] Added all five 1.12.2 sword tiers and all five hoe tiers with legacy item IDs and material durability.
+- [x] Added sword attack-damage/material stats and hoe combat stats as explicit data.
+- [x] Added the ten shaped crafting recipes, including mirrored hoe pattern matching and wood-plank metadata support.
+- [x] Composed recipe managers and registered sword/hoe items in the desktop client inventory registry.
+- [x] Connected sword and hoe recipes to the same 2x2/3x3 crafting interface as existing tool recipes.
+- [x] Added regression tests for IDs, durability, stats, recipe counts, crafting consumption, and mirrored patterns.
+- CI verification is tracked in GitHub Actions for the integration commit; no manual Windows GPU playtest is claimed.
