@@ -121,7 +121,8 @@ class MinecraftConnection:
     def set_timeout(self, timeout: float | None) -> None:
         if timeout is not None and (not math.isfinite(timeout) or timeout <= 0):
             raise ValueError("timeout must be positive and finite, or None")
-        self.socket.settimeout(timeout)
+        if hasattr(self.socket, "settimeout"):
+            self.socket.settimeout(timeout)
 
     def _recv_exact(self, size: int) -> bytes:
         chunks = bytearray()
