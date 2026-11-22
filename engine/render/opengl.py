@@ -199,7 +199,7 @@ class OpenGLRenderer:
         self.gl.glDeleteVertexArrays(1, [gpu.vao])
 
     @staticmethod
-    def _hud_vertices(selected_slot: int, health: float, food: int, paused: bool = False) -> np.ndarray:
+    def _hud_vertices(selected_slot: int, health: float, food: int, paused: bool = False, inventory_slots=None) -> np.ndarray:
         vertices = []
 
         def rect(x0, y0, x1, y1, color):
@@ -232,6 +232,26 @@ class OpenGLRenderer:
             rect(-0.18, 0.08, 0.18, 0.13, (0.22, 0.48, 0.72))
             rect(-0.18, -0.02, 0.18, 0.03, (0.34, 0.38, 0.45))
             rect(-0.18, -0.12, 0.18, -0.07, (0.34, 0.38, 0.45))
+        if inventory_slots is not None:
+            rect(-0.43, -0.36, 0.43, 0.36, (0.10, 0.12, 0.16))
+            slot_w, slot_h, gap_x, gap_y = 0.075, 0.105, 0.012, 0.025
+            grid_left, grid_top = -0.3915, 0.245
+            for index, entry in enumerate(inventory_slots[:36]):
+                row, col = divmod(index, 9)
+                x0 = grid_left + col * (slot_w + gap_x)
+                y1 = grid_top - row * (slot_h + gap_y)
+                x1, y0 = x0 + slot_w, y1 - slot_h
+                border = (0.95, 0.72, 0.22) if index == selected_slot else (0.48, 0.52, 0.58)
+                rect(x0, y0, x1, y1, border)
+                rect(x0 + 0.005, y0 + 0.005, x1 - 0.005, y1 - 0.005, (0.16, 0.18, 0.22))
+                item_id, count = entry
+                if item_id:
+                    color_value = (int(item_id) * 0x45D9F3B) & 0xFFFFFFFF
+                    color = (0.35 + ((color_value >> 16) & 0xFF) / 390.0,
+                             0.35 + ((color_value >> 8) & 0xFF) / 390.0,
+                             0.35 + (color_value & 0xFF) / 390.0)
+                    rect(x0 + 0.018, y0 + 0.027, x1 - 0.018, y1 - 0.027, color)
+                    rect(x0 + 0.012, y0 + 0.012, x0 + 0.012 + min(1.0, int(count) / 64.0) * 0.05, y0 + 0.018, (0.92, 0.92, 0.92))
         return np.asarray(vertices, dtype=np.float32)
 
     def render(self, mvp: np.ndarray, *, clear_color=(0.52, 0.72, 0.92, 1.0),
@@ -254,9 +274,10 @@ class OpenGLRenderer:
             health = float(hud_state.get("health", 20.0))
             food = int(hud_state.get("food", 20))
             paused = bool(hud_state.get("paused", False))
+            inventory_slots = hud_state.get("inventory_slots")
             if not 0 <= selected < 9:
                 raise ValueError("selected hotbar slot must be in [0, 8]")
-            hud = self._hud_vertices(selected, health, food, paused)
+            hud = self._hud_vertices(selected, health, food, paused, inventory_slots)
             gl.glDisable(gl.GL_DEPTH_TEST)
             gl.glDisable(gl.GL_CULL_FACE)
             gl.glUseProgram(self.hud_program)
