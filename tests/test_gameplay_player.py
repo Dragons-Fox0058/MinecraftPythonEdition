@@ -3,7 +3,7 @@ import unittest
 
 from engine.core import BlockPos, EnumFacing
 from engine.entities import EntityPlayer
-from engine.gameplay import Item, ItemStack
+from engine.gameplay import FoodProperties, Item, ItemStack
 from engine.gameplay.player import PlayerController
 from engine.world import World
 import engine.blocks.vanilla_blocks as VB
@@ -15,6 +15,8 @@ class TestPlayerController(unittest.TestCase):
         self.player = EntityPlayer(self.world, 0, 64, 0)
         self.controller = PlayerController(self.player)
         self.stone_item = Item(500, "test:stone_block")
+        self.apple = Item(501, "test:apple")
+        self.controller.food_registry.register(self.apple, FoodProperties(4, 0.3))
 
     def test_controller_attaches_player_components(self):
         self.assertIs(self.player.inventory, self.controller.inventory)
@@ -48,6 +50,13 @@ class TestPlayerController(unittest.TestCase):
             lambda item: VB.STONE if item is self.stone_item else None,
         )
         self.assertTrue(result.placed)
+        self.assertEqual(self.controller.held_item.count, 1)
+
+    def test_consume_food_from_selected_hotbar_slot(self):
+        self.controller.hunger.food_level = 10
+        self.controller.inventory.set_slot(0, ItemStack(self.apple, 2))
+        self.assertTrue(self.controller.consume_food())
+        self.assertEqual(self.controller.hunger.food_level, 14)
         self.assertEqual(self.controller.held_item.count, 1)
 
     def test_drop_and_pickup(self):
