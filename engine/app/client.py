@@ -139,6 +139,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     block_breaking = BlockBreaking(world, drop_resolver=resolve_block_drop)
     mouse_left_down = False
     paused = False
+    inventory_open = False
 
     mesh_builder = ChunkMeshBuilder()
     meshes = {}
@@ -153,7 +154,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused
+            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open
             if action == glfw.PRESS:
                 input_state.key_down(key)
                 if key == glfw.KEY_SPACE:
@@ -164,17 +165,33 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     label = "empty" if stack.is_empty else f"{stack.item.name} x{stack.count}"
                     glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}: {label}")
                 if key == glfw.KEY_ESCAPE:
-                    paused = not paused
+                    if inventory_open:
+                        inventory_open = False
+                    else:
+                        paused = not paused
                     input_state.set_focus(False)
                     input_state.set_focus(True)
                     input_state.mouse_x = input_state.mouse_y = 0.0
                     input_state.mouse_dx = input_state.mouse_dy = 0.0
                     glfw.set_input_mode(
                         window, glfw.CURSOR,
-                        glfw.CURSOR_NORMAL if paused else glfw.CURSOR_DISABLED,
+                        glfw.CURSOR_NORMAL if (paused or inventory_open) else glfw.CURSOR_DISABLED,
                     )
-                    title = "Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}"
+                    title = "Minecraft Python Edition — INVENTORY" if inventory_open else ("Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}")
                     glfw.set_window_title(window, title)
+                elif key == glfw.KEY_E and not paused:
+                    inventory_open = not inventory_open
+                    mouse_left_down = False
+                    block_breaking.reset()
+                    input_state.set_focus(False)
+                    input_state.set_focus(True)
+                    input_state.mouse_x = input_state.mouse_y = 0.0
+                    input_state.mouse_dx = input_state.mouse_dy = 0.0
+                    glfw.set_input_mode(
+                        window, glfw.CURSOR,
+                        glfw.CURSOR_NORMAL if inventory_open else glfw.CURSOR_DISABLED,
+                    )
+                    glfw.set_window_title(window, "Minecraft Python Edition — INVENTORY" if inventory_open else f"Minecraft Python Edition — {world.name}")
                 elif key == glfw.KEY_F6:
                     try:
                         if lan_server is not None and lan_server.running:
@@ -225,7 +242,23 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 renderer.upload_chunk_mesh(key, mesh_builder.build(chunk, neighbors=neighbors))
 
         def on_mouse_button(_window, button, action, _mods):
-            nonlocal mouse_left_down
+            nonlocal mouse_left_down, selected_hotbar_slot
+            if inventory_open:
+                if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
+                    cursor_x, cursor_y = glfw.get_cursor_pos(window)
+                    window_w, window_h = glfw.get_window_size(window)
+                    if window_w > 0 and window_h > 0:
+                        nx = cursor_x * 2.0 / window_w - 1.0
+                        ny = 1.0 - cursor_y * 2.0 / window_h
+                        col = math.floor((nx + 0.3915) / 0.087)
+                        row = math.floor((0.245 - ny) / 0.13)
+                        if 0 <= col < 9 and 0 <= row < 4:
+                            slot = row * 9 + col
+                            if slot < 9:
+                                selected_hotbar_slot = slot
+                            else:
+                                inventory.swap_slots(selected_hotbar_slot, slot)
+                return
             if button == glfw.MOUSE_BUTTON_LEFT:
                 mouse_left_down = action != glfw.RELEASE
                 if action == glfw.RELEASE:
@@ -299,7 +332,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 now = time.perf_counter()
                 frame_dt = min(now - previous, 0.1)
                 previous = now
-                if not paused:
+                if not paused and not inventory_open:
                     camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
 
                 forward = camera.forward.copy()
@@ -318,7 +351,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 move_z = (float(input_state.is_key_down(glfw.KEY_W))
                           - float(input_state.is_key_down(glfw.KEY_S)))
                 move_length = math.hypot(move_x, move_z)
-                if paused:
+                if paused or inventory_open:
                     move_x = move_z = move_length = 0.0
                 if move_length:
                     move_x /= move_length
@@ -326,8 +359,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 speed = PLAYER_SPRINT_SPEED if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else PLAYER_WALK_SPEED
                 horizontal = (right * move_x + forward * move_z) * (speed / TICK_RATE)
 
-                tick_accumulator += frame_dt if not paused else 0.0
-                while not paused and tick_accumulator >= tick_duration:
+                tick_accumulator += frame_dt if not (paused or inventory_open) else 0.0
+                while not (paused or inventory_open) and tick_accumulator >= tick_duration:
                     if jump_requested and player.on_ground:
                         player.motion = Vec3d(player.motion.x, PLAYER_JUMP_VELOCITY, player.motion.z)
                         player.on_ground = False
@@ -401,7 +434,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             "selected_slot": selected_hotbar_slot,
                             "health": player.health,
                             "food": controller.hunger.food_level,
-                            "paused": paused,
+                            "paused": paused or inventory_open,
+                            "inventory_slots": [(0, 0) if stack.is_empty else (stack.item.item_id, stack.count) for stack in inventory.slots] if inventory_open else None,
                         },
                     )
         finally:
