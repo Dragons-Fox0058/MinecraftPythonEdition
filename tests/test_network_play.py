@@ -13,6 +13,7 @@ from engine.network.play import (
     decode_multi_block_change,
     decode_change_game_state, serverbound_player_abilities,
     serverbound_plugin_message, serverbound_use_entity, serverbound_use_item,
+    serverbound_entity_action,
 )
 
 
@@ -144,6 +145,17 @@ class TestPlayPackets(unittest.TestCase):
         self.assertEqual((state.reason, state.value), (3, 1.0))
         with self.assertRaises(ProtocolError):
             decode_change_game_state(b"bad")
+
+    def test_serverbound_entity_action_uses_varints(self):
+        packet_id, payload = serverbound_entity_action(300, 1, 0)
+        self.assertEqual(packet_id, SERVERBOUND["entity_action"])
+        reader = PacketBuffer(payload)
+        self.assertEqual(reader.read_varint(), 300)
+        self.assertEqual(reader.read_varint(), 1)
+        self.assertEqual(reader.read_varint(), 0)
+        self.assertEqual(reader.remaining, 0)
+        with self.assertRaises(ValueError):
+            serverbound_entity_action(-1, 1, 0)
 
     def test_dispatcher_known_and_unknown_packets(self):
         dispatcher = create_clientbound_dispatcher()
