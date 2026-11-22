@@ -1,25 +1,44 @@
 # MinecraftPythonEdition
 
-A Python 3 voxel-engine project targeting Minecraft Java Edition 1.12.2 behavior and data formats.
+A Python 3 voxel-engine project targeting Minecraft Java Edition 1.12.2 gameplay/data foundations. The desktop game and multiplayer host are **Python Edition only**; Java Edition clients cannot join the Python Edition LAN server.
 
-## Current engineering status
+## Desktop preview
 
-- Core, block, world, world-generation, entity, and gameplay foundations are implemented with automated unit tests.
-- Persistence and protocol-340 networking foundations exist; vanilla-world compatibility and full play-state networking are still in progress.
-- Rendering/input/application foundations now include a fixed-step loop, backend-independent input state, and CPU chunk-face meshing.
-- This repository is **not yet a complete playable Minecraft client**. The OpenGL window/GPU backend, texture atlas/resource packs, HUD, full network packet integration, and vanilla interoperability verification remain outstanding.
+Install Python 3.12 and dependencies:
+
+```bash
+python -m pip install -r requirements.txt
+python launcher.py
+```
+
+The current desktop preview opens an OpenGL 3.3 window with one generated chunk and a free camera (WASD, Space/Ctrl, Shift, mouse, Escape). Rendering currently uses deterministic placeholder block colors. Texture atlas/resource-pack support, interaction, HUD, inventory, and complete world streaming are still in progress.
+
+## Python Edition LAN host
+
+Use **HOST PYTHON EDITION SERVER** in the launcher to start a Python-only LAN host on port 25575. The current transport supports Python Edition handshake/admission, chat relay, player-state relay, and ping/pong. It is not Minecraft Java protocol 340 and is not yet a complete synchronized multiplayer game.
+
+## Windows launcher EXE
+
+On Windows 10/11 with Python 3.12 installed, run:
+
+```bat
+build_windows.bat
+```
+
+The build creates `dist\\MinecraftPythonLauncher.exe`. GitHub Actions also has a Windows build workflow that publishes the executable as a downloadable workflow artifact when it succeeds.
 
 ## Tests
 
-Run the current unit suite from the repository root:
-
 ```bash
-python -m pip install numpy cryptography glfw PyOpenGL
+python -m pip install -r requirements.txt
 python -m unittest discover -s tests -v
 ```
 
-The GitHub Actions workflow runs this suite on pushes and pull requests. For the optional desktop OpenGL backend, install `glfw` and `PyOpenGL` as shown above.
+The automated tests are not a substitute for desktop GPU smoke testing or genuine Minecraft 1.12.2 world/server compatibility fixtures.
 
-## Target
+## Target and compatibility
 
-Java Edition 1.12.2 (protocol 340). The project aims for interoperability, but compatibility is only claimed for features that have passed real vanilla-server/client or world-fixture tests.
+- World format target: Java Edition 1.12.2 Anvil/NBT.
+- Existing network client target: Java Edition protocol 340, with incomplete Play packet coverage.
+- New LAN host: Python Edition custom protocol only.
+- Java Edition client/server interoperability is not claimed unless verified by dedicated integration tests.
