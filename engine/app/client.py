@@ -54,6 +54,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     else:
         world = World(world_name)
         world.seed = int(seed)
+        world.spawn_point = BlockPos(8, 0, 8)
         world._provider = __import__(
             "engine.worldgen.provider", fromlist=["ChunkProviderOverworld"]
         ).ChunkProviderOverworld(world.seed)
