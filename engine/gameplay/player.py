@@ -7,6 +7,7 @@ from engine.gameplay.crafting import CraftingGrid, RecipeManager
 from engine.gameplay.drops import ItemDropManager
 from engine.gameplay.health import HungerManager
 from engine.gameplay.inventory import Inventory
+from engine.gameplay.interaction import InteractionManager
 from engine.gameplay.items import ItemStack
 from engine.gameplay.placement import BlockPlacement
 
@@ -28,6 +29,7 @@ class PlayerController:
         self.difficulty = difficulty
         self.breaking = BlockBreaking(self.world)
         self.drops = ItemDropManager(self.world)
+        self.interaction = InteractionManager(self.world)
         entity.inventory = self.inventory
         entity.hunger = self.hunger
         entity.gameplay_controller = self
@@ -53,6 +55,9 @@ class PlayerController:
 
     def add_exhaustion(self, amount: float) -> None:
         self.hunger.add_exhaustion(amount)
+
+    def ray_trace_blocks(self, start, direction, max_distance: float = 5.0):
+        return self.interaction.ray_trace_blocks(start, direction, max_distance)
 
     def break_block(self, pos: BlockPos, dig_speed: float = 1.0,
                     can_harvest: bool = False):
