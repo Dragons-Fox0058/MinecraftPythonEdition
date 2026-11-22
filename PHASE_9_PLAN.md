@@ -55,8 +55,8 @@ Known parity gaps (not marked complete):
 - Current terrain generator is explicitly simplified; its caves, ores, terrain noise, biome blending, structures, and feature population are not byte-for-byte Java 1.12.2.
 - Desktop movement still uses a simplified direct horizontal velocity model rather than the full vanilla movement-input/attribute/friction pipeline.
 - Block placement is still limited to the small starter block catalogue and does not yet implement all ItemBlock callbacks, metadata/orientation, replaceability, tile entities, and all collision shapes.
-- Drop resolver now covers the current ore subset, but plant, leaf, slab, metadata-variant, mob, and many other 1.12.2 loot rules remain incomplete. Fortune/Silk Touch parameters are implemented for supported ores but are not yet read from held-item enchantment NBT.
-- Current client has no full vanilla creative/survival mode selector, recipe-book equivalent, full crafting/furnace screen flow, mob spawn loop, or full world tick integration.
+- Drop resolver now handles the registered survival subset: ores, logs/saplings/leaves, flowers/mushrooms, tall grass, dead bushes, clay, snow, glowstone, and Silk Touch variants. It is not a complete 1.12.2 loot-table catalogue; block-state metadata and mob loot still need broader coverage. Fortune/Silk Touch are read from held ItemStack NBT for supported drops.
+- Desktop survival now has a 2x2 player crafting screen and a 3x3 crafting-table screen, with wood-to-planks, sticks, crafting-table, and all 15 pickaxe/axe/shovel recipes. It is not yet a full recipe-book/furnace interface.
 
 
 ## Java 1.12.2 block-drop correction — 2026-11-22
@@ -77,10 +77,10 @@ Known parity gaps (not marked complete):
 - [x] Fortune quantity multiplier uses the 1.12.2 random multiplier rule; lapis/redstone base quantities and random-call order are covered by deterministic tests.
 - [x] Registered the 15 legacy 1.12.2 pickaxe, axe, and shovel items with source-era numeric IDs and material durability.
 - [x] Desktop survival now uses the actual tool definitions for mining speed, harvest tier, and durability damage.
-- [x] New local player files receive a temporary wooden pickaxe/axe/shovel bootstrap loadout so the mining loop can be exercised. This is explicitly a development convenience, not vanilla's empty starting inventory.
-- [ ] Fortune and Silk Touch are not yet extracted from held ItemStack enchantment NBT; the drop resolver supports explicit levels/flags only.
-- [ ] Crafting recipes and UI are not yet connected, so players cannot yet craft replacement tools through the desktop interface.
-- [ ] Full block/plant/mob loot tables and metadata-aware ItemBlock behavior remain incomplete.
+- [x] New local player files start empty-handed; the generated oak trees and player crafting grid provide the survival progression.
+- [x] Fortune (ID 35) and Silk Touch (ID 33) are extracted from vanilla ItemStack ench/StoredEnchantments NBT and passed into the block drop resolver.
+- [x] 2x2 and 3x3 crafting screens are connected to the desktop client; log species metadata is preserved when crafting planks, and grid contents return to inventory (or drop into the world if inventory is full) when the UI closes.
+- [x] Added a first playable tree feature so survival worlds generate logs and leaves. Plant/leaf/utility drops have deterministic regression tests. Full block-state metadata and mob loot catalogues are still broader work.
 
 
 CI verification — 2026-11-22:
@@ -88,3 +88,17 @@ CI verification — 2026-11-22:
 - Windows launcher build for desktop integration commit 593e533: SUCCESS; EXE build and artifact upload steps both passed (run 45025750661).
 - An intermediate run on commit 6b00163 failed because the test's scripted RNG values still reflected the old Fortune call order. The test fixture was corrected in commit be631c4; the subsequent complete suite passed.
 - These checks establish automated tests and packaging only; they do not establish an interactive Windows GPU playtest or complete Java 1.12.2 parity.
+
+
+## Survival crafting, enchantment NBT, trees and expanded drops — 2026-11-22
+
+- [x] Parse legacy enchantment IDs from ItemStack NBT, including normal ench and StoredEnchantments lists.
+- [x] Read Fortune III and Silk Touch from the selected held stack and apply them to supported block drops.
+- [x] Register the 2x2 player crafting grid and 3x3 crafting-table grid in the desktop UI.
+- [x] Add log-to-planks (preserving wood metadata), planks-to-sticks, crafting-table, and all 15 pickaxe/axe/shovel recipes.
+- [x] Add crafting output collection, input consumption, and return of remaining grid ingredients on UI close/save; overflow is dropped as a world item.
+- [x] Remove the temporary wooden tool starter kit. New players begin empty-handed.
+- [x] Add deterministic oak tree population to generated chunks so logs are available for the crafting progression.
+- [x] Expand supported drops to logs, saplings, leaves, tall grass, dead bushes, flowers/mushrooms, clay, snow, glowstone, and Silk Touch block returns.
+- [x] Preserve the current supported drop set through dedicated regression tests.
+- [ ] A full Java 1.12.2 block-state/metadata and mob loot catalogue is not claimed; current supported block and worldgen subsets are explicit.
