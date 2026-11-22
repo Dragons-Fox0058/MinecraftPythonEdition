@@ -4,7 +4,7 @@ from __future__ import annotations
 import numpy as np
 
 from engine.core import ChunkPos
-from engine.core.nbt import NBTDocument, NBTList, NBTError, TAG_COMPOUND
+from engine.core.nbt import (NBTDocument, NBTTag, NBTList, NBTError, TAG_BYTE, TAG_INT, TAG_LONG, TAG_COMPOUND)
 from engine.world.chunk import Chunk
 
 
@@ -57,7 +57,7 @@ def chunk_to_nbt(chunk: Chunk, *, last_update: int = 0,
         blocks = (block_ids & 0xFF).astype(np.uint8).tobytes()
         add = (block_ids >> 8).astype(np.uint8)
         section = {
-            "Y": section_y,
+            "Y": NBTTag(TAG_BYTE, section_y),
             "Blocks": blocks,
             "Data": _pack_nibbles(metadata),
             "BlockLight": _pack_nibbles(block_light),
@@ -68,13 +68,13 @@ def chunk_to_nbt(chunk: Chunk, *, last_update: int = 0,
         sections.append(section)
 
     level = {
-        "xPos": int(chunk.pos.x),
-        "zPos": int(chunk.pos.z),
-        "LastUpdate": int(last_update),
-        "InhabitedTime": int(inhabited_time),
-        "TerrainPopulated": 1 if terrain_populated else 0,
-        "LightPopulated": 1 if light_populated else 0,
-        "V": 1,
+        "xPos": NBTTag(TAG_INT, int(chunk.pos.x)),
+        "zPos": NBTTag(TAG_INT, int(chunk.pos.z)),
+        "LastUpdate": NBTTag(TAG_LONG, int(last_update)),
+        "InhabitedTime": NBTTag(TAG_LONG, int(inhabited_time)),
+        "TerrainPopulated": NBTTag(TAG_BYTE, 1 if terrain_populated else 0),
+        "LightPopulated": NBTTag(TAG_BYTE, 1 if light_populated else 0),
+        "V": NBTTag(TAG_BYTE, 1),
         "Sections": NBTList(TAG_COMPOUND, tuple(sections)),
         "Biomes": bytes(256),
         "HeightMap": tuple(0 for _ in range(256)),
