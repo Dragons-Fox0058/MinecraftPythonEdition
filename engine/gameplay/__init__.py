@@ -17,6 +17,7 @@ from engine.gameplay.vanilla_fuels import register_vanilla_fuel_items, register_
 from engine.gameplay.vanilla_smelting import register_vanilla_smelting_items, register_vanilla_smelting_recipes
 from engine.gameplay.vanilla_food_recipes import register_vanilla_food_recipe_items, register_vanilla_food_recipes
 from engine.gameplay.tools import ToolDefinition, ToolMaterial, ToolRegistry
+from engine.gameplay.damage import DamageSource, ArmorDefinition, ArmorRegistry
 from engine.gameplay.vanilla_tools import VANILLA_TOOL_MATERIALS, create_vanilla_tool_registry
 from engine.gameplay.time import GameRules, WorldTime
 from engine.gameplay.player import PlayerController
@@ -36,6 +37,7 @@ __all__ = [
     "register_vanilla_smelting_items", "register_vanilla_smelting_recipes",
     "register_vanilla_food_recipe_items", "register_vanilla_food_recipes",
     "ToolDefinition", "ToolMaterial", "ToolRegistry",
+    "DamageSource", "ArmorDefinition", "ArmorRegistry",
     "VANILLA_TOOL_MATERIALS", "create_vanilla_tool_registry",
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
