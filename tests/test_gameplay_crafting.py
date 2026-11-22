@@ -94,6 +94,19 @@ class TestCrafting(unittest.TestCase):
         self.assertEqual(grid.get_slot(0).count, 2)
         self.assertEqual(grid.get_slot(1).count, 1)
 
+    def test_crafting_returns_container_item_to_empty_input_slot(self):
+        bucket = Item(20, "test:bucket", max_stack_size=16)
+        milk_bucket = Item(21, "test:milk_bucket", max_stack_size=1, container_item=bucket)
+        grid = CraftingGrid(1, 1)
+        manager = RecipeManager()
+        manager.register(ShapedRecipe(1, 1, [Ingredient(milk_bucket)], ItemStack(self.plank, 1)))
+        grid.set_slot(0, ItemStack(milk_bucket, 1))
+        output = grid.craft(manager)
+        self.assertEqual(output.item, self.plank)
+        self.assertEqual(grid.get_slot(0).item, bucket)
+        self.assertEqual(grid.get_slot(0).count, 1)
+        self.assertEqual(grid.take_container_returns(), ())
+
     def test_craft_without_recipe_returns_empty_and_preserves_inputs(self):
         grid = CraftingGrid(2, 2)
         grid.set_slot(0, ItemStack(self.wood, 2))
