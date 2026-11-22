@@ -52,6 +52,10 @@ class TestBlockPlacement(unittest.TestCase):
         self.assertFalse(result.placed)
         self.assertEqual(result.reason, "not_a_block_item")
 
+    def test_non_callable_collision_callback_rejected(self):
+        with self.assertRaises(TypeError):
+            self.placement.place(self.stack, self.pos, EnumFacing.UP, can_place=True)
+
     def test_unregistered_block_rejected(self):
         unregistered = Block("test:unregistered", 9999, VB.STONE.material)
         placement = BlockPlacement(self.world, lambda item: unregistered)
