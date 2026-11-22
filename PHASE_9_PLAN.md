@@ -19,7 +19,7 @@
 - [x] First-person player camera, mouse capture, fixed-tick WASD movement, gravity, jump, sprint, block raycast, mining, and block placement (temporary block palette).
 - [x] Basic rendered crosshair, nine-slot hotbar frame, and health/hunger bars; item icons/count labels and full inventory screen remain.
 - [x] In-game F6 Python-only LAN host toggle and F7 join dialog (transport-level; no remote world replication yet).
-- [x] Basic block item drops, pickup into a 36-slot inventory, selected-stack placement, player health/hunger ticking, and player inventory NBT save/load for the supported block-item subset.\n- [ ] Full vanilla item/block catalogue, crafting/inventory screens, item icons/count labels, full food/combat/damage systems, audio, pause/settings menus, and full in-game server/join UI.
+- [x] Basic block item drops, pickup into a 36-slot inventory, selected-stack placement, player health/hunger ticking, and player inventory NBT save/load for the supported block-item subset.\n- [ ] Full vanilla item/block catalogue, crafting UI, item icons/count text, complete food/combat/damage systems, audio, video/audio settings, and full in-game server/join UI.
 - [x] User-facing Tk launcher entrypoint and Windows PyInstaller EXE build workflow.
 - [ ] Windows build and real desktop smoke tests.
 
@@ -36,4 +36,4 @@
 
 ## Status
 
-Phase 9 remains **in progress**, not complete. The game now has a first playable interaction loop, but it is not yet a complete Minecraft-style single-player Survival experience. The current inventory and item registry cover only a small local block subset, not the complete 1.12.2 catalogue. HUD is basic geometry without item icons or count text. Crafting UI, mobs, audio, texture atlas, pause/settings menu, and full save-selection menu remain absent. Windows workflow success does not prove a real GPU launch; desktop smoke testing remains outstanding.
+Phase 9 remains **in progress**, not complete. The game now has a first playable interaction loop, but it is not yet a complete Minecraft-style single-player Survival experience. The current inventory and item registry cover only a small block-item subset, not the complete 1.12.2 catalogue. HUD/inventory are basic geometry without actual item textures or count text. Crafting UI, mobs, audio, texture atlas, settings menu, and full save-selection menu remain absent. Windows workflow success does not prove a real GPU launch; desktop smoke testing remains outstanding.
