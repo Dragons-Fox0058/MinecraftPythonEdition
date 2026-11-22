@@ -91,7 +91,7 @@ class TestPlaySession(unittest.TestCase):
         body = PacketBuffer()
         body.write(struct.pack(">iBiBB", 44, 1, -1, 2, 20))
         body.write_string("default")
-        body.write(b"\\x00")
+        body.write(bytes((0,)))
         result = session.process_packet(CLIENTBOUND["join_game"], body.to_bytes())
         self.assertEqual(result.entity_id, 44)
         self.assertEqual(world.dimension, -1)
