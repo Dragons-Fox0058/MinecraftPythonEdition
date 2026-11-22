@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import time
+import uuid
 from pathlib import Path
 
 import numpy as np
@@ -10,7 +11,9 @@ import numpy as np
 from engine.core import Vec3d, BlockPos
 from engine.entities.entity import Entity
 from engine.gameplay.breaking import BlockBreaking
-from engine.gameplay.items import Item, ItemStack
+from engine.gameplay.items import Item, ItemStack, ItemRegistry
+from engine.gameplay.player import PlayerController
+from engine.gameplay.effects import StatusEffectManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.drops import EntityItem
 from engine.gameplay.interaction import InteractionManager
@@ -22,7 +25,7 @@ from engine.render.opengl import OpenGLRenderer
 from engine.server.local import PythonEditionServer, ServerConfig
 from engine.world.world import World
 from engine.worldgen.generator import ChunkGeneratorOverworld
-from engine.persistence.world import load_world, save_world
+from engine.persistence.world import load_world, save_world, load_world_player, save_world_player
 
 
 TICK_RATE = 20.0
@@ -30,6 +33,32 @@ PLAYER_WALK_SPEED = 4.3
 PLAYER_SPRINT_SPEED = 5.6
 PLAYER_JUMP_VELOCITY = 0.42
 RENDER_DISTANCE_CHUNKS = 2
+
+
+class DesktopPlayer(Entity):
+    """Living player entity used by the desktop single-player session."""
+
+    def __init__(self, world, x, y, z):
+        super().__init__(world, x, y, z)
+        self.max_health = 20.0
+        self.health = 20.0
+        self.status_effects = StatusEffectManager()
+        self.yaw = 0.0
+        self.pitch = 0.0
+
+    def heal(self, amount):
+        if self.dead or amount <= 0:
+            return False
+        self.health = min(self.max_health, self.health + float(amount))
+        return True
+
+    def damage(self, amount):
+        if self.dead or amount <= 0:
+            return False
+        self.health = max(0.0, self.health - float(amount))
+        if self.health <= 0:
+            self.kill()
+        return True
 
 
 def _surface_y(chunk, local_x: int, local_z: int) -> int:
@@ -76,7 +105,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         spawn_y = _surface_y(spawn_chunk, local_x, local_z) + 1
     else:
         spawn_y = spawn.y
-    player = Entity(world, spawn.x + 0.5, float(spawn_y), spawn.z + 0.5)
+    player = DesktopPlayer(world, spawn.x + 0.5, float(spawn_y), spawn.z + 0.5)
     world.add_entity(player)
     camera = Camera(position=(player.pos.x, spawn_y + player.eye_height, player.pos.z), yaw=0.0, pitch=0.0)
     input_state = InputState()
@@ -86,12 +115,20 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     selected_hotbar_slot = 0
     hotbar_block_ids = (1, 3, 4, 5, 12, 13, 20, 24, 49)
     inventory = Inventory()
+    item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
         block_id: Item(10000 + block_id, BLOCK_REGISTRY.by_id(block_id).registry_name)
         for block_id in hotbar_block_ids if BLOCK_REGISTRY.by_id(block_id) is not None
     }
+    for item in block_items.values():
+        item_registry.register(item)
     item_to_block = {item: block_id for block_id, item in block_items.items()}
+    controller = PlayerController(player, inventory=inventory, difficulty="normal")
+    player_uuid = uuid.uuid5(uuid.NAMESPACE_URL, f"minecraft-python-edition:{world.name}:{world.seed}")
+    player_file = save_directory / "playerdata" / f"{player_uuid}.dat"
+    if player_file.is_file():
+        load_world_player(save_directory, player_uuid, player, controller, item_registry)
     interaction = InteractionManager(world)
 
     def resolve_block_drop(block, _pos):
@@ -282,6 +319,16 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     jump_requested = False
                     player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
                     player.on_update()
+                    controller.tick()
+                    if player.dead:
+                        controller.on_death()
+                        player.dead = False
+                        player.health = player.max_health
+                        player.set_position(
+                            world.spawn_point.x + 0.5, world.spawn_point.y + 1.0,
+                            world.spawn_point.z + 0.5,
+                        )
+                        player.motion = Vec3d(0.0, 0.0, 0.0)
                     if mouse_left_down:
                         hit = interaction.ray_trace_blocks(
                             Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
@@ -337,6 +384,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 math.floor(player.pos.x), math.floor(player.pos.y), math.floor(player.pos.z)
             )
             save_world(world, save_directory)
+            save_world_player(save_directory, player, controller, item_registry, player_uuid=player_uuid)
             if lan_client is not None:
                 lan_client.close()
             if lan_server is not None:
