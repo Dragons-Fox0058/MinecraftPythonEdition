@@ -381,7 +381,14 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 width, height = glfw.get_framebuffer_size(window)
                 if width > 0 and height > 0:
                     renderer.gl.glViewport(0, 0, width, height)
-                    renderer.render(camera.view_projection_matrix(width / height))
+                    renderer.render(
+                        camera.view_projection_matrix(width / height),
+                        hud_state={
+                            "selected_slot": selected_hotbar_slot,
+                            "health": player.health,
+                            "food": controller.hunger.food_level,
+                        },
+                    )
         finally:
             world.spawn_point = BlockPos(
                 math.floor(player.pos.x), math.floor(player.pos.y), math.floor(player.pos.z)
