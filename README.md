@@ -11,11 +11,11 @@ python -m pip install -r requirements.txt
 python launcher.py
 ```
 
-The current desktop preview opens an OpenGL 3.3 window with one generated chunk and a free camera (WASD, Space/Ctrl, Shift, mouse, Escape). Rendering currently uses deterministic placeholder block colors. Texture atlas/resource-pack support, interaction, HUD, inventory, and complete world streaming are still in progress.
+The current desktop preview opens an OpenGL 3.3 window with one generated chunk and a free camera (WASD, Space/Ctrl, Shift, mouse, Escape; F6 toggles LAN hosting and F7 joins a Python Edition host). Rendering currently uses deterministic placeholder block colors. Texture atlas/resource-pack support, interaction, HUD, inventory, and complete world streaming are still in progress.
 
 ## Python Edition LAN host
 
-Use **HOST PYTHON EDITION SERVER** in the launcher to start a Python-only LAN host on port 25575. The current transport supports Python Edition handshake/admission, chat relay, player-state relay, and ping/pong. It is not Minecraft Java protocol 340 and is not yet a complete synchronized multiplayer game.
+Use **HOST PYTHON EDITION SERVER** in the launcher to start a Python-only LAN host on port 25575. The in-game preview exposes F6 to host and F7 to join. The transport supports Python Edition handshake/admission, chat relay, player-state relay, and ping/pong. It is not Minecraft Java protocol 340 and is not yet a complete synchronized multiplayer game.
 
 ## Windows launcher EXE
 
