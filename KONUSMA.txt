@@ -364,3 +364,33 @@ GPT2'DEN BEKLENTİ:
 Bu düzeltmeyi esas alarak Phase 7 denetimine ve geliştirmesine devam et. İlk raporunda mevcut test durumunu, tamamlanmış kayıt/yükleme özelliklerini, eksikleri, dosyaları ve önerilen sıradaki küçük adımı belirt.
 
 Bu mesaj koordinasyon düzeltmesidir; oyun kodunda değişiklik yapılmadı ve test çalıştırılmadı.
+
+
+============================================================
+GPT1 — ÇALIŞMA MODELİ DEĞİŞİKLİĞİ / GPT1 TÜM FAZLARI ÜSTLENDİ
+============================================================
+
+Kullanıcının açık talimatı: "her şeyi sen yapıcaksın." Bundan sonra GPT2'nin yanıtı veya harici bir ajanın çalışması beklenmeyecek. GPT1 hem Phase 7 Persistence hem Phase 8 Networking işlerini bizzat yürütecek. Kullanıcının terminalde komut çalıştırması zorunlu kılınmayacak; GitHub deposunda doğrudan yapılabilen işler GPT1 tarafından yapılacak.
+
+GÜNCEL DEPO İNCELEMESİ:
+- Güncel main commit: 2a0ea1b5c9ac1b334e71c439d1ea3180dce0b07d.
+- Phase 7 dosyaları mevcut: engine/persistence/chunk.py, region.py, world.py, player.py; testler test_nbt.py, test_persistence_chunk.py, test_persistence_region.py, test_persistence_player.py, test_persistence_world.py.
+- Phase 8 session receiver / GameApplication entegrasyonu mevcut; gerçek sunucu ile uçtan uca doğrulama yapılmış değil.
+- Son genel CI run #360 (45020034345): 424 test, 2 başarısız. Hatalar test_worldgen.TestChunkGenerator.test_different_seeds_differ ve test_terrain_has_air_at_top. Log doğrulandı: farklı seed heightmap'leri eşit çıkıyor; bazı sütunlarda y=255 block state 32.
+- Son network CI run #11 (45019714036): başarılı, 51 test. Bu sonuç sadece mevcut network test kümesini doğrular; tam vanilla uyumluluk anlamına gelmez.
+- Son genel CI hataları WorldGen/Phase 4 kaynaklıdır; Phase 7/8 koduyla doğrudan ilişkili oldukları kanıtlanmadı. Ancak tüm test paketinin yeşil olması için ayrıca ele alınacak.
+
+İLK DENETİM NOTLARI:
+- Phase 7 world save/load şu an level.dat + Anvil region + chunk block/light/biome/heightmap içeriklerini kaydediyor.
+- chunk_to_nbt() Entities, TileEntities ve TileTicks alanlarını boş listeler olarak yazıyor; dünya içi entity ve block-entity kalıcılığı henüz uygulanmış görünmüyor.
+- world.py SpawnX/Y/Z sabit 0/64/0 yazılıyor; World spawn konumu API'siyle bağlantısı doğrulanmalı.
+- Player persistence ayrı modülde mevcut; world save/load ile otomatik bağlandığı henüz kanıtlanmadı.
+- Phase 8 background receiver ana thread'de paket uygulama yaklaşımıyla çalışıyor; keep-alive timeout güncellemesi ve bağlantı hata durumları daha ayrıntılı incelenecek.
+
+Bu mesajda oyun kodu değiştirilmedi. Test yeniden çalıştırılmadı; yalnızca GitHub Actions logu ve kaynak dosyalar incelendi.
+
+SIRADAKİ GPT1 ADIMLARI:
+1. WorldGen iki testinin neden bozulduğunu kaynak koddan teşhis et; ilgili dosya ve test kapsamını doğrula.
+2. Phase 7 için entity/tile entity persistence ve world/player save entegrasyonunu incele.
+3. Phase 8 için keep-alive, disconnect ve receiver lifecycle durumlarını tamamla.
+4. Küçük değişiklikleri ayrı commitlerle gönder; her işlemden sonra bu günlüğe gerçek sonuçları yaz.
