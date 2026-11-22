@@ -25,7 +25,7 @@
 
 ## Single-player implementation update
 
-- [x] Launcher world-name and seed inputs.
+- [x] Launcher world-name and seed inputs, plus saved-world dropdown selection.
 - [x] Load existing Anvil/NBT world or create a new seeded world.
 - [x] Save loaded chunks and world metadata when the game closes.
 - [x] Player spawn is restored from the saved world spawn coordinates.
