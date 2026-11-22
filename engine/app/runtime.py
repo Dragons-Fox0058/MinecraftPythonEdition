@@ -67,13 +67,20 @@ class GameApplication:
     """Toolkit-neutral application shell; window/input/render backends are injected."""
 
     def __init__(self, config: GameConfig, update: Callable[[float], None],
-                 render: Callable[[float], None], poll_events: Callable[[], bool] | None = None):
+                 render: Callable[[float], None], poll_events: Callable[[], bool] | None = None,
+                 network_session=None):
         if not callable(update) or not callable(render):
             raise TypeError("update and render callbacks are required")
         self.config = config
         self.update = update
         self.render = render
         self.poll_events = poll_events or (lambda: True)
+        if network_session is not None and not all(
+            callable(getattr(network_session, name, None))
+            for name in ("start_receiver", "poll_received", "tick", "close")
+        ):
+            raise TypeError("network_session must provide start_receiver, poll_received, tick, and close")
+        self.network_session = network_session
         self.loop = FixedTimestepLoop(config.tick_rate, config.max_frame_time,
                                       config.max_catch_up_ticks)
         self.running = False
@@ -91,13 +98,23 @@ class GameApplication:
         frames = 0
         frame_budget = 1.0 / self.config.target_fps
         try:
+            if self.network_session is not None:
+                self.network_session.start_receiver()
+
+            def fixed_update(dt: float) -> None:
+                if self.network_session is not None:
+                    self.network_session.poll_received()
+                self.update(dt)
+                if self.network_session is not None:
+                    self.network_session.tick()
+
             while self.running and (max_frames is None or frames < max_frames):
                 frame_start = clock()
                 if not self.poll_events():
                     break
                 elapsed = max(0.0, frame_start - previous)
                 previous = frame_start
-                _, alpha = self.loop.advance(elapsed, self.update)
+                _, alpha = self.loop.advance(elapsed, fixed_update)
                 self.render(alpha)
                 frames += 1
                 remaining = frame_budget - (clock() - frame_start)
@@ -105,6 +122,8 @@ class GameApplication:
                     sleep(remaining)
         finally:
             self.running = False
+            if self.network_session is not None:
+                self.network_session.close()
 
 
 __all__ = ["GameConfig", "FixedTimestepLoop", "GameApplication"]
