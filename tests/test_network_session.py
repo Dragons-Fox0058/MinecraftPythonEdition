@@ -1,9 +1,13 @@
 """Tests for protocol-340 play-session state integration."""
 import json
+import queue
 import struct
+import threading
+import time
 import unittest
 import uuid
 
+from engine.app.runtime import GameApplication, GameConfig
 from engine.entities.player import EntityPlayer
 from engine.gameplay.health import HungerManager
 
@@ -30,6 +34,31 @@ class FakeConnection:
         self.closed = True
 
 
+class BlockingFakeConnection:
+    def __init__(self):
+        self.sent = []
+        self.closed = False
+        self.incoming = queue.Queue()
+        self.packet_received = threading.Event()
+        self.receiver_ended = threading.Event()
+
+    def send(self, packet_id, payload=b""):
+        self.sent.append((packet_id, payload))
+
+    def receive(self):
+        packet = self.incoming.get()
+        if packet is None:
+            self.receiver_ended.set()
+            raise EOFError("fake connection closed")
+        self.packet_received.set()
+        return packet
+
+    def close(self):
+        if not self.closed:
+            self.closed = True
+            self.incoming.put(None)
+
+
 class TestPlaySession(unittest.TestCase):
     def test_keep_alive_is_answered(self):
         conn = FakeConnection()
@@ -40,6 +69,74 @@ class TestPlaySession(unittest.TestCase):
         self.assertEqual(result, 7654)
         self.assertEqual(conn.sent[0][0], 0x0B)
         self.assertEqual(struct.unpack(">q", conn.sent[0][1])[0], 7654)
+
+    def test_background_receiver_queues_packets_for_game_thread(self):
+        conn = BlockingFakeConnection()
+        events = []
+        session = PlaySession(conn, on_event=lambda name, value: events.append((name, value)))
+        session.start_receiver()
+        conn.incoming.put((0x7F, b"background-packet"))
+        self.assertTrue(conn.packet_received.wait(1.0))
+        deadline = time.monotonic() + 1.0
+        processed = 0
+        while processed == 0 and time.monotonic() < deadline:
+            processed = session.poll_received()
+            if processed == 0:
+                time.sleep(0.001)
+        self.assertEqual(processed, 1)
+        self.assertEqual(events, [("unknown_packet", (0x7F, b"background-packet"))])
+        session.close()
+        self.assertTrue(conn.closed)
+
+    def test_background_receiver_propagates_connection_failure(self):
+        conn = BlockingFakeConnection()
+        session = PlaySession(conn)
+        session.start_receiver()
+        conn.incoming.put(None)
+        self.assertTrue(conn.receiver_ended.wait(1.0))
+        deadline = time.monotonic() + 1.0
+        while session._receiver_error is None and time.monotonic() < deadline:
+            time.sleep(0.001)
+        with self.assertRaises(ConnectionError):
+            session.poll_received()
+        self.assertFalse(session.connected)
+        self.assertTrue(conn.closed)
+
+    def test_game_application_pumps_network_session_on_fixed_ticks(self):
+        class FakeNetworkSession:
+            def __init__(self):
+                self.calls = []
+
+            def start_receiver(self):
+                self.calls.append("start")
+
+            def poll_received(self):
+                self.calls.append("poll")
+
+            def tick(self):
+                self.calls.append("tick")
+                return True
+
+            def close(self):
+                self.calls.append("close")
+
+        network = FakeNetworkSession()
+        clock_value = [0.0]
+
+        def clock():
+            clock_value[0] += 0.05
+            return clock_value[0]
+
+        app = GameApplication(
+            GameConfig(), lambda dt: network.calls.append("update"),
+            lambda alpha: None, network_session=network,
+        )
+        app.run(max_frames=2, clock=clock, sleep=lambda _: None)
+        self.assertEqual(network.calls[0], "start")
+        self.assertIn("poll", network.calls)
+        self.assertIn("update", network.calls)
+        self.assertIn("tick", network.calls)
+        self.assertEqual(network.calls[-1], "close")
 
     def test_block_change_updates_world(self):
         conn = FakeConnection()
