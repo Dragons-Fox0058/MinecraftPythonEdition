@@ -154,7 +154,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open
+            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot, paused, inventory_open, mouse_left_down
             if action == glfw.PRESS:
                 input_state.key_down(key)
                 if key == glfw.KEY_SPACE:
