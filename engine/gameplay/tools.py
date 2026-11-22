@@ -14,6 +14,8 @@ class ToolMaterial:
     durability: int
     efficiency: float
     harvest_level: int
+    enchantability: int = 0
+    damage_vs_entity: float = 0.0
 
     def __post_init__(self) -> None:
         if not isinstance(self.name, str) or not self.name:
@@ -24,6 +26,12 @@ class ToolMaterial:
             raise ValueError("efficiency must be positive")
         if isinstance(self.harvest_level, bool) or not isinstance(self.harvest_level, int) or self.harvest_level < 0:
             raise ValueError("harvest_level must be a non-negative integer")
+        if isinstance(self.enchantability, bool) or not isinstance(self.enchantability, int) or self.enchantability < 0:
+            raise ValueError("enchantability must be a non-negative integer")
+        if (isinstance(self.damage_vs_entity, bool)
+                or not isinstance(self.damage_vs_entity, (int, float))
+                or self.damage_vs_entity < 0):
+            raise ValueError("damage_vs_entity must be non-negative")
 
 
 @dataclass(frozen=True)
