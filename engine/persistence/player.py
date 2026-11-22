@@ -14,6 +14,10 @@ class PlayerDataError(ValueError):
     """Invalid player NBT or incompatible item registry."""
 
 
+def _plain(value):
+    return value.value if isinstance(value, NBTTag) else value
+
+
 def _signed64(value: int) -> int:
     return value - (1 << 64) if value >= (1 << 63) else value
 
@@ -115,13 +119,13 @@ def player_from_nbt(document: NBTDocument, entity, controller: PlayerController,
 
         controller.inventory.clear()
         for entry in data.get("Inventory", NBTList(TAG_COMPOUND, ())).values:
-            item_id = int(entry["id"])
+            item_id = int(_plain(entry["id"]))
             item = items.get_by_id(item_id)
             if item is None:
                 continue
-            count = int(entry["Count"])
-            slot = int(entry["Slot"])
-            raw_damage = int(entry.get("Damage", 0))
+            count = int(_plain(entry["Count"]))
+            slot = int(_plain(entry["Slot"]))
+            raw_damage = int(_plain(entry.get("Damage", 0)))
             metadata = 0 if item.is_damageable else (raw_damage if item.has_subtypes else 0)
             durability = raw_damage if item.is_damageable else 0
             stack = ItemStack(item, count, metadata=metadata, damage=durability,
@@ -154,8 +158,8 @@ def player_from_nbt(document: NBTDocument, entity, controller: PlayerController,
             except (ValueError, KeyError):
                 continue
 
-        most = int(data.get("UUIDMost", 0)) & ((1 << 64) - 1)
-        least = int(data.get("UUIDLeast", 0)) & ((1 << 64) - 1)
+        most = int(_plain(data.get("UUIDMost", 0))) & ((1 << 64) - 1)
+        least = int(_plain(data.get("UUIDLeast", 0))) & ((1 << 64) - 1)
         result_uuid = uuid.UUID(int=(most << 64) | least)
         entity.uuid = result_uuid
         return result_uuid
