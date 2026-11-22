@@ -19,7 +19,9 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 - [x] Item, ItemRegistry, and ItemStack with metadata, durability, NBT copying, splitting, merging, and registry freezing.
 - [x] Inventory with 36 main slots, hotbar, armor slots, offhand, insertion, extraction, and item counting.
 - [x] Block-breaking progress with harvest flag and injectable drop resolver.
-- [x] Explicit tool materials, item-to-tool definitions, harvest-level requirements, tool-speed modifiers, and durability use; complete vanilla block/tool mappings remain pending.
+- [x] Tool material records include 1.12.2 durability, efficiency, harvest level, enchantability, and material attack-damage values; explicit item-to-tool definitions, harvest requirements, speed modifiers, and durability use are integrated.
+- [x] Source-backed vanilla tool registry factory maps wooden/stone/iron/diamond/golden pickaxes, axes, and shovels to the currently registered block catalogue; item instances and numeric IDs are supplied by the caller.
+- [ ] Expand block definitions to the complete 1.12.2 catalogue and verify all axe/pickaxe/shovel effective-block and harvest-level mappings against the complete source data.
 - [x] Block placement with explicit item-to-block resolver, replaceability, world bounds, and optional collision predicate.
 - [x] Shaped and shapeless recipes, mirrored patterns, alternatives, subtype metadata, output validation, and container-item returns.
 - [x] Player crafting result insertion and overflow drops.
