@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import math
+import random
 import time
 import uuid
 from pathlib import Path
@@ -17,6 +18,7 @@ from engine.gameplay.effects import StatusEffectManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.drops import EntityItem
 from engine.gameplay.vanilla_tools import create_vanilla_tool_registry
+from engine.gameplay.vanilla_drops import resolve_vanilla_block_drops
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
@@ -116,7 +118,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     jump_requested = False
     inventory = Inventory()
     selected_hotbar_slot = inventory.selected_hotbar_slot
-    hotbar_block_ids = (1, 3, 4, 5, 12, 13, 20, 24, 49)
+    hotbar_block_ids = (1, 2, 3, 4, 5, 12, 13, 20, 24, 49)
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
@@ -125,6 +127,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     }
     for item in block_items.values():
         item_registry.register(item)
+    flint_item = Item(318, "minecraft:flint")
+    item_registry.register(flint_item)
     item_to_block = {item: block_id for block_id, item in block_items.items()}
     # Start with an empty hand/tool catalogue. Vanilla harvest requirements still
     # apply: stone/ores cannot be harvested by hand even before tools are added.
@@ -139,9 +143,17 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         load_world_player(save_directory, player_uuid, player, controller, item_registry)
     interaction = InteractionManager(world)
 
-    def resolve_block_drop(block, _pos):
-        item = block_items.get(block.block_id)
-        return [ItemStack(item, 1)] if item is not None else []
+    def resolve_block_drop(block, pos):
+        # Keep block loot deterministic for a given world seed and position,
+        # matching the repeatable world simulation used by saved worlds.
+        drop_seed = (
+            int(world.seed) ^ (pos.x * 341873128712)
+            ^ (pos.y * 132897987541) ^ (pos.z * 42317861)
+        )
+        return resolve_vanilla_block_drops(
+            block, block_items, flint_item=flint_item,
+            rng=random.Random(drop_seed),
+        )
 
     block_breaking = BlockBreaking(
         world, drop_resolver=resolve_block_drop, tool_registry=tool_registry,
