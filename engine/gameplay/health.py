@@ -26,19 +26,26 @@ class FoodProperties:
 
 class FoodRegistry:
     def __init__(self) -> None:
-        self._foods: dict[Item, FoodProperties] = {}
+        self._foods: dict[tuple[Item, int | None], FoodProperties] = {}
 
-    def register(self, item: Item, properties: FoodProperties) -> None:
+    def register(self, item: Item, properties: FoodProperties,
+                 metadata: int | None = None) -> None:
         if not isinstance(item, Item):
             raise TypeError("food item must be an Item")
         if not isinstance(properties, FoodProperties):
             raise TypeError("properties must be FoodProperties")
-        if item in self._foods:
-            raise ValueError(f"food already registered: {item.name}")
-        self._foods[item] = properties
+        if metadata is not None and (
+            isinstance(metadata, bool) or not isinstance(metadata, int)
+            or not 0 <= metadata <= 32767
+        ):
+            raise ValueError("metadata must be None or an integer from 0 to 32767")
+        key = (item, metadata)
+        if key in self._foods:
+            raise ValueError(f"food already registered: {item.name} metadata={metadata}")
+        self._foods[key] = properties
 
-    def get(self, item: Item) -> FoodProperties | None:
-        return self._foods.get(item)
+    def get(self, item: Item, metadata: int = 0) -> FoodProperties | None:
+        return self._foods.get((item, metadata), self._foods.get((item, None)))
 
     def __len__(self) -> int:
         return len(self._foods)
@@ -91,7 +98,7 @@ class HungerManager:
             raise TypeError("foods must be a FoodRegistry")
         if stack.is_empty:
             return False
-        properties = foods.get(stack.item)
+        properties = foods.get(stack.item, stack.metadata)
         if properties is None or not self.can_eat(properties.always_edible):
             return False
         self.eat(properties.food_points, properties.saturation_modifier)
