@@ -86,18 +86,21 @@ class PlayerController:
             source = DamageSource("generic")
         if not isinstance(source, DamageSource):
             raise TypeError("source must be a DamageSource")
-        if self.entity.dead or getattr(self.entity, "hurt_time", 0) > 0:
+        if self.entity.dead:
             return False
+        armor_stacks = tuple(self.inventory.armor)
         if self.armor_registry is not None:
-            armor_stacks = tuple(self.inventory.armor)
             reduced = self.armor_registry.calculate_damage(amount, armor_stacks, source)
-            self.armor_registry.damage_armor(amount, armor_stacks, source)
         else:
             reduced = amount
         if reduced <= 0:
             return False
         before = self.entity.health
-        self.entity.damage(reduced)
+        accepted = self.entity.damage(reduced)
+        if accepted is False:
+            return False
+        if self.armor_registry is not None:
+            self.armor_registry.damage_armor(amount, armor_stacks, source)
         return self.entity.health < before
 
     def eat(self, food_points: int, saturation_modifier: float) -> None:
