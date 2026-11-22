@@ -123,3 +123,20 @@ CI verification — 2026-11-22:
 - [x] Added deterministic RNG injection for reproducible AI tests.
 - [x] Added lifecycle and persistent-target regression tests.
 - CI: Python tests passed (464 total, run 45028188916).
+
+
+
+## Player game modes — 2026-11-22
+
+- [x] Added the Java 1.12.2 mode IDs and names: Survival=0, Creative=1, Adventure=2, Spectator=3.
+- [x] Added local `/gamemode` parsing for numeric IDs, full names, and vanilla short aliases. F4 opens the desktop command prompt.
+- [x] Survival and Adventure continue hunger/exhaustion processing; Creative and Spectator do not.
+- [x] Creative mode has instant block breaking without drops, non-consuming block placement, reusable crafting ingredients, flight movement, and immunity to ordinary damage.
+- [x] Adventure mode enforces item NBT `CanDestroy` and `CanPlaceOn` lists for block breaking and placement.
+- [x] Spectator mode enables noclip flight and blocks block interaction, inventory access, item pickup, and item dropping.
+- [x] Player mode is saved in playerdata NBT (`playerGameType`); world default mode is saved and loaded through level.dat (`GameType`).
+- [x] Added regression tests for mode parsing, command transitions, mode-specific behavior, Adventure NBT restrictions, and player/world persistence.
+
+Compatibility boundary:
+- This is the integrated four-mode foundation for the current playable subset, not complete Java 1.12.2 parity. A full creative catalogue/inventory screen, spectator entity-camera switching, and multiplayer permission/command synchronization are not present yet.
+- F4 command entry is a desktop development interface, not a complete in-game chat/command console.
