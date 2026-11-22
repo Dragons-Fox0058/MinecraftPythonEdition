@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import shutil
 from pathlib import Path
 
 from engine.core import ChunkPos, NBTTag, NBTDocument, read_nbt, write_nbt, TAG_BYTE, TAG_INT, TAG_LONG
@@ -81,12 +82,32 @@ def save_world(world: World, directory: str | os.PathLike) -> None:
     for chunk in world.chunk_provider.all_chunks():
         rx, rz, slot = region_coordinates(chunk.pos.x, chunk.pos.z)
         grouped.setdefault((rx, rz), []).append((slot, chunk))
+    chunks_to_mark_clean = []
     for (rx, rz), chunks in grouped.items():
         region = RegionFile(root / "region" / f"r.{rx}.{rz}.mca")
         for slot, chunk in chunks:
-            region.write_chunk(slot & 31, slot >> 5, chunk_to_nbt(chunk, last_update=world.world_time.total_time))
-            chunk.clear_dirty()
-    _atomic_write(root / "level.dat", write_nbt(_metadata_document(world), compression="gzip"))
+            region.write_chunk(
+                slot & 31, slot >> 5,
+                chunk_to_nbt(chunk, last_update=world.world_time.total_time),
+            )
+            chunks_to_mark_clean.append(chunk)
+
+    level_path = root / "level.dat"
+    if level_path.is_file():
+        backup = root / "level.dat_old"
+        temporary_backup = root / "level.dat_old.tmp"
+        try:
+            shutil.copy2(level_path, temporary_backup)
+            os.replace(temporary_backup, backup)
+        finally:
+            try:
+                temporary_backup.unlink()
+            except FileNotFoundError:
+                pass
+    _atomic_write(level_path, write_nbt(_metadata_document(world), compression="gzip"))
+    # A chunk is clean only after every region and the world metadata were saved.
+    for chunk in chunks_to_mark_clean:
+        chunk.clear_dirty()
 
 
 def load_world(directory: str | os.PathLike) -> World:
