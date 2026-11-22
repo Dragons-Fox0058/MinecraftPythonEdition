@@ -113,3 +113,13 @@ CI verification — 2026-11-22:
 - [x] Connected sword and hoe recipes to the same 2x2/3x3 crafting interface as existing tool recipes.
 - [x] Added regression tests for IDs, durability, stats, recipe counts, crafting consumption, and mirrored patterns.
 - CI verification is tracked in GitHub Actions for the integration commit; no manual Windows GPU playtest is claimed.
+
+
+## Entity AI lifecycle correction — 2026-11-22
+
+- [x] Replaced the previous start/update/reset-every-tick behavior with persistent running-goal scheduling.
+- [x] Added explicit should_continue lifecycle handling and duplicate-task protection.
+- [x] Made wandering targets persist across ticks and added a cooldown between wander goals.
+- [x] Added deterministic RNG injection for reproducible AI tests.
+- [x] Added lifecycle and persistent-target regression tests.
+- CI: Python tests passed (464 total, run 45028188916).
