@@ -37,6 +37,9 @@ class World:
             update = getattr(entity, "on_update", None)
             if callable(update):
                 update()
+            controller = getattr(entity, "gameplay_controller", None)
+            if controller is not None:
+                controller.tick()
 
     @property
     def chunk_provider(self) -> ChunkProvider:
