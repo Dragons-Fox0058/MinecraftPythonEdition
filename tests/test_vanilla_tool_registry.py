@@ -54,6 +54,14 @@ class TestVanillaToolRegistry(unittest.TestCase):
             self.registry.dig_speed(self.items["iron_pickaxe"], "dirt"), 1.0
         )
 
+    def test_empty_hand_harvest_rules_match_vanilla(self):
+        empty_hand = create_vanilla_tool_registry({})
+        # Java 1.12.2 requires a pickaxe for stone and ores, but not dirt.
+        self.assertFalse(empty_hand.can_harvest(None, "stone"))
+        self.assertFalse(empty_hand.can_harvest(None, "iron_ore"))
+        self.assertTrue(empty_hand.can_harvest(None, "dirt"))
+        self.assertTrue(empty_hand.can_harvest(None, "sand"))
+
     def test_vanilla_harvest_levels(self):
         self.assertFalse(
             self.registry.can_harvest(self.items["wooden_pickaxe"], "iron_ore")
