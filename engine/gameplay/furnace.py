@@ -9,19 +9,29 @@ from engine.gameplay.items import Item, ItemStack
 
 class FuelRegistry:
     def __init__(self) -> None:
-        self._burn_times: dict[Item, int] = {}
+        self._burn_times: dict[tuple[Item, int | None], int] = {}
 
-    def register(self, item: Item, burn_time: int) -> None:
+    def register(self, item: Item, burn_time: int, metadata: int | None = None) -> None:
         if not isinstance(item, Item):
             raise TypeError("fuel must be an Item")
         if isinstance(burn_time, bool) or not isinstance(burn_time, int) or burn_time <= 0:
             raise ValueError("burn_time must be a positive integer")
-        self._burn_times[item] = burn_time
+        if metadata is not None and (
+            isinstance(metadata, bool) or not isinstance(metadata, int)
+            or not 0 <= metadata <= 32767
+        ):
+            raise ValueError("metadata must be None or an integer from 0 to 32767")
+        key = (item, metadata)
+        if key in self._burn_times:
+            raise ValueError(f"fuel already registered: {item.name} metadata={metadata}")
+        self._burn_times[key] = burn_time
 
     def get_burn_time(self, stack: ItemStack) -> int:
         if not isinstance(stack, ItemStack) or stack.is_empty:
             return 0
-        return self._burn_times.get(stack.item, 0)
+        return self._burn_times.get(
+            (stack.item, stack.metadata), self._burn_times.get((stack.item, None), 0)
+        )
 
 
 class SmeltingRecipe:
@@ -78,6 +88,7 @@ class Furnace:
         self.current_item_burn_time = 0
         self.cook_time = 0
         self.total_cook_time = cook_time
+        self.container_returns: list[ItemStack] = []
 
     @property
     def is_burning(self) -> bool:
@@ -122,6 +133,11 @@ class Furnace:
             return stack.copy()
         return self._insert_stack(self.fuel, stack)
 
+    def take_container_returns(self) -> tuple[ItemStack, ...]:
+        returned = tuple(stack.copy() for stack in self.container_returns)
+        self.container_returns.clear()
+        return returned
+
     def take_output(self, amount: int | None = None) -> ItemStack:
         if amount is None:
             amount = self.output.count
@@ -143,7 +159,17 @@ class Furnace:
             return False
         self.current_item_burn_time = duration
         self.burn_time = duration
+        fuel_item = self.fuel.item
         self.fuel.shrink(1)
+        if fuel_item.container_item is not None:
+            returned = ItemStack(
+                fuel_item.container_item, 1,
+                metadata=fuel_item.container_item_metadata,
+            )
+            if self.fuel.is_empty:
+                self.fuel = returned
+            else:
+                self.container_returns.append(returned)
         return True
 
     def _smelt_once(self) -> bool:
