@@ -36,6 +36,13 @@ class TestCamera(unittest.TestCase):
         self.assertGreater(vertices.shape[0], 100)
         self.assertTrue(np.isfinite(vertices).all())
 
+    def test_inventory_hud_geometry_accepts_36_slots(self):
+        slots = [(index + 1, index % 64) for index in range(36)]
+        vertices = OpenGLRenderer._hud_vertices(2, 20.0, 20, inventory_slots=slots)
+        self.assertEqual(vertices.shape[1], 5)
+        self.assertGreater(vertices.shape[0], 500)
+        self.assertTrue(np.isfinite(vertices).all())
+
     def test_view_and_projection_matrices(self):
         camera = Camera(position=(1, 2, 3))
         view = camera.view_matrix()
