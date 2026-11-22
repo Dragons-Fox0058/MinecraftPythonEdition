@@ -180,14 +180,16 @@ def serverbound_use_entity(entity_id: int, action: int, *,
                            hand: int = 0) -> tuple[int, bytes]:
     if isinstance(entity_id, bool) or not isinstance(entity_id, int) or entity_id < 0:
         raise ValueError("entity_id must be a non-negative integer")
-    if action not in (0, 1, 2):
+    if isinstance(action, bool) or not isinstance(action, int) or action not in (0, 1, 2):
         raise ValueError("entity interaction action must be 0, 1, or 2")
     if action == 2:
-        if target is None or len(target) != 3 or not all(math.isfinite(v) for v in target):
+        if (target is None or len(target) != 3
+                or not all(isinstance(v, (int, float)) and not isinstance(v, bool)
+                           and math.isfinite(v) for v in target)):
             raise ValueError("interact-at action requires a finite 3D target")
     elif target is not None:
         raise ValueError("target coordinates are only valid for interact-at")
-    if action in (0, 2) and hand not in (0, 1):
+    if action in (0, 2) and (isinstance(hand, bool) or not isinstance(hand, int) or hand not in (0, 1)):
         raise ValueError("hand must be 0 or 1")
     out = PacketBuffer()
     out.write_varint(entity_id)
