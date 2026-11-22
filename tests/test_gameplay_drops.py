@@ -88,7 +88,8 @@ class TestItemDrops(unittest.TestCase):
         self.world.add_entity(second)
         for _ in range(25):
             first.on_update()
-            if first.dead:
+            second.on_update()
+            if first.dead or second.dead:
                 break
         self.assertTrue(first.dead or second.dead)
         survivor = second if first.dead else first
