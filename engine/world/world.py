@@ -6,6 +6,7 @@ from engine.blocks import BLOCK_REGISTRY, BlockState
 import engine.blocks.vanilla_blocks as VB
 from engine.world.chunk_provider import ChunkProvider
 from engine.gameplay.time import GameRules, WorldTime
+from engine.gameplay.game_mode import GameMode
 
 AIR_ID = 0
 
@@ -16,6 +17,7 @@ class World:
         self._provider = ChunkProvider()
         self._entities = []
         self.seed = 0
+        self.default_game_mode = GameMode.SURVIVAL
         # Vanilla level.dat SpawnX/SpawnY/SpawnZ; default world spawn.
         self.spawn_point = BlockPos(0, 64, 0)
         self.game_rules = GameRules()
