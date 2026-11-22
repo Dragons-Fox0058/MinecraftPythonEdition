@@ -23,7 +23,7 @@ class TestVanillaToolRecipes(unittest.TestCase):
         self.recipes = create_vanilla_tool_recipes(self.tools, self.items)
 
     def test_all_fifteen_tool_recipes_registered(self):
-        self.assertEqual(len(self.recipes), 18)
+        self.assertEqual(len(self.recipes), 21)
 
     def test_player_2x2_grid_crafts_planks_sticks_and_crafting_table(self):
         grid = CraftingGrid(2, 2)
