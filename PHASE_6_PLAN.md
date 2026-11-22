@@ -33,7 +33,8 @@ Target: Minecraft Java Edition 1.12.2 behavior.
 - [x] Dropped item entities, inventory pickup, lifetime, pickup delay, and vanilla-style partial stack merging with remainder preservation.
 - [x] World clock and typed game rules integrated with world ticking.
 - [x] Player controller joining inventory, block interaction, food consumption, crafting, item drops, pickup, death handling, and armor-aware damage.
-- [x] Damage-source flags, armor/toughness reduction, armor durability wear, and player-controller integration; armor catalogue values remain caller-supplied.
+- [x] Damage-source flags, armor/toughness reduction, armor durability wear, and player-controller integration.
+- [x] Source-backed 1.12.2 armor material/slot catalogue factory for leather, chainmail, iron, golden, and diamond armor; numeric item IDs remain caller-supplied.
 - [x] keepInventory, doEntityDrops, and doTileDrops handling in the implemented paths.
 - [x] GitHub Actions unittest workflow.
 
