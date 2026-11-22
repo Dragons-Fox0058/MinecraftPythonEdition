@@ -1,11 +1,14 @@
-"""Source-backed vanilla 1.12.2 tool rules for the registered block catalogue."""
+"""Source-backed vanilla 1.12.2 tool definitions and item catalogue."""
 from __future__ import annotations
+
 from collections.abc import Mapping
+
 from engine.blocks.material import Material
 import engine.blocks.vanilla_blocks  # ensure the vanilla registry is populated
 from engine.blocks.registry import GLOBAL as BLOCK_REGISTRY
 from engine.gameplay.items import Item
 from engine.gameplay.tools import ToolDefinition, ToolMaterial, ToolRegistry
+
 
 VANILLA_TOOL_MATERIALS = {
     "wooden": ToolMaterial("wood", 59, 2.0, 0, 15, 0.0),
@@ -15,6 +18,28 @@ VANILLA_TOOL_MATERIALS = {
     "golden": ToolMaterial("gold", 32, 12.0, 0, 22, 0.0),
 }
 
+# Numeric IDs are the legacy 1.12.2 Item registry IDs.
+VANILLA_TOOL_ITEM_IDS = {
+    "iron_shovel": 256, "iron_pickaxe": 257, "iron_axe": 258,
+    "wooden_shovel": 269, "wooden_pickaxe": 270, "wooden_axe": 271,
+    "stone_shovel": 273, "stone_pickaxe": 274, "stone_axe": 275,
+    "diamond_shovel": 277, "diamond_pickaxe": 278, "diamond_axe": 279,
+    "golden_shovel": 284, "golden_pickaxe": 285, "golden_axe": 286,
+}
+
+
+def create_vanilla_tool_items() -> dict[str, Item]:
+    """Create all 15 damageable vanilla pickaxe, axe, and shovel items."""
+    result = {}
+    for name, item_id in VANILLA_TOOL_ITEM_IDS.items():
+        material_name, _tool_class = name.split("_", 1)
+        result[name] = Item(
+            item_id, f"minecraft:{name}", max_stack_size=1,
+            max_damage=VANILLA_TOOL_MATERIALS[material_name].durability,
+        )
+    return result
+
+
 _PICKAXE_EFFECTIVE = frozenset({
     "activator_rail", "coal_ore", "cobblestone", "detector_rail",
     "diamond_block", "diamond_ore", "double_stone_slab", "golden_rail",
@@ -22,6 +47,7 @@ _PICKAXE_EFFECTIVE = frozenset({
     "lapis_ore", "lit_redstone_ore", "mossy_cobblestone", "netherrack",
     "packed_ice", "rail", "red_sandstone", "redstone_ore", "sandstone",
     "stone", "stone_slab", "stone_button", "stone_pressure_plate",
+    "emerald_ore", "quartz_ore",
 })
 _AXE_EFFECTIVE = frozenset({
     "planks", "bookshelf", "log", "log2", "chest", "pumpkin",
@@ -33,16 +59,12 @@ _SHOVEL_EFFECTIVE = frozenset({
     "sand", "snow", "snow_layer", "soul_sand", "grass_path",
 })
 
-def create_vanilla_tool_registry(items: Mapping[str, Item]) -> ToolRegistry:
-    """Build rules for supplied items; item IDs are never guessed here.
 
-    Keys use names such as wooden_pickaxe, iron_axe, and diamond_shovel.
-    Missing tools remain unavailable; unknown keys and invalid items fail.
-    """
+def create_vanilla_tool_registry(items: Mapping[str, Item]) -> ToolRegistry:
+    """Build tool rules for supplied canonical names; missing tools stay absent."""
     if not isinstance(items, Mapping):
         raise TypeError("items must be a mapping of canonical names to Item")
-    valid_keys = {f"{material}_{kind}" for material in VANILLA_TOOL_MATERIALS
-                  for kind in ("pickaxe", "axe", "shovel")}
+    valid_keys = set(VANILLA_TOOL_ITEM_IDS)
     unknown = set(items) - valid_keys
     if unknown:
         raise ValueError(f"unknown vanilla tool names: {sorted(unknown)!r}")
@@ -78,4 +100,8 @@ def create_vanilla_tool_registry(items: Mapping[str, Item]) -> ToolRegistry:
             registry.set_harvest_requirement(name, "shovel", 0)
     return registry
 
-__all__ = ["VANILLA_TOOL_MATERIALS", "create_vanilla_tool_registry"]
+
+__all__ = [
+    "VANILLA_TOOL_MATERIALS", "VANILLA_TOOL_ITEM_IDS",
+    "create_vanilla_tool_items", "create_vanilla_tool_registry",
+]
