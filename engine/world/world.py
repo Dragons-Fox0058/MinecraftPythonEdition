@@ -16,6 +16,8 @@ class World:
         self._provider = ChunkProvider()
         self._entities = []
         self.seed = 0
+        # Vanilla level.dat SpawnX/SpawnY/SpawnZ; default world spawn.
+        self.spawn_point = BlockPos(0, 64, 0)
         self.game_rules = GameRules()
         self.world_time = WorldTime(day_time=6000)  # noon
 
