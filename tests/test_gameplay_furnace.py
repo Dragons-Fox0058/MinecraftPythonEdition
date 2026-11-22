@@ -53,6 +53,27 @@ class TestFurnace(unittest.TestCase):
         self.assertGreater(self.furnace.burn_progress, 0)
         self.assertAlmostEqual(self.furnace.cook_progress, 1 / 3)
 
+    def test_fuel_registry_supports_metadata_variants(self):
+        wood = Item(10, "test:wood", has_subtypes=True)
+        registry = FuelRegistry()
+        registry.register(wood, 300, metadata=0)
+        registry.register(wood, 100, metadata=1)
+        self.assertEqual(registry.get_burn_time(ItemStack(wood, 1, metadata=0)), 300)
+        self.assertEqual(registry.get_burn_time(ItemStack(wood, 1, metadata=1)), 100)
+        self.assertEqual(registry.get_burn_time(ItemStack(wood, 1, metadata=2)), 0)
+
+    def test_lava_bucket_fuel_returns_empty_bucket(self):
+        bucket = Item(11, "test:bucket", max_stack_size=16)
+        lava_bucket = Item(12, "test:lava_bucket", max_stack_size=1, container_item=bucket)
+        fuels = FuelRegistry()
+        fuels.register(lava_bucket, 20000)
+        furnace = Furnace(fuels, self.recipes, cook_time=1)
+        furnace.input = ItemStack(self.ore, 1)
+        furnace.fuel = ItemStack(lava_bucket, 1)
+        furnace.update()
+        self.assertIs(furnace.fuel.item, bucket)
+        self.assertEqual(furnace.fuel.count, 1)
+
     def test_fuel_registry(self):
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.coal, 1)), 1600)
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.ore, 1)), 0)
