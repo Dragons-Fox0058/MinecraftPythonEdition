@@ -41,7 +41,7 @@ class TestItemDrops(unittest.TestCase):
             self.inventory.set_slot(i, ItemStack(self.stone, 64))
         self.inventory.remove_from_slot(0, 5)
         drop = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 8), pickup_delay=0)
-        self.assertFalse(drop.try_pickup(self.inventory))
+        self.assertTrue(drop.try_pickup(self.inventory))
         self.assertEqual(drop.stack.count, 3)
         self.assertFalse(drop.dead)
 
