@@ -65,6 +65,7 @@ class HungerManager:
         self.exhaustion = 0.0
         self.food_timer = 0
         self.tick_count = 0
+        self.container_returns: list[ItemStack] = []
 
     def can_eat(self, always_edible: bool = False) -> bool:
         if not isinstance(always_edible, bool):
@@ -101,9 +102,30 @@ class HungerManager:
         properties = foods.get(stack.item, stack.metadata)
         if properties is None or not self.can_eat(properties.always_edible):
             return False
+        food_item = stack.item
         self.eat(properties.food_points, properties.saturation_modifier)
-        stack.shrink(1)
+        if food_item.container_item is not None:
+            returned = ItemStack(
+                food_item.container_item, 1,
+                metadata=food_item.container_item_metadata,
+            )
+            if stack.count == 1:
+                stack.item = returned.item
+                stack.count = 1
+                stack.metadata = returned.metadata
+                stack.damage = 0
+                stack.nbt = None
+            else:
+                stack.shrink(1)
+                self.container_returns.append(returned)
+        else:
+            stack.shrink(1)
         return True
+
+    def take_container_returns(self) -> tuple[ItemStack, ...]:
+        returned = tuple(stack.copy() for stack in self.container_returns)
+        self.container_returns.clear()
+        return returned
 
     def _process_exhaustion(self) -> None:
         while self.exhaustion > 4.0:
