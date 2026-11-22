@@ -74,6 +74,8 @@ class PlayerController:
 
     def drop_item(self, stack: ItemStack, x: float | None = None,
                   y: float | None = None, z: float | None = None):
+        if not isinstance(stack, ItemStack):
+            raise TypeError("stack must be an ItemStack")
         if stack.is_empty:
             return None
         x = self.entity.pos.x if x is None else x
