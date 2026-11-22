@@ -6,3 +6,5 @@ from engine.network.connection import (ConnectionState, PACKET_IDS, MinecraftCon
 from engine.network.status import ServerStatus, query_server
 
 from engine.network.login import LoginIdentity, login_offline
+
+from engine.network.packets import (serverbound_chat, serverbound_keep_alive, serverbound_player, serverbound_position, serverbound_position_look, serverbound_look, serverbound_held_item, serverbound_digging, decode_clientbound_keep_alive, decode_clientbound_chat)
