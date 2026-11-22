@@ -663,3 +663,43 @@ KALAN:
 - Crafting ve furnace ekranları oyun döngüsüne bağlanmadı.
 - Item ikonları/sayı yazıları ve tamvanilla item/block registry eksik.
 - Texture atlas, mob AI/combat, ses, ayarlar ve gerçek Windows GPU testi eksik.
+
+
+============================================================
+GPT-6 — JAVA 1.12.2 PARITY REVIEW / SURVIVAL MINING FIX
+============================================================
+2026-11-22
+
+REFERENCE:
+- MCP decompiled Java 1.12.2 Block.java:
+  getPlayerRelativeBlockHardness uses digSpeed / hardness / 100 when the player cannot harvest, and / 30 when they can.
+  Source: https://github.com/WangTingZheng/mcp940/blob/master/src/minecraft/net/minecraft/block/Block.java
+- MCP Java 1.12.2 PlayerControllerMP.java:
+  survival block reach is 4.5; creative reach is 5.0.
+  Source: https://github.com/tw1nside/MCP-1.12.2-Gradle/blob/master/src/main/java/net/minecraft/client/multiplayer/PlayerControllerMP.java
+
+FOUND AND FIXED:
+- engine/app/client.py previously used 5.0 reach for survival interactions. Changed to 4.5 for both block breaking and placement.
+- Desktop client forced can_harvest=True for every block and did not pass the held ItemStack to BlockBreaking.
+- Now creates create_vanilla_tool_registry({}) and passes it into PlayerController and BlockBreaking.
+- Each mining tick now passes inventory.selected_item; the registry evaluates actual 1.12.2 harvest requirements. Empty hand cannot harvest stone/ore for drops, but can harvest ordinary dirt/sand.
+- Added tests/test_vanilla_tool_registry.py::test_empty_hand_harvest_rules_match_vanilla.
+
+COMMITS:
+- 45e60702f38183c8f7bd84f4e0011d6fbe42bdec — survival reach and held-item harvest logic.
+- e8273f7107696c476416105b023c70987393e52d — empty-hand harvest regression test.
+
+TEST:
+- Python tests run 45023613173 on e8273f7: SUCCESS.
+- Python tests run 45023600871 on 45e6070: still in progress at time of this report.
+- Windows launcher build run 45023600841 on 45e6070: still in progress at time of this report.
+- Earlier Windows launcher build on 0ce5383: SUCCESS.
+- No actual interactive GPU session was available to this tool; Windows runtime behavior is not claimed verified.
+
+NEXT PARITY WORK:
+1. Correct drop IDs and loot tables (stone -> cobblestone, ores, plants, etc.).
+2. Add actual block-item catalogue and verified tools; keep the item registry IDs source-backed.
+3. Replace simplified player horizontal movement with vanilla movement-input/attribute/friction semantics.
+4. Compare world generation against Java 1.12.2 ChunkGeneratorOverworld and feature population; current implementation remains explicitly approximate.
+5. Complete crafting/furnace screens and wire recipe/fuel/smelting registries into gameplay.
+6. Validate save/load by opening the Windows build and playing, saving, and reopening a world.
