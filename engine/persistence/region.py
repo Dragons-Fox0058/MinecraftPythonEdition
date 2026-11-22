@@ -1,7 +1,6 @@
 """Anvil .mca region-file reader/writer (Minecraft Java 1.12.2)."""
 from __future__ import annotations
 
-import gzip
 import os
 import struct
 import zlib
@@ -71,9 +70,9 @@ class RegionFile:
         payload = data[start + 5:start + 4 + length]
         try:
             if compression == COMPRESSION_GZIP:
-                return read_nbt(gzip.decompress(payload))
+                return read_nbt(payload, compression="gzip")
             if compression == COMPRESSION_ZLIB:
-                return read_nbt(zlib.decompress(payload))
+                return read_nbt(payload, compression="zlib")
             if compression == COMPRESSION_NONE:
                 return read_nbt(payload)
         except (NBTError, OSError, zlib.error) as exc:
