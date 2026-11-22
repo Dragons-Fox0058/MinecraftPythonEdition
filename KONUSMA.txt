@@ -739,3 +739,11 @@ KALAN:
 - Silk Touch ve Fortune enchantment'larının gerçek ItemStack/tool sistemiyle entegrasyonu.
 - Bitki, yaprak, slab, metadata ve tüm diğer 1.12.2 loot tabloları.
 - Tool item kataloğu hâlâ starter envantere bağlı değil; bu nedenle oyuncu şu anda taş gibi blokları uygun kazmayla kıramaz.
+
+
+DOĞRULAMA EKİ — 2026-11-22:
+- Tam dosya ağacı içeren commit 0da7c9a için Python test workflow run 45023871376 SUCCESS.
+- Bu çalıştırmada 439 test geçti; yeni stone/grass, glass/Silk Touch ve gravel/Fortune testleri de başarılı.
+- İlk client.py commit'i (793e9eb) modül dosyası eklenmeden önce CI'ya girdiği için o commit'in testi import hatasıyla başarısız oldu. Sonraki commit 1ddee6b modülü ekledi; 0da7c9a üzerindeki tam ağaç testleri başarılı.
+- Ardından client.py içindeki harvest/drop entegrasyon açıklaması netleştirildi: commit 7a979fa. Bu commit için yeni Python ve Windows workflow sonuçları bekleniyor.
+- Windows launcher build run 45023860355, eski 793e9eb commit'i üzerinde hâlâ çalışıyor; bu nedenle yeni commit 7a979fa için başlatılan build sonucu ayrıca kontrol edilmeli.
