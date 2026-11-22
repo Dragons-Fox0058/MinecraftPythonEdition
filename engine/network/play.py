@@ -17,16 +17,30 @@ from engine.network.codec import PacketBuffer, ProtocolError
 # Protocol 340 (Java Edition 1.12.2), Play state.
 SERVERBOUND = {
     "teleport_confirm": 0x00,
+    "tab_complete": 0x01,
     "chat": 0x02,
     "client_status": 0x03,
     "client_settings": 0x04,
+    "confirm_transaction": 0x05,
+    "enchant_item": 0x06,
+    "click_window": 0x07,
+    "close_window": 0x08,
+    "plugin_message": 0x09,
+    "use_entity": 0x0A,
     "keep_alive": 0x0B,
     "player": 0x0C,
     "player_position": 0x0D,
     "player_position_look": 0x0E,
     "player_look": 0x0F,
+    "vehicle_move": 0x10,
+    "steer_boat": 0x11,
+    "craft_recipe_request": 0x12,
     "player_abilities": 0x13,
     "player_digging": 0x14,
+    "entity_action": 0x15,
+    "steer_vehicle": 0x16,
+    "crafting_book_data": 0x17,
+    "resource_pack_status": 0x18,
     "held_item_change": 0x19,
     "creative_inventory_action": 0x1A,
     "update_sign": 0x1B,
@@ -130,7 +144,7 @@ def serverbound_teleport_confirm(teleport_id: int) -> tuple[int, bytes]:
 
 
 def serverbound_client_status(action: int) -> tuple[int, bytes]:
-    # 0 = respawn, 1 = request statistics, 2 = open inventory achievement (legacy).
+    # 0 = respawn, 1 = request statistics.
     if isinstance(action, bool) or not isinstance(action, int) or action not in (0, 1):
         raise ValueError("client status action must be 0 or 1")
     out = PacketBuffer()
