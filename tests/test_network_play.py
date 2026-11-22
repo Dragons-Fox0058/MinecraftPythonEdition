@@ -67,7 +67,9 @@ class TestPlayPackets(unittest.TestCase):
             decode_disconnect(b"\x01x")
 
     def test_health_time_and_abilities(self):
-        health = decode_update_health(struct.pack(">fif", 18.5, 17, 4.0))
+        food = PacketBuffer()
+        food.write_varint(17)
+        health = decode_update_health(struct.pack(">f", 18.5) + food.to_bytes() + struct.pack(">f", 4.0))
         self.assertEqual((health.health, health.food, health.food_saturation),
                          (18.5, 17, 4.0))
         time = decode_time_update(struct.pack(">qq", 1000, 6000))
