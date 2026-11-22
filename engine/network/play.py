@@ -186,6 +186,13 @@ class BlockChange:
 
 
 @dataclass(frozen=True)
+class MultiBlockChange:
+    chunk_x: int
+    chunk_z: int
+    records: tuple[BlockChange, ...]
+
+
+@dataclass(frozen=True)
 class UnloadChunk:
     chunk_x: int
     chunk_z: int
@@ -243,6 +250,27 @@ def decode_block_change(payload: bytes) -> BlockChange:
     if state_id < 0 or buf.remaining:
         raise ProtocolError("invalid Block Change payload")
     return BlockChange(x, y, z, state_id)
+
+
+def decode_multi_block_change(payload: bytes) -> MultiBlockChange:
+    buf = PacketBuffer(payload)
+    chunk_x, chunk_z = struct.unpack(">ii", buf.read(8))
+    count = buf.read_varint()
+    if not 0 <= count <= 4096:
+        raise ProtocolError("invalid Multi Block Change record count")
+    records = []
+    for _ in range(count):
+        horizontal = buf.read(1)[0]
+        y = buf.read(1)[0]
+        state_id = buf.read_varint()
+        if state_id < 0:
+            raise ProtocolError("negative block state in Multi Block Change")
+        x = chunk_x * 16 + ((horizontal >> 4) & 0x0F)
+        z = chunk_z * 16 + (horizontal & 0x0F)
+        records.append(BlockChange(x, y, z, state_id))
+    if buf.remaining:
+        raise ProtocolError("trailing Multi Block Change payload")
+    return MultiBlockChange(chunk_x, chunk_z, tuple(records))
 
 
 def decode_unload_chunk(payload: bytes) -> UnloadChunk:
@@ -343,6 +371,7 @@ class PlayPacketDispatcher:
 def create_clientbound_dispatcher() -> PlayPacketDispatcher:
     dispatcher = PlayPacketDispatcher()
     dispatcher.register(CLIENTBOUND["block_change"], decode_block_change)
+    dispatcher.register(CLIENTBOUND["multi_block_change"], decode_multi_block_change)
     dispatcher.register(CLIENTBOUND["unload_chunk"], decode_unload_chunk)
     dispatcher.register(CLIENTBOUND["disconnect"], decode_disconnect)
     dispatcher.register(CLIENTBOUND["update_health"], decode_update_health)
@@ -359,7 +388,8 @@ __all__ = [
     "serverbound_client_status", "serverbound_client_settings", "BlockChange",
     "UnloadChunk", "Disconnect", "UpdateHealth", "TimeUpdate",
     "PlayerAbilities", "Respawn", "PluginMessage", "ChangeGameState",
-    "decode_block_change", "decode_unload_chunk", "decode_disconnect",
+    "MultiBlockChange", "decode_block_change", "decode_multi_block_change",
+    "decode_unload_chunk", "decode_disconnect",
     "decode_update_health", "decode_time_update", "decode_player_abilities",
     "decode_respawn", "decode_plugin_message", "decode_change_game_state",
     "PlayPacketDispatcher",
