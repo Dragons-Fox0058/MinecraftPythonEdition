@@ -81,10 +81,10 @@ class ChunkGeneratorOverworld:
                 n_min = self.noise_min.noise3(wx * 0.03, 0, wz * 0.03)
                 n_max = self.noise_max.noise3(wx * 0.03, 0, wz * 0.03)
                 base = biome.base_height * 30.0
-                var = biome.height_variation * 30.0
+                var = biome.height_variation * 80.0
                 avg = (n_min + n_max) * 0.5
                 h = 64.0 + base + avg * var
-                hm[lx, lz] = int(max(1, min(255, h)))
+                hm[lx, lz] = int(max(1, min(254, h)))
         return hm
 
     # ---------------- terrain blocks ----------------
