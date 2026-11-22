@@ -217,6 +217,13 @@ class MinecraftConnection:
         return cls(sock)
 
     def close(self):
+        # Wake a thread blocked in recv() before releasing the socket.
+        shutdown = getattr(self.socket, "shutdown", None)
+        if callable(shutdown):
+            try:
+                shutdown(socket.SHUT_RDWR)
+            except OSError:
+                pass
         try:
             self.socket.close()
         except OSError:
