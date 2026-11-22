@@ -39,6 +39,15 @@ class TestFoodConsumption(unittest.TestCase):
         stick = Item(3, "minecraft:stick")
         self.assertFalse(hunger.consume(ItemStack(stick, 1), self.foods))
 
+    def test_food_registry_supports_metadata_variants(self):
+        fish = Item(4, "minecraft:fish", has_subtypes=True)
+        registry = FoodRegistry()
+        registry.register(fish, FoodProperties(2, 0.2), metadata=0)
+        registry.register(fish, FoodProperties(5, 1.2), metadata=4)
+        self.assertEqual(registry.get(fish, 0).food_points, 2)
+        self.assertEqual(registry.get(fish, 4).food_points, 5)
+        self.assertIsNone(registry.get(fish, 1))
+
     def test_food_registry_rejects_duplicates(self):
         with self.assertRaises(ValueError):
             self.foods.register(self.apple, FoodProperties(1, 0.1))
