@@ -42,12 +42,12 @@ class EntityItem(Entity):
     def try_pickup(self, inventory) -> bool:
         if self.dead or self.pickup_delay > 0 or self.stack.is_empty:
             return False
+        original_count = self.stack.count
         remainder = inventory.insert(self.stack)
         self.stack = remainder
         if self.stack.is_empty:
             self.kill()
-            return True
-        return False
+        return self.stack.count < original_count
 
     def kill(self) -> None:
         if self.dead:
