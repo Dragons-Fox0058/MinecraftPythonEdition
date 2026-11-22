@@ -144,8 +144,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     interaction = InteractionManager(world)
 
     def resolve_block_drop(block, pos):
-        # Keep block loot deterministic for a given world seed and position,
-        # matching the repeatable world simulation used by saved worlds.
+        # BlockBreaking calls this only after the held tool passes the harvest
+        # requirement; this resolver then applies the supported vanilla loot
+        # rule. Seed by world and position so saved worlds stay deterministic.
         drop_seed = (
             int(world.seed) ^ (pos.x * 341873128712)
             ^ (pos.y * 132897987541) ^ (pos.z * 42317861)
