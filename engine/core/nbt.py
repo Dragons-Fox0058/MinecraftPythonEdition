@@ -27,6 +27,11 @@ class NBTError(ValueError):
     """Malformed or unsupported NBT data."""
 
 @dataclass(frozen=True)
+class NBTTag:
+    tag_type: int
+    value: Any
+
+@dataclass(frozen=True)
 class NBTList:
     tag_type: int
     values: tuple[Any, ...]
@@ -124,6 +129,7 @@ def _encode_string(value: str) -> bytes:
     return struct.pack(">H", len(data)) + data
 
 def _infer_tag(value: Any) -> int:
+    if isinstance(value, NBTTag): return value.tag_type
     if isinstance(value, bool): return TAG_BYTE
     if isinstance(value, int):
         if -128 <= value <= 127: return TAG_BYTE
@@ -142,6 +148,10 @@ def _infer_tag(value: Any) -> int:
 
 def _write_payload(stream: io.BytesIO, tag_type: int, value: Any, depth: int, max_depth: int):
     if depth > max_depth: raise ValueError("NBT nesting limit exceeded")
+    if isinstance(value, NBTTag):
+        if value.tag_type != tag_type:
+            raise ValueError("NBTTag type does not match its parent tag")
+        value = value.value
     formats = {TAG_BYTE: ">b", TAG_SHORT: ">h", TAG_INT: ">i", TAG_LONG: ">q",
                TAG_FLOAT: ">f", TAG_DOUBLE: ">d"}
     if tag_type in formats:
@@ -185,7 +195,7 @@ def write_nbt(document: NBTDocument | dict[str, Any], *, name: str = "",
     raise ValueError("compression must be none, gzip, or zlib")
 
 
-__all__ = ["NBTError", "NBTList", "NBTDocument", "read_nbt", "write_nbt",
+__all__ = ["NBTError", "NBTTag", "NBTList", "NBTDocument", "read_nbt", "write_nbt",
            "TAG_END", "TAG_BYTE", "TAG_SHORT", "TAG_INT", "TAG_LONG",
            "TAG_FLOAT", "TAG_DOUBLE", "TAG_BYTE_ARRAY", "TAG_STRING",
            "TAG_LIST", "TAG_COMPOUND", "TAG_INT_ARRAY", "TAG_LONG_ARRAY"]
