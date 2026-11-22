@@ -2,8 +2,9 @@
 from __future__ import annotations
 
 import socket
+from pathlib import Path
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 from engine.app.client import main as run_game
 from engine.server.local import PythonEditionServer, ServerConfig
@@ -28,8 +29,16 @@ class Launcher:
         form.pack(fill="x", padx=64, pady=(0, 8))
         tk.Label(form, text="WORLD NAME", bg="#151923", fg="#c7cfdd",
                  font=("Segoe UI", 8, "bold")).grid(row=0, column=0, sticky="w")
-        tk.Entry(form, textvariable=self.world_name, bg="#252c3a", fg="white",
-                 insertbackground="white", relief="flat").grid(row=1, column=0, sticky="ew", ipady=7, padx=(0, 8))
+        saved_worlds = []
+        saves_root = Path("saves")
+        if saves_root.is_dir():
+            saved_worlds = sorted(
+                folder.name for folder in saves_root.iterdir()
+                if folder.is_dir() and (folder / "level.dat").is_file()
+            )
+        ttk.Combobox(form, textvariable=self.world_name, values=saved_worlds).grid(
+            row=1, column=0, sticky="ew", ipady=5, padx=(0, 8)
+        )
         tk.Label(form, text="SEED", bg="#151923", fg="#c7cfdd",
                  font=("Segoe UI", 8, "bold")).grid(row=0, column=1, sticky="w")
         tk.Entry(form, textvariable=self.seed, bg="#252c3a", fg="white",
