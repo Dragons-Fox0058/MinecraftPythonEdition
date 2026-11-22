@@ -14,6 +14,7 @@ from engine.network.packets import (
 )
 from engine.network.play import (
     CLIENTBOUND, decode_block_change, decode_change_game_state,
+    decode_multi_block_change,
     decode_disconnect, decode_player_abilities, decode_plugin_message,
     decode_respawn, decode_time_update, decode_unload_chunk,
     decode_update_health, serverbound_client_settings,
@@ -161,6 +162,15 @@ class PlaySession:
                     BlockPos(change.x, change.y, change.z), change.state_id
                 )
             return self._emit("block_change", change)
+
+        if packet_id == CLIENTBOUND["multi_block_change"]:
+            change = decode_multi_block_change(payload)
+            if self.world is not None:
+                for record in change.records:
+                    self.world.set_block_state_id(
+                        BlockPos(record.x, record.y, record.z), record.state_id
+                    )
+            return self._emit("multi_block_change", change)
 
         if packet_id == CLIENTBOUND["unload_chunk"]:
             chunk = decode_unload_chunk(payload)
