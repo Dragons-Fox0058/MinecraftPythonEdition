@@ -18,11 +18,24 @@ class Launcher:
         self.root.configure(bg="#151923")
         self.server = None
         self.status = tk.StringVar(value="Ready")
+        self.world_name = tk.StringVar(value="New World")
+        self.seed = tk.StringVar(value="0")
         tk.Label(self.root, text="MINECRAFT", bg="#151923", fg="#f4f6fb",
                  font=("Segoe UI", 27, "bold")).pack(pady=(34, 0))
         tk.Label(self.root, text="PYTHON EDITION", bg="#151923", fg="#77c7ff",
                  font=("Segoe UI", 13, "bold")).pack(pady=(0, 22))
-        self._button("PLAY", self.play).pack(fill="x", padx=90, pady=7)
+        form = tk.Frame(self.root, bg="#151923")
+        form.pack(fill="x", padx=64, pady=(0, 8))
+        tk.Label(form, text="WORLD NAME", bg="#151923", fg="#c7cfdd",
+                 font=("Segoe UI", 8, "bold")).grid(row=0, column=0, sticky="w")
+        tk.Entry(form, textvariable=self.world_name, bg="#252c3a", fg="white",
+                 insertbackground="white", relief="flat").grid(row=1, column=0, sticky="ew", ipady=7, padx=(0, 8))
+        tk.Label(form, text="SEED", bg="#151923", fg="#c7cfdd",
+                 font=("Segoe UI", 8, "bold")).grid(row=0, column=1, sticky="w")
+        tk.Entry(form, textvariable=self.seed, bg="#252c3a", fg="white",
+                 insertbackground="white", relief="flat", width=12).grid(row=1, column=1, sticky="ew", ipady=7)
+        form.columnconfigure(0, weight=1)
+        self._button("PLAY SINGLEPLAYER", self.play).pack(fill="x", padx=90, pady=7)
         self._button("HOST PYTHON EDITION SERVER", self.host).pack(fill="x", padx=90, pady=7)
         self._button("STOP SERVER", self.stop_server).pack(fill="x", padx=90, pady=7)
         tk.Label(self.root, textvariable=self.status, bg="#151923", fg="#c7cfdd",
@@ -38,9 +51,18 @@ class Launcher:
                          font=("Segoe UI", 10, "bold"), cursor="hand2")
 
     def play(self):
+        name = self.world_name.get().strip()
+        if not name or name in (".", "..") or any(ch in name for ch in "/\\\\"):
+            messagebox.showerror("Invalid world name", "Enter a valid world name.")
+            return
+        try:
+            seed = int(self.seed.get().strip() or "0")
+        except ValueError:
+            messagebox.showerror("Invalid seed", "Seed must be an integer.")
+            return
         self.root.withdraw()
         try:
-            run_game()
+            run_game(seed=seed, world_name=name)
         except Exception as exc:
             messagebox.showerror("Minecraft Python Edition", str(exc), parent=self.root)
         finally:
