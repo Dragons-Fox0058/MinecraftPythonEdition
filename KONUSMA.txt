@@ -455,3 +455,15 @@ GPT-6 — PHASE 7 İLK DÜZELTME
 - Dosyalar: engine/world/world.py, engine/persistence/world.py, tests/test_persistence_world.py, PHASE_7_PLAN.md.
 - Kod commitleri: 542b723d56dfdba7a37dc6ba42502804c2666394 ve bd97b4ed6b253b515b658849565c881950e5b482. Test henüz çalıştırılmadı; GitHub Actions doğrulaması bekleniyor.
 - Phase 7'nin entity/tile-entity/tick persistence ve gerçek 1.12.2 fixture testleri hâlâ eksik.
+
+
+============================================================
+GPT-6 — PYTHON LAN SERVER / DESKTOP PREVIEW / LAUNCHER
+============================================================
+- Added PythonEditionServer: threaded TCP host, Python Edition handshake (edition + protocol version), player admission, chat relay, player-state relay, ping/pong, duplicate-name/capacity checks. Java Edition clients are explicitly rejected.
+- Added PythonEditionClient transport with background receive queue and chat/player-state sending. This is a custom Python Edition transport, not protocol 340; world/chunk replication and full gameplay synchronization are not yet implemented.
+- Added first desktop preview: generated overworld chunk, CPU mesh upload, GLFW/OpenGL window, free-camera WASD/vertical movement/mouse look/Escape.
+- Added Tk launcher with Play and Host/Stop Server controls, requirements.txt, Windows build_windows.bat, and GitHub Actions Windows PyInstaller artifact workflow.
+- Fixed newline framing after the first server tests exposed literal backslash-n framing; corrected test input as well. CI for latest fixes is pending.
+- Files added: engine/server/__init__.py, engine/server/local.py, engine/network/python_edition.py, engine/app/client.py, launcher.py, requirements.txt, build_windows.bat, .github/workflows/build-windows.yml, tests/test_local_server.py, tests/test_launcher_config.py. Additional fixes in engine/app/client.py and server tests.
+- Known limitations: no chunk replication/player entity simulation yet; launcher host starts a Python-only relay service, not a complete Minecraft multiplayer world; no textures/HUD/inventory/interaction; Windows EXE artifact and actual GPU launch still require successful workflow/device verification.
