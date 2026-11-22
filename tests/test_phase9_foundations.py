@@ -33,7 +33,7 @@ class TestFixedTimestepLoop(unittest.TestCase):
         rendered = []
         app = GameApplication(GameConfig(), lambda dt: None, rendered.append,
                               poll_events=lambda: len(rendered) < 2)
-        times = iter((0.0, 0.0, 0.01, 0.01, 0.02))
+        times = iter((0.0, 0.0, 0.01, 0.01, 0.02, 0.02))
         app.run(clock=lambda: next(times), sleep=lambda _: None)
         self.assertEqual(len(rendered), 2)
         self.assertFalse(app.running)
