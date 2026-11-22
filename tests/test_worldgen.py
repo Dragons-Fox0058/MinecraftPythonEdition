@@ -121,11 +121,8 @@ class TestChunkGenerator(unittest.TestCase):
 
     def test_tree_feature_places_logs_and_leaves_deterministically(self):
         class OneTreeRandom:
-            def __init__(self):
-                self.calls = 0
             def next_int(self, bound):
-                self.calls += 1
-                return 0 if self.calls <= 2 else 1
+                return 0
 
         generator = ChunkGeneratorOverworld(123)
         chunk = Chunk(ChunkPos(0, 0))
