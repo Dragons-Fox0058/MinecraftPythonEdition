@@ -8,16 +8,18 @@
 - [x] TCP connection wrapper with exact reads, framed send/receive, and compression switching.
 - [x] Protocol-340 handshake encoding/decoding for status and login.
 - [x] Server status JSON query and ping/pong latency verification.
-- [x] Offline-mode login, login success parsing, compression negotiation, and explicit rejection of online-mode encryption requests.
+- [x] Offline-mode login and login success parsing.
+- [x] Online-mode RSA public-key parsing, PKCS#1 v1.5 secret/token encryption, Minecraft signed server hash, AES/CFB8 stream encryption, and authenticated session-join callback.
+- [x] HTTPS Mojang session join helper; access tokens are passed at runtime and are not logged or persisted by the networking layer.
 - [x] Common play payloads for chat, keep-alive, player movement/look, held slot, and block digging.
 - [x] Unit tests for codec boundaries, compression, handshake, status, offline login, and play payloads.
 - [x] Opt-in GitHub Actions workflow to test status and offline login against the genuine Mojang 1.12.2 server JAR.
 
 ## Remaining compatibility work
 
-- [ ] Implement RSA server-key handling, AES/CFB8 stream encryption, and supported Microsoft/Mojang session authentication for online-mode servers.
-- [ ] Complete the protocol-340 packet registry for both directions and all states.
-- [ ] Implement complete play packet codecs: chunk data, block changes, entity updates, inventory/windows, player abilities, plugin messages, chat components, and disconnect handling.
+- [x] RSA/AES-CFB8 transport and session join flow implemented and covered with a simulated cryptographic handshake. **Not yet validated against a live online-mode server.**
+- [ ] Complete the protocol-340 packet registry for both directions and all states; current IDs and payload codecs cover only common packets.
+- [ ] Complete play packet codecs and semantics: chunk data block-entity NBT decoding, block changes, entity updates, inventory/windows, player abilities, plugin messages, full chat components, and disconnect handling.
 - [ ] Integrate network state changes with world, player, inventory, entity, and chunk systems.
 - [ ] Implement robust reconnect, timeout, keep-alive scheduling, and graceful disconnect behavior.
 - [ ] Run the real Java 1.12.2 interoperability workflow and record the result.
@@ -28,4 +30,4 @@ The real-server workflow is manual and runs only when the repository owner has r
 
 ## Status
 
-The transport and offline login foundations are implemented. Phase 8 is **not complete**: online-mode encryption/authentication and the full play packet/state integration remain.
+The transport, offline login, and online-mode cryptographic/session-login foundations are implemented and unit-tested. Phase 8 is **not complete**: live online-mode verification and full play packet/state integration remain.
