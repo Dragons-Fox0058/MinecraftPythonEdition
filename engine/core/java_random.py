@@ -36,11 +36,14 @@ class JavaRandom:
                 return val
 
     def next_long(self) -> int:
-        hi = self._next(32)
-        lo = self._next(32)
-        v = (hi << 32) + lo
-        if v >= (1 << 63): v -= (1 << 64)
-        return v
+        # java.util.Random.nextLong() sign-extends BOTH next(32) int values
+        # before combining them. Treating the low half as unsigned breaks
+        # the coordinate-seed derivation used by Minecraft world generation.
+        hi = self.next_int()
+        lo = self.next_int()
+        value = (hi << 32) + lo
+        value &= 0xFFFFFFFFFFFFFFFF
+        return value - (1 << 64) if value >= (1 << 63) else value
 
     def next_double(self) -> float:
         return ((self._next(26) << 27) + self._next(27)) / float(1 << 53)
@@ -79,4 +82,5 @@ def string_seed(seed: int, name: str) -> int:
     seed * 31L + hash instead, but for the structures we implement first
     the additive form matches vanilla.
     """
-    return (seed + java_string_hash(name)) & 0xFFFFFFFFFFFFFFFF if seed >= 0 else seed + java_string_hash(name)
+    value = (seed + java_string_hash(name)) & 0xFFFFFFFFFFFFFFFF
+    return value - (1 << 64) if value >= (1 << 63) else value
