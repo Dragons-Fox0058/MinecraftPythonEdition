@@ -137,6 +137,14 @@ class ChunkGeneratorOverworld:
         chunk = Chunk(ChunkPos(cx, cz))
         hm = self.generate_heightmap(cx, cz)
         self.set_blocks_in_chunk(chunk, hm)
+        # Persist biome IDs and the generated surface height with the chunk.
+        for lx in range(16):
+            for lz in range(16):
+                wx = cx * 16 + lx
+                wz = cz * 16 + lz
+                biome = self.biome_provider.get_biome_at(wx, wz)
+                chunk.biomes[lx, lz] = biome.biome_id
+                chunk.heightmap[lx, lz] = int(hm[lx, lz]) + 1
         # deterministic rng per chunk
         r = JavaRandom((cx * 341873128712 + cz * 132897987541 + self.seed) & 0xFFFFFFFF)
         self.generate_caves(chunk, r)
