@@ -122,13 +122,9 @@ def login_online(host: str, port: int, username: str, access_token: str,
                 raise ProtocolError(f"login rejected: {buffer.read_string()}")
             if packet_id != 0x01:
                 if packet_id == 0x02:
-                    buffer = PacketBuffer(payload)
-                    raw_uuid = buffer.read_string(max_chars=36)
-                    accepted_name = buffer.read_string(max_chars=16)
-                    if accepted_name != username:
-                        raise ProtocolError("server returned a different username")
-                    connection.state = ConnectionState.PLAY
-                    return connection, LoginIdentity(uuid.UUID(raw_uuid), accepted_name)
+                    raise ProtocolError(
+                        "online-mode login success arrived before encryption; refusing unauthenticated login"
+                    )
                 raise ProtocolError(f"unexpected login packet ID: {packet_id}")
             request = PacketBuffer(payload)
             server_id = request.read_string(max_chars=20)
