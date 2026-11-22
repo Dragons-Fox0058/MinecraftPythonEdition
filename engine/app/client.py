@@ -10,6 +10,9 @@ import numpy as np
 from engine.core import Vec3d, BlockPos
 from engine.entities.entity import Entity
 from engine.gameplay.breaking import BlockBreaking
+from engine.gameplay.items import Item, ItemStack
+from engine.gameplay.inventory import Inventory
+from engine.gameplay.drops import EntityItem
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
@@ -82,8 +85,20 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     jump_requested = False
     selected_hotbar_slot = 0
     hotbar_block_ids = (1, 3, 4, 5, 12, 13, 20, 24, 49)
+    inventory = Inventory()
+    from engine.blocks import BLOCK_REGISTRY
+    block_items = {
+        block_id: Item(10000 + block_id, BLOCK_REGISTRY.by_id(block_id).registry_name)
+        for block_id in hotbar_block_ids if BLOCK_REGISTRY.by_id(block_id) is not None
+    }
+    item_to_block = {item: block_id for block_id, item in block_items.items()}
     interaction = InteractionManager(world)
-    block_breaking = BlockBreaking(world)
+
+    def resolve_block_drop(block, _pos):
+        item = block_items.get(block.block_id)
+        return [ItemStack(item, 1)] if item is not None else []
+
+    block_breaking = BlockBreaking(world, drop_resolver=resolve_block_drop)
     mouse_left_down = False
 
     mesh_builder = ChunkMeshBuilder()
@@ -106,7 +121,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     jump_requested = True
                 if glfw.KEY_1 <= key <= glfw.KEY_9:
                     selected_hotbar_slot = key - glfw.KEY_1
-                    glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}")
+                    stack = inventory.get_hotbar_slot(selected_hotbar_slot)
+                    label = "empty" if stack.is_empty else f"{stack.item.name} x{stack.count}"
+                    glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}: {label}")
                 if key == glfw.KEY_ESCAPE:
                     glfw.set_window_should_close(window, True)
                 elif key == glfw.KEY_F6:
@@ -173,8 +190,12 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 target = hit.pos.offset(hit.side_hit)
                 if (target.chunk_x, target.chunk_z) not in chunks or not world.is_in_world_bounds(target.y):
                     return
-                block_id = hotbar_block_ids[selected_hotbar_slot]
-                from engine.blocks import BLOCK_REGISTRY
+                held_stack = inventory.selected_item
+                if held_stack.is_empty:
+                    return
+                block_id = item_to_block.get(held_stack.item)
+                if block_id is None:
+                    return
                 block = BLOCK_REGISTRY.by_id(block_id)
                 if block is None or not block.is_full_cube:
                     return
@@ -182,6 +203,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 if box is not None and box.intersects(player.get_entity_bounding_box()):
                     return
                 world.set_block_state_id(target, block_id)
+                held_stack.shrink(1)
                 block_breaking.reset()
                 refresh_chunk_mesh(target.chunk_x, target.chunk_z)
 
@@ -272,6 +294,14 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             )
                             if result.broken:
                                 refresh_chunk_mesh(hit.pos.chunk_x, hit.pos.chunk_z)
+                    for dropped in tuple(world.entities):
+                        if isinstance(dropped, EntityItem):
+                            dropped.on_update()
+                            dx = dropped.pos.x - player.pos.x
+                            dy = dropped.pos.y - (player.pos.y + 0.8)
+                            dz = dropped.pos.z - player.pos.z
+                            if dx * dx + dy * dy + dz * dz <= 1.44:
+                                dropped.try_pickup(inventory)
                     tick_accumulator -= tick_duration
 
                 camera.position = np.asarray(
