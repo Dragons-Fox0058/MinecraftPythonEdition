@@ -4,6 +4,7 @@ import socket
 import unittest
 
 from engine.server.local import PythonEditionServer, ServerConfig
+from engine.network.python_edition import PythonEditionClient
 
 
 class TestPythonEditionServer(unittest.TestCase):
@@ -43,6 +44,21 @@ class TestPythonEditionServer(unittest.TestCase):
             self.assertEqual(server.player_count, 0)
         finally:
             stream.close()
+            client.close()
+            server.stop()
+
+    def test_python_edition_client_handshake(self):
+        server = PythonEditionServer(ServerConfig(host="127.0.0.1", port=0))
+        host, port = server.start()
+        client = PythonEditionClient(host, port, "ClientTester")
+        try:
+            welcome = client.connect()
+            self.assertEqual(welcome["type"], "welcome")
+            self.assertEqual(welcome["username"], "ClientTester")
+            self.assertEqual(server.player_count, 1)
+            client.send_chat("hello")
+            client.send_player_state(1.0, 64.0, -2.0)
+        finally:
             client.close()
             server.stop()
 
