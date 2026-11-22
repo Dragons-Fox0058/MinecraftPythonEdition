@@ -44,6 +44,8 @@ __all__ = [
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
     "EffectType", "StatusEffect", "StatusEffectManager",
+    "LootEntry", "BlockLootTable", "LootTableRegistry",
 ]
 
 from engine.gameplay.effects import EffectType, StatusEffect, StatusEffectManager
+from engine.gameplay.loot import LootEntry, BlockLootTable, LootTableRegistry
