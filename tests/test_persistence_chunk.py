@@ -21,6 +21,15 @@ class TestChunkPersistence(unittest.TestCase):
         self.assertEqual(int(restored.light[15, 15, 255]), 0xF3)
         self.assertFalse(restored.dirty)
 
+    def test_heightmap_and_biomes_round_trip(self):
+        chunk = Chunk(ChunkPos(4, -2))
+        chunk.blocks[2, 3, 99] = (1 << 4)
+        chunk.blocks[2, 3, 255] = (2 << 4)
+        chunk.biomes[2, 3] = 7
+        restored = chunk_from_nbt(chunk_to_nbt(chunk))
+        self.assertEqual(int(restored.heightmap[2, 3]), 256)
+        self.assertEqual(int(restored.biomes[2, 3]), 7)
+
     def test_empty_chunk_has_valid_empty_sections(self):
         chunk = Chunk(ChunkPos(0, 0))
         document = chunk_to_nbt(chunk)
