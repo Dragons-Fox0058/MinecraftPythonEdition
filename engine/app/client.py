@@ -16,6 +16,7 @@ from engine.gameplay.player import PlayerController
 from engine.gameplay.effects import StatusEffectManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.drops import EntityItem
+from engine.gameplay.vanilla_tools import create_vanilla_tool_registry
 from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
@@ -125,7 +126,13 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     for item in block_items.values():
         item_registry.register(item)
     item_to_block = {item: block_id for block_id, item in block_items.items()}
-    controller = PlayerController(player, inventory=inventory, difficulty="normal")
+    # Start with an empty hand/tool catalogue. Vanilla harvest requirements still
+    # apply: stone/ores cannot be harvested by hand even before tools are added.
+    tool_registry = create_vanilla_tool_registry({})
+    controller = PlayerController(
+        player, inventory=inventory, difficulty="normal",
+        tool_registry=tool_registry,
+    )
     player_uuid = uuid.uuid5(uuid.NAMESPACE_URL, f"minecraft-python-edition:{world.name}:{world.seed}")
     player_file = save_directory / "playerdata" / f"{player_uuid}.dat"
     if player_file.is_file():
@@ -136,7 +143,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
         item = block_items.get(block.block_id)
         return [ItemStack(item, 1)] if item is not None else []
 
-    block_breaking = BlockBreaking(world, drop_resolver=resolve_block_drop)
+    block_breaking = BlockBreaking(
+        world, drop_resolver=resolve_block_drop, tool_registry=tool_registry,
+    )
     mouse_left_down = False
     paused = False
     inventory_open = False
@@ -271,7 +280,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     block_breaking.reset()
             elif button == glfw.MOUSE_BUTTON_RIGHT and action == glfw.PRESS:
                 hit = interaction.ray_trace_blocks(
-                    Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
+                    Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 4.5
                 )
                 if hit is None or hit.side_hit is None:
                     return
@@ -395,13 +404,14 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                         player.motion = Vec3d(0.0, 0.0, 0.0)
                     if mouse_left_down:
                         hit = interaction.ray_trace_blocks(
-                            Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
+                            Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 4.5
                         )
                         if hit is None:
                             block_breaking.reset()
                         else:
                             result = block_breaking.damage_block(
-                                hit.pos, dig_speed=1.0, can_harvest=True
+                                hit.pos, dig_speed=1.0, can_harvest=False,
+                                tool_stack=inventory.selected_item,
                             )
                             if result.broken:
                                 refresh_chunk_mesh(hit.pos.chunk_x, hit.pos.chunk_z)
