@@ -109,6 +109,8 @@ class HungerManager:
     def tick(self, entity, natural_regeneration: bool = True,
              difficulty: str = "normal") -> None:
         """Advance one tick and apply healing/starvation to a living entity."""
+        if not isinstance(natural_regeneration, bool):
+            raise TypeError("natural_regeneration must be a bool")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
             raise ValueError("difficulty must be peaceful, easy, normal, or hard")
         if not hasattr(entity, "health") or not hasattr(entity, "max_health"):
