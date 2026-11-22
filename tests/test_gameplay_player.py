@@ -65,6 +65,35 @@ class TestPlayerController(unittest.TestCase):
         self.assertEqual(self.controller.hunger.food_level, 14)
         self.assertEqual(self.controller.held_item.count, 1)
 
+    def test_death_drops_inventory_and_equipment(self):
+        self.controller.inventory.set_slot(0, ItemStack(self.stone_item, 5))
+        self.controller.inventory.set_armor_slot(0, ItemStack(self.stone_item, 1))
+        self.controller.inventory.set_offhand(ItemStack(self.stone_item, 2))
+        self.player.dead = True
+        self.world.tick()
+        self.assertNotIn(self.player, self.world.entities)
+        item_entities = [e for e in self.world.entities if hasattr(e, "stack")]
+        self.assertEqual(sum(e.stack.count for e in item_entities), 8)
+        self.assertTrue(self.controller.inventory.get_slot(0).is_empty)
+        self.assertTrue(self.controller.inventory.armor[0].is_empty)
+        self.assertTrue(self.controller.inventory.offhand.is_empty)
+
+    def test_keep_inventory_prevents_death_drops(self):
+        self.controller.inventory.set_slot(0, ItemStack(self.stone_item, 5))
+        self.world.game_rules.set("keepInventory", True)
+        self.player.dead = True
+        self.world.tick()
+        self.assertTrue(self.controller.inventory.get_slot(0).count == 5)
+        self.assertFalse(any(hasattr(e, "stack") for e in self.world.entities))
+
+    def test_death_drops_are_processed_only_once(self):
+        self.controller.inventory.set_slot(0, ItemStack(self.stone_item, 5))
+        self.player.dead = True
+        first = self.controller.on_death()
+        second = self.controller.on_death()
+        self.assertEqual(len(first), 1)
+        self.assertEqual(second, ())
+
     def test_drop_and_pickup(self):
         source = ItemStack(self.stone_item, 3)
         drop = self.controller.drop_item(source)
