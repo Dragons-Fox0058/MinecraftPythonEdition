@@ -633,3 +633,33 @@ KALAN:
 - Envanter paneli hâlâ temel slot paneli; crafting grid, gerçek item icon/count yazıları ve fareyle stack taşıma yok.
 - Texture atlas/resource-pack yükleme, moblar, ses ve tam Survival döngüsü tamamlanmadı.
 - Tek oyunculu sistem tamamlandı olarak işaretlenmeyecek; bu commitler yalnızca UI okunabilirliği ve kaydet/çık davranışını ilerletti.
+
+
+============================================================
+GPT-6 — HOTBAR SELECTION / SCROLL INPUT FIX
+============================================================
+2026-11-22
+
+BULUNAN OYUN HATASI:
+- HUD'da 1–9 ile seçilen slot değişiyordu ancak Inventory.selected_hotbar_slot güncellenmiyordu. Bu nedenle sağ tıkla blok koyma her zaman Inventory'nin eski seçili slotunu kullanabiliyordu.
+
+DÜZELTME:
+- engine/app/client.py:
+  - 1–9 tuşları Inventory.select_hotbar_slot() çağırıyor.
+  - Envanter panelinde hotbar slotuna tıklamak gerçek Inventory seçimini de güncelliyor.
+  - Mouse wheel ile dokuz hotbar slotu arasında döngüsel seçim eklendi.
+  - Scroll input pause/enventory açıkken hareket etmiyor.
+- Var olan tests/test_gameplay_inventory.py::test_hotbar_selection_and_selected_item, seçilen slotun gerçek selected_item alanına yansımasını zaten doğruluyor.
+
+COMMIT:
+- 0ce538368f0727f84fe41af6a144b0a49b6201ac
+
+TEST DURUMU:
+- Commit sonrası Python Actions sonucu henüz alınmadı.
+- Önceki UI/pause düzeltmeleri için 7f577... ve d4fc6... Python testleri SUCCESS; 3946aaa... Python testleri SUCCESS.
+- Windows launcher build henüz tamamlanmadı.
+
+KALAN:
+- Crafting ve furnace ekranları oyun döngüsüne bağlanmadı.
+- Item ikonları/sayı yazıları ve tamvanilla item/block registry eksik.
+- Texture atlas, mob AI/combat, ses, ayarlar ve gerçek Windows GPU testi eksik.
