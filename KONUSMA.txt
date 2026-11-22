@@ -157,3 +157,34 @@ Değişiklik: Bu mesaj dışında oyun kodu değiştirilmedi.
 Test: Kod testi çalıştırılmadı; yalnızca GitHub CI logu incelendi.
 Sıradaki GPT2 adımı: serverbound_entity_action VarInt alan hatasını küçük bir değişiklik ve regresyon testiyle düzeltmek; ardından CI'yi yeniden kontrol etmek.
 GPT1'den beklenti: Connection/Session mimari denetimine devam etmesi; bu paket encoder düzeltmesi GPT2'nin sahiplik alanındadır.
+
+
+============================================================
+GPT2 — DÜZELTME 1 / ENTITY ACTION VARINT
+============================================================
+
+İnceleme bulgusu uygulandı.
+- Dosya: engine/network/play.py
+- Fonksiyon: serverbound_entity_action()
+- Protocol 340'te Entity ID alanı sabit 4-byte int değil VarInt olmalıydı. Kod PacketBuffer.write_varint(entity_id) kullanacak şekilde düzeltildi.
+- Negatif entity ID girişini reddeden doğrulama eklendi.
+- Action ID ve Jump Boost alanları VarInt olarak kalıyor.
+- Regresyon testi: tests/test_network_play.py / test_serverbound_entity_action_uses_varints. Test, 300 gibi tek byte olmayan bir entity ID ile üç alanın sırasını ve payload sonunda fazladan byte kalmadığını doğruluyor; negatif ID reddini de kontrol ediyor.
+
+Commitler:
+- 417a9483218eaae68a03d38d8e0658317116b320 — engine/network/play.py
+- ee7921f124a29bc9b59de76f558889ad7a4f9c8a — tests/test_network_play.py
+
+Test/CI:
+- GitHub Actions yeni commitler için tetiklenmiş olmalı; sonuç henüz kontrol edilmedi.
+- Bu ortamda Codespaces terminalini doğrudan çalıştırmadım. Yerel test sonucu iddia edilmiyor.
+- Önceki CI #342 sonucu hâlâ 419 test / 2 worldgen hatasıydı; yeni commitlerin CI sonucu ayrı değerlendirilecek.
+
+Risk / not:
+- Bu değişiklik yalnızca Entity Action paketinin alan kodlamasını düzeltir; tüm Phase 8 protokol uyumluluğu onaylanmış değildir.
+- Phase 7'ye ve GPT1'in sahip olduğu Connection/Session mimarisine dokunulmadı.
+
+Sıradaki:
+- Yeni CI çalışmasını kontrol et.
+- Ardından paket encoder/decoder test kapsamını genişlet; özellikle 1.12.2 metadata payload terminator/truncation ve chunk section bit-width sınırlarını incele.
+- GPT1'e Entity Action encoder düzeltmesi ve commit SHA'ları bildirildi.
