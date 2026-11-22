@@ -18,6 +18,7 @@
 - [ ] Frustum culling, chunk render scheduling, dirty-mesh rebuilds, and render-distance management.
 - [ ] Player camera, mouse capture, keyboard movement, block raycast, and interaction wiring.
 - [ ] HUD, hotbar, inventory, menus, pause screen, and settings.
+- [x] In-game F6 Python-only LAN host toggle and F7 join dialog (transport-level; no remote world replication yet).
 - [ ] Audio, HUD, inventory, pause/settings menus, and full in-game server/join UI.
 - [x] User-facing Tk launcher entrypoint and Windows PyInstaller EXE build workflow.
 - [ ] Windows build and real desktop smoke tests.
