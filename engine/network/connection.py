@@ -29,11 +29,13 @@ PACKET_IDS = {
         "serverbound_chat": 0x02, "serverbound_keep_alive": 0x0B,
         "serverbound_player": 0x0C, "serverbound_position": 0x0D,
         "serverbound_position_look": 0x0E, "serverbound_look": 0x0F,
-        "serverbound_digging": 0x13, "serverbound_held_item": 0x19,
+        "serverbound_player_abilities": 0x13, "serverbound_digging": 0x14,
+        "serverbound_held_item": 0x19,
         "serverbound_block_placement": 0x1E, "serverbound_use_item": 0x1F,
         "clientbound_chat": 0x0F, "clientbound_disconnect": 0x1A,
         "clientbound_keep_alive": 0x1F, "clientbound_chunk_data": 0x20,
         "clientbound_join_game": 0x23, "clientbound_player_position": 0x2F,
+        "clientbound_player_abilities": 0x2C,
     },
 }
 
