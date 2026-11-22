@@ -6,8 +6,10 @@ import time
 
 import numpy as np
 
-from engine.core import Vec3d
+from engine.core import Vec3d, BlockPos, EnumFacing
 from engine.entities.entity import Entity
+from engine.gameplay.breaking import BlockBreaking
+from engine.gameplay.interaction import InteractionManager
 from engine.input.state import InputState
 from engine.network.python_edition import PythonEditionClient
 from engine.render.camera import Camera
@@ -61,6 +63,11 @@ def main(*, seed: int = 0) -> None:
     lan_server = None
     lan_client = None
     jump_requested = False
+    selected_hotbar_slot = 0
+    hotbar_block_ids = (1, 3, 4, 5, 12, 13, 20, 24, 49)
+    interaction = InteractionManager(world)
+    block_breaking = BlockBreaking(world)
+    mouse_left_down = False
 
     mesh_builder = ChunkMeshBuilder()
     meshes = {}
@@ -75,11 +82,14 @@ def main(*, seed: int = 0) -> None:
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client, jump_requested
+            nonlocal lan_server, lan_client, jump_requested, selected_hotbar_slot
             if action == glfw.PRESS:
                 input_state.key_down(key)
                 if key == glfw.KEY_SPACE:
                     jump_requested = True
+                if glfw.KEY_1 <= key <= glfw.KEY_9:
+                    selected_hotbar_slot = key - glfw.KEY_1
+                    glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}")
                 if key == glfw.KEY_ESCAPE:
                     glfw.set_window_should_close(window, True)
                 elif key == glfw.KEY_F6:
@@ -119,6 +129,44 @@ def main(*, seed: int = 0) -> None:
             elif action == glfw.RELEASE:
                 input_state.key_up(key)
 
+
+        def refresh_chunk_mesh(cx, cz):
+            key = (cx, cz)
+            chunk = chunks.get(key)
+            if chunk is None:
+                return
+            neighbors = {(cx + dx, cz + dz): chunks[(cx + dx, cz + dz)]
+                         for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))
+                         if (cx + dx, cz + dz) in chunks}
+            renderer.upload_chunk_mesh(key, mesh_builder.build(chunk, neighbors=neighbors))
+
+        def on_mouse_button(_window, button, action, _mods):
+            nonlocal mouse_left_down
+            if button == glfw.MOUSE_BUTTON_LEFT:
+                mouse_left_down = action != glfw.RELEASE
+                if action == glfw.RELEASE:
+                    block_breaking.reset()
+            elif button == glfw.MOUSE_BUTTON_RIGHT and action == glfw.PRESS:
+                hit = interaction.ray_trace_blocks(
+                    Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
+                )
+                if hit is None or hit.side_hit is None:
+                    return
+                target = hit.pos.offset(hit.side_hit)
+                if (target.chunk_x, target.chunk_z) not in chunks or not world.is_in_world_bounds(target.y):
+                    return
+                block_id = hotbar_block_ids[selected_hotbar_slot]
+                from engine.blocks import BLOCK_REGISTRY
+                block = BLOCK_REGISTRY.by_id(block_id)
+                if block is None or not block.is_full_cube:
+                    return
+                box = block.get_collision_box(block.default_state, target)
+                if box is not None and box.intersects(player.get_entity_bounding_box()):
+                    return
+                world.set_block_state_id(target, block_id)
+                block_breaking.reset()
+                refresh_chunk_mesh(target.chunk_x, target.chunk_z)
+
         def on_mouse(_window, x, y):
             if input_state.mouse_x == 0.0 and input_state.mouse_y == 0.0:
                 input_state.mouse_x, input_state.mouse_y = x, y
@@ -127,6 +175,7 @@ def main(*, seed: int = 0) -> None:
 
         glfw.set_key_callback(window, on_key)
         glfw.set_cursor_pos_callback(window, on_mouse)
+        glfw.set_mouse_button_callback(window, on_mouse_button)
         for key, mesh in meshes.items():
             renderer.upload_chunk_mesh(key, mesh)
 
@@ -172,6 +221,17 @@ def main(*, seed: int = 0) -> None:
                     player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
                     player.on_update()
                     tick_accumulator -= tick_duration
+
+                if mouse_left_down:
+                    hit = interaction.ray_trace_blocks(
+                        Vec3d(*camera.position.tolist()), Vec3d(*camera.forward.tolist()), 5.0
+                    )
+                    if hit is None:
+                        block_breaking.reset()
+                    else:
+                        result = block_breaking.damage_block(hit.pos, dig_speed=1.0, can_harvest=True)
+                        if result.broken:
+                            refresh_chunk_mesh(hit.pos.chunk_x, hit.pos.chunk_z)
 
                 camera.position = np.asarray(
                     (player.pos.x, player.pos.y + player.eye_height, player.pos.z),
