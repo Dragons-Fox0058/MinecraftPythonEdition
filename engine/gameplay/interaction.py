@@ -42,7 +42,8 @@ class InteractionManager:
         start_pos = BlockPos(x, y, z)
         initial_id = self.world.get_block_state_id(start_pos)
         initial_block = BLOCK_REGISTRY.by_id(initial_id)
-        if initial_block is not None and initial_block.can_collide():
+        initial_state = self.world.get_block_state(start_pos)
+        if initial_block is not None and initial_block.get_collision_box(initial_state, start_pos) is not None:
             return BlockRayHit(start_pos, initial_block, None, start, 0.0)
 
         def axis_values(origin: float, cell: int, delta: float):
@@ -82,7 +83,8 @@ class InteractionManager:
             pos = BlockPos(x, y, z)
             block_id = self.world.get_block_state_id(pos)
             block = BLOCK_REGISTRY.by_id(block_id)
-            if block is not None and block.can_collide():
+            state = self.world.get_block_state(pos)
+            if block is not None and block.get_collision_box(state, pos) is not None:
                 hit = Vec3d(
                     start.x + ray.x * distance,
                     start.y + ray.y * distance,
