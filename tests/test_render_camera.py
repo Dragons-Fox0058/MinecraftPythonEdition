@@ -3,6 +3,7 @@ import unittest
 import numpy as np
 
 from engine.render.camera import Camera
+from engine.render.opengl import OpenGLRenderer
 
 
 class TestCamera(unittest.TestCase):
@@ -27,6 +28,13 @@ class TestCamera(unittest.TestCase):
         camera = Camera(position=(0, 0, 0))
         camera.move_local(right=2, up=1, forward=3)
         np.testing.assert_allclose(camera.position, (2, 1, 3), atol=1e-7)
+
+    def test_hud_geometry_contains_crosshair_hotbar_and_status_bars(self):
+        vertices = OpenGLRenderer._hud_vertices(4, 10.0, 15)
+        self.assertEqual(vertices.ndim, 2)
+        self.assertEqual(vertices.shape[1], 5)
+        self.assertGreater(vertices.shape[0], 100)
+        self.assertTrue(np.isfinite(vertices).all())
 
     def test_view_and_projection_matrices(self):
         camera = Camera(position=(1, 2, 3))
