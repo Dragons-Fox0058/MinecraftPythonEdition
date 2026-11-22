@@ -12,6 +12,7 @@ from engine.gameplay.health import FoodRegistry, HungerManager
 from engine.gameplay.inventory import Inventory
 from engine.gameplay.interaction import InteractionManager
 from engine.gameplay.items import ItemStack
+from engine.gameplay.loot import LootTableRegistry
 from engine.gameplay.placement import BlockPlacement
 from engine.gameplay.tools import ToolRegistry
 
@@ -24,7 +25,8 @@ class PlayerController:
                  difficulty: str = "normal", block_drop_resolver=None,
                  food_registry: FoodRegistry | None = None,
                  tool_registry: ToolRegistry | None = None,
-                 armor_registry: ArmorRegistry | None = None) -> None:
+                 armor_registry: ArmorRegistry | None = None,
+                 loot_registry: LootTableRegistry | None = None) -> None:
         if not hasattr(entity, "world"):
             raise TypeError("entity must have a world")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
@@ -41,7 +43,8 @@ class PlayerController:
             raise TypeError("armor_registry must be an ArmorRegistry or None")
         self.armor_registry = armor_registry
         self.breaking = BlockBreaking(
-            self.world, drop_resolver=block_drop_resolver, tool_registry=tool_registry
+            self.world, drop_resolver=block_drop_resolver, tool_registry=tool_registry,
+            loot_registry=loot_registry
         )
         self.drops = ItemDropManager(self.world)
         self.interaction = InteractionManager(self.world)
