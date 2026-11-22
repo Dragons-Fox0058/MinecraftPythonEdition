@@ -50,6 +50,21 @@ class TestPlaySession(unittest.TestCase):
         session.process_packet(CLIENTBOUND["block_change"], body.to_bytes())
         self.assertEqual(world.get_block_state_id(BlockPos(-3, 70, 8)), 42)
 
+    def test_multi_block_change_updates_world(self):
+        conn = FakeConnection()
+        world = World()
+        session = PlaySession(conn, world=world)
+        body = PacketBuffer()
+        body.write(struct.pack(">ii", -2, 3))
+        body.write_varint(2)
+        body.write(bytes((0xA5, 64)))
+        body.write_varint(17)
+        body.write(bytes((0x0F, 70)))
+        body.write_varint(33)
+        session.process_packet(CLIENTBOUND["multi_block_change"], body.to_bytes())
+        self.assertEqual(world.get_block_state_id(BlockPos(-22, 64, 53)), 17)
+        self.assertEqual(world.get_block_state_id(BlockPos(-17, 70, 63)), 33)
+
     def test_unload_chunk_updates_world(self):
         conn = FakeConnection()
         world = World()
