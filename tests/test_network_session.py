@@ -2,6 +2,7 @@
 import json
 import struct
 import unittest
+import uuid
 
 from engine.entities.player import EntityPlayer
 from engine.gameplay.health import HungerManager
@@ -142,6 +143,54 @@ class TestPlaySession(unittest.TestCase):
         session.process_packet(CLIENTBOUND["time_update"], struct.pack(">qq", 900, 12345))
         self.assertEqual(world.world_time.total_time, 900)
         self.assertEqual(world.world_time.day_time, 12345)
+
+    def test_remote_entity_spawn_move_velocity_and_destroy(self):
+        conn = FakeConnection()
+        world = World()
+        session = PlaySession(conn, world=world)
+        entity_uuid = uuid.UUID("12345678-1234-5678-1234-567812345678")
+        spawn = PacketBuffer()
+        spawn.write_varint(77)
+        spawn.write(entity_uuid.bytes)
+        spawn.write(bytes((2,)))
+        spawn.write(struct.pack(">ddd", 1.0, 2.0, 3.0))
+        spawn.write(bytes((64, 128)))
+        spawn.write(struct.pack(">i", 1))
+        spawn.write(struct.pack(">hhh", 800, -400, 0))
+        session.process_packet(CLIENTBOUND["spawn_object"], spawn.to_bytes())
+        entity = session.network_entities[77]
+        self.assertEqual((entity.pos.x, entity.pos.y, entity.pos.z), (1.0, 2.0, 3.0))
+        self.assertEqual(entity.entity_uuid, entity_uuid)
+        self.assertEqual(len(world.entities), 1)
+
+        movement = PacketBuffer()
+        movement.write_varint(77)
+        movement.write(struct.pack(">hhh", 4096, 0, -4096))
+        movement.write(bytes((1,)))
+        session.process_packet(CLIENTBOUND["entity_relative_move"], movement.to_bytes())
+        self.assertEqual((entity.pos.x, entity.pos.y, entity.pos.z), (2.0, 2.0, 2.0))
+        self.assertTrue(entity.on_ground)
+
+        velocity = PacketBuffer()
+        velocity.write_varint(77)
+        velocity.write(struct.pack(">hhh", 800, 0, -800))
+        session.process_packet(CLIENTBOUND["entity_velocity"], velocity.to_bytes())
+        self.assertAlmostEqual(entity.motion.x, 0.1)
+        self.assertAlmostEqual(entity.motion.z, -0.1)
+
+        teleport = PacketBuffer()
+        teleport.write_varint(77)
+        teleport.write(struct.pack(">ddd", 9.0, 8.0, 7.0))
+        teleport.write(bytes((0, 64, 1)))
+        session.process_packet(CLIENTBOUND["entity_teleport"], teleport.to_bytes())
+        self.assertEqual((entity.pos.x, entity.pos.y, entity.pos.z), (9.0, 8.0, 7.0))
+
+        destroy = PacketBuffer()
+        destroy.write_varint(1)
+        destroy.write_varint(77)
+        session.process_packet(CLIENTBOUND["destroy_entities"], destroy.to_bytes())
+        self.assertNotIn(77, session.network_entities)
+        self.assertEqual(world.entities, [])
 
     def test_chunk_data_updates_loaded_world_chunk(self):
         conn = FakeConnection()
