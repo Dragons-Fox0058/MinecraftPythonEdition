@@ -111,7 +111,9 @@ class WorldTime:
     def set_day_time(self, value: int) -> None:
         if isinstance(value, bool) or not isinstance(value, int):
             raise TypeError("day time must be an integer")
-        self.day_time = value % self.DAY_LENGTH
+        if value < 0:
+            raise ValueError("day time cannot be negative")
+        self.day_time = value
 
     def add_day_time(self, ticks: int) -> None:
         if isinstance(ticks, bool) or not isinstance(ticks, int):
