@@ -14,12 +14,12 @@ class TestPythonEditionServer(unittest.TestCase):
         stream = client.makefile("rwb")
         try:
             stream.write(json.dumps({"type": "hello", "edition": "MinecraftPythonEdition",
-                                     "protocol": 1, "username": "Tester"}).encode() + b"\\n")
+                                     "protocol": 1, "username": "Tester"}).encode() + b"\n")
             stream.flush()
             welcome = json.loads(stream.readline())
             self.assertEqual(welcome["type"], "welcome")
             self.assertEqual(welcome["username"], "Tester")
-            stream.write(json.dumps({"type": "ping", "nonce": 42}).encode() + b"\\n")
+            stream.write(json.dumps({"type": "ping", "nonce": 42}).encode() + b"\n")
             stream.flush()
             self.assertEqual(json.loads(stream.readline()), {"type": "pong", "nonce": 42})
             self.assertEqual(server.player_count, 1)
