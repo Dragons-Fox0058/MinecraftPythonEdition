@@ -59,12 +59,14 @@ class TestItemDrops(unittest.TestCase):
         self.assertTrue(older.dead)
         self.assertNotIn(older, self.world.entities)
 
-    def test_merge_rejects_overstacked_combination(self):
+    def test_merge_partially_fills_stack_and_keeps_remainder(self):
         first = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 40))
         second = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 30))
-        self.assertFalse(first.try_merge(second))
-        self.assertEqual(first.stack.count, 40)
-        self.assertEqual(second.stack.count, 30)
+        self.assertTrue(first.try_merge(second))
+        self.assertEqual(first.stack.count, 64)
+        self.assertEqual(second.stack.count, 6)
+        self.assertFalse(first.dead)
+        self.assertFalse(second.dead)
 
     def test_merge_rejects_different_metadata_for_subtypes(self):
         dye = Item(2, "test:dye", has_subtypes=True)
