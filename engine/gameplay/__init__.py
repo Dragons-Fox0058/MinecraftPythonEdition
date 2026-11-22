@@ -14,6 +14,7 @@ from engine.gameplay.furnace import (
 from engine.gameplay.health import FoodProperties, FoodRegistry, HungerManager
 from engine.gameplay.vanilla_foods import register_vanilla_food_items, register_vanilla_foods
 from engine.gameplay.vanilla_fuels import register_vanilla_fuel_items, register_vanilla_fuels
+from engine.gameplay.vanilla_smelting import register_vanilla_smelting_items, register_vanilla_smelting_recipes
 from engine.gameplay.time import GameRules, WorldTime
 from engine.gameplay.player import PlayerController
 from engine.gameplay.interaction import InteractionManager, BlockRayHit
@@ -29,6 +30,7 @@ __all__ = [
     "FoodProperties", "FoodRegistry", "HungerManager",
     "register_vanilla_food_items", "register_vanilla_foods",
     "register_vanilla_fuel_items", "register_vanilla_fuels",
+    "register_vanilla_smelting_items", "register_vanilla_smelting_recipes",
     "GameRules", "WorldTime",
     "PlayerController", "InteractionManager", "BlockRayHit",
 ]
