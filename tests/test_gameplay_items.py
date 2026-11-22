@@ -12,6 +12,13 @@ class TestItem(unittest.TestCase):
         self.assertEqual(item.max_stack_size, 64)
         self.assertFalse(item.is_damageable)
 
+    def test_item_can_define_container_item(self):
+        bucket = Item(325, "minecraft:bucket", max_stack_size=16)
+        milk_bucket = Item(335, "minecraft:milk_bucket", max_stack_size=1,
+                           container_item=bucket)
+        self.assertIs(milk_bucket.container_item, bucket)
+        self.assertEqual(milk_bucket.container_item_metadata, 0)
+
     def test_damageable_item_must_not_stack(self):
         with self.assertRaises(ValueError):
             Item(2, "minecraft:pickaxe", max_stack_size=64, max_damage=250)
