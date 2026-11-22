@@ -238,7 +238,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                      if (cx + dx, cz + dz) in chunks}
         meshes[(cx, cz)] = mesh_builder.build(chunk, neighbors=neighbors)
 
-    with OpenGLRenderer(1280, 720, title=f"Minecraft Python Edition — {world.name}") as renderer:
+    with OpenGLRenderer(1280, 720, title=f"Minecraft Python Edition — {world.name} — {controller.game_mode.display_name}") as renderer:
         window = renderer.window
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
@@ -276,7 +276,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     )
                     title = ("Minecraft Python Edition — CRAFTING" if crafting_open else "Minecraft Python Edition — INVENTORY") if inventory_open else ("Minecraft Python Edition — PAUSED (ESC to resume)" if paused else f"Minecraft Python Edition — {world.name}")
                     glfw.set_window_title(window, title)
-                elif key == glfw.KEY_E and not paused:
+                elif key == glfw.KEY_E and not paused and controller.game_mode is not GameMode.SPECTATOR:
                     if inventory_open:
                         return_crafting_grid(crafting_grid)
                     inventory_open = not inventory_open
@@ -385,7 +385,8 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             if 0.15 <= nx <= 0.25 and 0.12 <= ny <= 0.22:
                                 recipe = crafting_grid.find_recipe(tool_recipes)
                                 if recipe is not None and inventory.add_item(recipe.output):
-                                    crafting_grid.craft(tool_recipes)
+                                    if controller.game_mode is not GameMode.CREATIVE:
+                                        crafting_grid.craft(tool_recipes)
                                 return
                             col = math.floor((nx + 0.37) / 0.078)
                             row = math.floor((-0.015 - ny) / 0.08)
