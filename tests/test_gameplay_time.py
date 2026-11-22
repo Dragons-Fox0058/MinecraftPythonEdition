@@ -2,6 +2,7 @@
 import unittest
 
 from engine.gameplay.time import GameRules, WorldTime
+from engine.world import World
 
 
 class TestWorldTime(unittest.TestCase):
@@ -28,7 +29,7 @@ class TestWorldTime(unittest.TestCase):
         clock = WorldTime()
         clock.set_day_time(25000)
         self.assertEqual(clock.time_of_day, 1000)
-        self.assertEqual(clock.day_count, 0)
+        self.assertEqual(clock.day_count, 1)
 
     def test_add_day_time(self):
         clock = WorldTime(day_time=100)
@@ -36,6 +37,21 @@ class TestWorldTime(unittest.TestCase):
         self.assertEqual(clock.day_time, 150)
         clock.add_day_time(-1000)
         self.assertEqual(clock.day_time, 0)
+
+
+class TestWorldIntegration(unittest.TestCase):
+    def test_world_tick_advances_clock(self):
+        world = World()
+        world.tick()
+        self.assertEqual(world.world_time.total_time, 1)
+        self.assertEqual(world.time_of_day, 6001)
+
+    def test_daylight_cycle_rule_pauses_day_clock(self):
+        world = World()
+        world.game_rules.set("doDaylightCycle", False)
+        world.tick()
+        self.assertEqual(world.world_time.total_time, 1)
+        self.assertEqual(world.time_of_day, 6000)
 
 
 class TestGameRules(unittest.TestCase):
