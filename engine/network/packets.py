@@ -138,7 +138,8 @@ def decode_clientbound_join_game(payload: bytes) -> JoinGamePacket:
     max_players = buffer.read(1)[0]
     level_type = buffer.read_string(max_chars=16)
     reduced = buffer.read(1)[0]
-    if reduced not in (0, 1) or buffer.remaining:
+    if (reduced not in (0, 1) or buffer.remaining
+            or (game_mode & 0x07) > 3 or difficulty > 3):
         raise ProtocolError("invalid Join Game payload")
     return JoinGamePacket(entity_id, game_mode, dimension, difficulty,
                           max_players, level_type, bool(reduced))
@@ -150,8 +151,9 @@ def decode_clientbound_player_position_look(payload: bytes) -> PlayerPositionLoo
     yaw, pitch = struct.unpack(">ff", buffer.read(8))
     flags = buffer.read(1)[0]
     teleport_id = buffer.read_varint()
-    if buffer.remaining:
-        raise ProtocolError("trailing Player Position And Look payload")
+    if (buffer.remaining or not all(math.isfinite(v) for v in (x, y, z, yaw, pitch))
+            or flags & ~0x1F or teleport_id < 0):
+        raise ProtocolError("invalid Player Position And Look payload")
     return PlayerPositionLookPacket(x, y, z, yaw, pitch, flags, teleport_id)
 
 
