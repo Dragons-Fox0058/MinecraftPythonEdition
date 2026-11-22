@@ -22,10 +22,9 @@ The launcher lets you enter a world name and seed, then opens a GLFW/OpenGL 3.3 
 - **Left mouse:** mine the targeted block
 - **Right mouse:** place the selected block
 - **1–9:** choose a temporary block palette slot
-- **Escape:** close the game and save the world
 - **F6/F7:** start/stop a Python Edition host or connect to one
 
-Mining produces item entities for the supported block subset; collected items enter the 36-slot inventory, and placement consumes the selected stack. The player has health and hunger state, and the renderer draws a basic crosshair, nine-slot hotbar frame, and health/hunger bars. The item catalogue is still a small local subset rather than the complete verified 1.12.2 catalogue. Placeholder block colors remain; the vanilla texture atlas, item icons/count text, inventory screen, crafting UI, pause/settings menus, mob simulation, and richer Survival mechanics are not complete. GPU/Windows desktop smoke testing is also outstanding.
+Mining produces item entities for the supported block subset; collected items enter the 36-slot inventory, and placement consumes the selected stack. The player has health and hunger state, and the renderer draws a basic crosshair, nine-slot hotbar, 36-slot inventory panel, pause overlay, and health/hunger bars. The item catalogue is still a small local subset rather than the complete verified 1.12.2 catalogue. Placeholder block colors remain; the vanilla texture atlas, item icons/count text, inventory screen, crafting UI, pause/settings menus, mob simulation, and richer Survival mechanics are not complete. GPU/Windows desktop smoke testing is also outstanding.
 
 ## Python Edition LAN host
 
