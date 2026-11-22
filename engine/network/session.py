@@ -12,6 +12,12 @@ from engine.network.entity_packets import (
     decode_spawn_experience_orb, decode_entity_relative_move,
     decode_entity_teleport, decode_entity_velocity, decode_destroy_entities,
 )
+from engine.network.window_packets import (
+    EMPTY_SLOT, decode_window_items, decode_set_slot, decode_open_window,
+    decode_close_window, decode_window_property, decode_confirm_transaction,
+    serverbound_click_window, serverbound_close_window,
+    serverbound_confirm_transaction, WireItemStack,
+)
 from engine.network.packets import (
     decode_clientbound_chat, decode_clientbound_chunk_data,
     decode_clientbound_join_game, decode_clientbound_keep_alive,
@@ -73,6 +79,10 @@ class PlaySession:
         self._ticks = 0
         self._last_keep_alive_at = time.monotonic()
         self.network_entities = {}
+        self.open_windows = {}
+        self.window_items = {}
+        self.window_properties = {}
+        self.cursor_item = EMPTY_SLOT
 
     def _emit(self, name: str, value):
         if self.on_event is not None:
@@ -137,6 +147,20 @@ class PlaySession:
         if not self.connected:
             raise RuntimeError("play session is disconnected")
         self._send(serverbound_plugin_message(channel, data))
+
+    def close_window(self, window_id: int) -> None:
+        if not self.connected:
+            raise RuntimeError("play session is disconnected")
+        self._send(serverbound_close_window(window_id))
+
+    def click_window(self, window_id: int, slot: int, button: int,
+                     action_number: int, mode: int,
+                     clicked_item: WireItemStack) -> None:
+        if not self.connected:
+            raise RuntimeError("play session is disconnected")
+        self._send(serverbound_click_window(
+            window_id, slot, button, action_number, mode, clicked_item
+        ))
 
     def use_entity(self, entity_id: int, action: int, *, target=None,
                    hand: int = 0) -> None:
@@ -300,6 +324,53 @@ class PlaySession:
             if self.player is not None:
                 self.player.game_mode = self.last_respawn.game_mode
             return self._emit("respawn", self.last_respawn)
+
+        if packet_id == CLIENTBOUND["open_window"]:
+            window = decode_open_window(payload)
+            self.open_windows[window.window_id] = window
+            self.window_items.setdefault(window.window_id, ())
+            return self._emit("open_window", window)
+
+        if packet_id == CLIENTBOUND["close_window"]:
+            window_id = decode_close_window(payload)
+            self.open_windows.pop(window_id, None)
+            self.window_items.pop(window_id, None)
+            self.window_properties.pop(window_id, None)
+            return self._emit("close_window", window_id)
+
+        if packet_id == CLIENTBOUND["window_items"]:
+            window = decode_window_items(payload)
+            self.window_items[window.window_id] = window.items
+            return self._emit("window_items", window)
+
+        if packet_id == CLIENTBOUND["set_slot"]:
+            update = decode_set_slot(payload)
+            if update.window_id == -1 and update.slot == -1:
+                self.cursor_item = update.item
+            else:
+                current = list(self.window_items.get(update.window_id, ()))
+                if update.slot >= 0:
+                    if update.slot >= 4096:
+                        from engine.network.codec import ProtocolError
+                        raise ProtocolError("window slot index exceeds limit")
+                    if len(current) <= update.slot:
+                        current.extend([EMPTY_SLOT] * (update.slot + 1 - len(current)))
+                    current[update.slot] = update.item
+                    self.window_items[update.window_id] = tuple(current)
+            return self._emit("set_slot", update)
+
+        if packet_id == CLIENTBOUND["window_property"]:
+            prop = decode_window_property(payload)
+            self.window_properties[(prop.window_id, prop.property_id)] = prop.value
+            return self._emit("window_property", prop)
+
+        if packet_id == CLIENTBOUND["confirm_transaction"]:
+            confirmation = decode_confirm_transaction(payload)
+            if not confirmation.accepted:
+                self._send(serverbound_confirm_transaction(
+                    confirmation.window_id, confirmation.action_number, False
+                ))
+            return self._emit("confirm_transaction", confirmation)
 
         if packet_id == CLIENTBOUND["plugin_message"]:
             self.last_plugin_message = decode_plugin_message(payload)
