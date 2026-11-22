@@ -10,6 +10,7 @@ from engine.network.play import (
     serverbound_client_settings, decode_block_change, decode_unload_chunk,
     decode_disconnect, decode_update_health, decode_time_update,
     decode_player_abilities, decode_respawn, decode_plugin_message,
+    decode_multi_block_change,
     decode_change_game_state,
 )
 
@@ -79,6 +80,23 @@ class TestPlayPackets(unittest.TestCase):
         self.assertEqual(abilities.flags, 0x05)
         with self.assertRaises(ProtocolError):
             decode_player_abilities(struct.pack(">Bff", 0x80, 0.05, 0.1))
+
+    def test_multi_block_change_decodes_chunk_relative_positions(self):
+        body = PacketBuffer()
+        body.write(struct.pack(">ii", -2, 3))
+        body.write_varint(2)
+        body.write(bytes((0xA5, 64)))
+        body.write_varint(17)
+        body.write(bytes((0x0F, 70)))
+        body.write_varint(33)
+        result = decode_multi_block_change(body.to_bytes())
+        self.assertEqual((result.chunk_x, result.chunk_z), (-2, 3))
+        self.assertEqual(
+            [(r.x, r.y, r.z, r.state_id) for r in result.records],
+            [(-22, 64, 53, 17), (-17, 70, 63, 33)],
+        )
+        with self.assertRaises(ProtocolError):
+            decode_multi_block_change(body.to_bytes() + b"\\x00")
 
     def test_respawn_plugin_message_and_game_state(self):
         respawn = struct.pack(">iBB", -1, 2, 1) + _string("default")
