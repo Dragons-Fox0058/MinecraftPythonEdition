@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 import json
+import math
 import socket
 import socketserver
 import threading
@@ -194,7 +195,7 @@ class PythonEditionServer:
                         elif kind == "player_state":
                             pos = msg.get("position")
                             if (not isinstance(pos, list) or len(pos) != 3
-                                    or any(type(v) not in (int, float) for v in pos)):
+                                    or any(type(v) not in (int, float) or not math.isfinite(v) for v in pos)):
                                 continue
                             packet = {"type": "player_state", "username": username,
                                       "position": [float(v) for v in pos]}
