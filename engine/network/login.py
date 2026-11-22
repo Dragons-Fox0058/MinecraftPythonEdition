@@ -5,6 +5,8 @@ import hashlib
 import json
 import uuid
 import secrets
+import urllib.error
+import urllib.request
 from dataclasses import dataclass
 
 from engine.network.codec import PacketBuffer, ProtocolError
@@ -56,6 +58,34 @@ def minecraft_server_hash(server_id: str, shared_secret: bytes,
     digest = hashlib.sha1(server_id.encode("ascii") + shared_secret + public_key_der).digest()
     value = int.from_bytes(digest, "big", signed=True)
     return ("-" if value < 0 else "") + format(abs(value), "x")
+
+
+def mojang_session_join(access_token: str, profile_uuid: uuid.UUID,
+                        server_hash: str, timeout: float = 10.0) -> None:
+    """Join an online-mode server using a launcher-issued access token."""
+    if not isinstance(access_token, str) or not access_token:
+        raise ValueError("access_token must be non-empty")
+    if not isinstance(profile_uuid, uuid.UUID):
+        profile_uuid = uuid.UUID(str(profile_uuid))
+    body = json.dumps({
+        "accessToken": access_token,
+        "selectedProfile": profile_uuid.hex,
+        "serverId": server_hash,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        "https://sessionserver.mojang.com/session/minecraft/join",
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=timeout) as response:
+            if response.status != 204:
+                raise ProtocolError(f"session join returned HTTP {response.status}")
+    except urllib.error.HTTPError as exc:
+        raise ProtocolError(f"session authentication rejected (HTTP {exc.code})") from exc
+    except urllib.error.URLError as exc:
+        raise ProtocolError("could not reach the Minecraft session service") from exc
 
 
 def login_online(host: str, port: int, username: str, access_token: str,
@@ -173,4 +203,4 @@ def login_offline(host: str, port: int, username: str, timeout: float = 10.0):
         raise
 
 
-__all__ = ["LoginIdentity", "login_offline", "login_online", "minecraft_server_hash"]
+__all__ = ["LoginIdentity", "login_offline", "login_online", "minecraft_server_hash", "mojang_session_join"]
