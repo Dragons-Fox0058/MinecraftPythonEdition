@@ -87,7 +87,7 @@ def create_vanilla_equipment_recipes(
         if hoe is not None:
             recipes.register(ShapedRecipe(
                 2, 3,
-                (ingredient, ingredient, None, stick, None, None),
+                (ingredient, ingredient, stick, None, stick, None),
                 ItemStack(hoe, 1),
             ))
     return recipes
