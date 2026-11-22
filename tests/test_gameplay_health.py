@@ -93,6 +93,10 @@ class TestHungerManager(unittest.TestCase):
         with self.assertRaises(ValueError):
             hunger.add_exhaustion(float("nan"))
 
+    def test_natural_regeneration_flag_must_be_boolean(self):
+        with self.assertRaises(TypeError):
+            HungerManager().tick(DummyLiving(), natural_regeneration=1)
+
     def test_invalid_difficulty_rejected(self):
         with self.assertRaises(ValueError):
             HungerManager().tick(DummyLiving(), difficulty="impossible")
