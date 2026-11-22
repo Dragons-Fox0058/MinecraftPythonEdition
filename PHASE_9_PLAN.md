@@ -32,6 +32,7 @@
 - [x] Save loaded chunks and world metadata when the game closes.
 - [x] Player spawn is restored from the saved world spawn coordinates.
 - [x] Player collision-based movement, gravity, jump, sprint, and camera follow.
+- [x] Hotbar selection is synchronized with the inventory's selected stack; mouse-wheel scrolling cycles through nine slots.
 - [x] Left-click block mining and right-click block placement.
 - [x] Number keys 1–9 select a temporary development block palette.
 - [x] 5×5 nearby chunk mesh streaming as the player crosses chunk boundaries.
