@@ -10,6 +10,12 @@ from engine.worldgen import (
 
 
 class TestNoisePerlin(unittest.TestCase):
+    def test_constructor_offsets_match_java_random_seed_zero(self):
+        noise = NoiseGeneratorPerlin(JavaRandom(0))
+        self.assertAlmostEqual(noise.x_offset, 0.730967787376657 * 256.0, places=12)
+        self.assertAlmostEqual(noise.y_offset, 0.24053641567148587 * 256.0, places=12)
+        self.assertAlmostEqual(noise.z_offset, 0.6374174253501083 * 256.0, places=12)
+
     def test_deterministic(self):
         r1 = JavaRandom(42)
         r2 = JavaRandom(42)
