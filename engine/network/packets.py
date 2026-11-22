@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import struct
+from dataclasses import dataclass
 
 from engine.core import BlockPos, EnumFacing
 from engine.network.codec import PacketBuffer, ProtocolError
@@ -76,6 +77,80 @@ def serverbound_digging(status: int, pos: BlockPos, face: EnumFacing) -> tuple[i
     return PACKET_IDS[ConnectionState.PLAY]["serverbound_digging"], payload.to_bytes()
 
 
+@dataclass(frozen=True)
+class JoinGamePacket:
+    entity_id: int
+    game_mode: int
+    dimension: int
+    difficulty: int
+    max_players: int
+    level_type: str
+    reduced_debug_info: bool
+
+
+@dataclass(frozen=True)
+class PlayerPositionLookPacket:
+    x: float
+    y: float
+    z: float
+    yaw: float
+    pitch: float
+    flags: int
+    teleport_id: int
+
+
+@dataclass(frozen=True)
+class ChunkDataPacket:
+    chunk_x: int
+    chunk_z: int
+    ground_up: bool
+    primary_bitmask: int
+    data: bytes
+
+
+def decode_clientbound_join_game(payload: bytes) -> JoinGamePacket:
+    buffer = PacketBuffer(payload)
+    entity_id = struct.unpack(">i", buffer.read(4))[0]
+    game_mode = buffer.read(1)[0]
+    dimension = struct.unpack(">i", buffer.read(4))[0]
+    difficulty = buffer.read(1)[0]
+    max_players = buffer.read(1)[0]
+    level_type = buffer.read_string(max_chars=16)
+    reduced = buffer.read(1)[0]
+    if reduced not in (0, 1) or buffer.remaining:
+        raise ProtocolError("invalid Join Game payload")
+    return JoinGamePacket(entity_id, game_mode, dimension, difficulty,
+                          max_players, level_type, bool(reduced))
+
+
+def decode_clientbound_player_position_look(payload: bytes) -> PlayerPositionLookPacket:
+    buffer = PacketBuffer(payload)
+    x, y, z = struct.unpack(">ddd", buffer.read(24))
+    yaw, pitch = struct.unpack(">ff", buffer.read(8))
+    flags = buffer.read(1)[0]
+    teleport_id = buffer.read_varint()
+    if buffer.remaining:
+        raise ProtocolError("trailing Player Position And Look payload")
+    return PlayerPositionLookPacket(x, y, z, yaw, pitch, flags, teleport_id)
+
+
+def decode_clientbound_chunk_data(payload: bytes) -> ChunkDataPacket:
+    buffer = PacketBuffer(payload)
+    chunk_x, chunk_z = struct.unpack(">ii", buffer.read(8))
+    ground_up = buffer.read(1)[0]
+    if ground_up not in (0, 1):
+        raise ProtocolError("invalid chunk ground-up flag")
+    bitmask = buffer.read_varint()
+    data_length = buffer.read_varint()
+    if bitmask < 0 or data_length < 0 or data_length > buffer.remaining:
+        raise ProtocolError("invalid chunk data length or bitmask")
+    chunk_data = buffer.read(data_length)
+    # Block-entity NBT compounds follow this byte array. Keep the remainder
+    # opaque until the complete tile-entity schema is available.
+    return ChunkDataPacket(chunk_x, chunk_z, bool(ground_up), bitmask,
+                           chunk_data + buffer.read_remaining())
+
+
 def decode_clientbound_keep_alive(payload: bytes) -> int:
     buffer = PacketBuffer(payload)
     value = buffer.read_varint()
@@ -96,4 +171,7 @@ def decode_clientbound_chat(payload: bytes) -> tuple[str, int]:
 __all__ = ["serverbound_chat", "serverbound_keep_alive", "serverbound_player",
            "serverbound_position", "serverbound_position_look", "serverbound_look",
            "serverbound_held_item", "serverbound_digging",
-           "decode_clientbound_keep_alive", "decode_clientbound_chat"]
+           "decode_clientbound_keep_alive", "decode_clientbound_chat",
+           "JoinGamePacket", "PlayerPositionLookPacket", "ChunkDataPacket",
+           "decode_clientbound_join_game", "decode_clientbound_player_position_look",
+           "decode_clientbound_chunk_data"]
