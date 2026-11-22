@@ -71,7 +71,6 @@ def main(*, seed: int = 0) -> None:
             if width > 0 and height > 0:
                 renderer.gl.glViewport(0, 0, width, height)
                 renderer.render(camera.view_projection_matrix(width / height))
-            input_state.begin_frame()
 
 
 if __name__ == "__main__":
