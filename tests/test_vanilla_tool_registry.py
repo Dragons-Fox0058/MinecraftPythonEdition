@@ -239,6 +239,38 @@ class TestVanillaToolRegistry(unittest.TestCase):
         )
         self.assertEqual(get_enchantment_level(stack, "fortune"), 2)
 
+    def test_tallgrass_drops_seeds_only_on_one_in_eight_roll(self):
+        class FixedRandom:
+            def __init__(self, value):
+                self.value = value
+            def randrange(self, stop):
+                self.stop = stop
+                return self.value
+        grass = SimpleNamespace(block_id=31, registry_name="tallgrass")
+        seeds = Item(295, "minecraft:wheat_seeds")
+        drops = resolve_vanilla_block_drops(
+            grass, {295: seeds}, rng=FixedRandom(0)
+        )
+        self.assertEqual([(stack.item.item_id, stack.count) for stack in drops], [(295, 1)])
+        no_drop = resolve_vanilla_block_drops(
+            grass, {295: seeds}, rng=FixedRandom(1)
+        )
+        self.assertEqual(no_drop, [])
+
+    def test_leaves_fortune_improves_sapling_chance(self):
+        class FixedRandom:
+            def randrange(self, stop):
+                self.stop = stop
+                return 0
+        leaves = SimpleNamespace(block_id=18, registry_name="leaves")
+        sapling = Item(6, "minecraft:sapling")
+        rng = FixedRandom()
+        drops = resolve_vanilla_block_drops(
+            leaves, {6: sapling}, fortune=3, rng=rng
+        )
+        self.assertEqual(rng.stop, 14)
+        self.assertEqual(drops[0].item.item_id, 6)
+
     def test_vanilla_harvest_levels(self):
         self.assertFalse(
             self.registry.can_harvest(self.items["wooden_pickaxe"], "iron_ore")
