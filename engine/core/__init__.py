@@ -16,4 +16,7 @@ __all__ = [
     'BlockPos', 'ChunkPos', 'CHUNK_SIZE', 'CHUNK_HEIGHT',
     'AxisAlignedBB',
     'JavaRandom', 'java_string_hash', 'string_seed',
+    'NBTError', 'NBTList', 'NBTDocument', 'read_nbt', 'write_nbt',
 ]
+
+from engine.core.nbt import NBTError, NBTList, NBTDocument, read_nbt, write_nbt
