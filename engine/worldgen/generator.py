@@ -8,17 +8,42 @@ from engine.worldgen.noise import NoiseGeneratorOctaves, NoiseGeneratorPerlin
 from engine.worldgen.biome import BiomeProvider, DEFAULT_BIOME
 
 
+# Chunk.blocks stores the Java 1.12.2 legacy state word:
+# (numeric block ID << 4) | metadata. Generated terrain uses metadata 0.
 AIR = 0
-STONE = 1
-GRASS = 2
-DIRT = 3
-BEDROCK = 7
-WATER = 9
-SAND = 12
-GRAVEL = 13
-SANDSTONE = 24
-SNOW = 80
-ICE = 79
+STONE = 1 << 4
+GRASS = 2 << 4
+DIRT = 3 << 4
+BEDROCK = 7 << 4
+WATER = 9 << 4
+SAND = 12 << 4
+GRAVEL = 13 << 4
+SANDSTONE = 24 << 4
+SNOW = 80 << 4
+ICE = 79 << 4
+
+
+def _signed_long(value: int) -> int:
+    value &= 0xFFFFFFFFFFFFFFFF
+    return value - (1 << 64) if value >= (1 << 63) else value
+
+
+def _mapgen_chunk_random(world_seed: int, chunk_x: int, chunk_z: int) -> JavaRandom:
+    """Java 1.12.2 MapGenBase chunk RNG seed derivation."""
+    seed_rng = JavaRandom(world_seed)
+    x_seed = seed_rng.next_long()
+    z_seed = seed_rng.next_long()
+    chunk_seed = _signed_long((chunk_x * x_seed) ^ (chunk_z * z_seed) ^ world_seed)
+    return JavaRandom(chunk_seed)
+
+
+def _population_chunk_random(world_seed: int, chunk_x: int, chunk_z: int) -> JavaRandom:
+    """Java 1.12.2 feature-population chunk RNG seed derivation."""
+    seed_rng = JavaRandom(world_seed)
+    x_seed = seed_rng.next_long() | 1
+    z_seed = seed_rng.next_long() | 1
+    chunk_seed = _signed_long(((chunk_x * x_seed) + (chunk_z * z_seed)) ^ world_seed)
+    return JavaRandom(chunk_seed)
 
 
 class ChunkGeneratorOverworld:
@@ -72,7 +97,7 @@ class ChunkGeneratorOverworld:
                     elif y < height:
                         sid = DIRT
                     elif y == height:
-                        sid = biome.top_block_id if height >= self.SEA_LEVEL else SAND
+                        sid = (biome.top_block_id << 4) if height >= self.SEA_LEVEL else SAND
                     else:
                         sid = AIR
                     chunk.blocks[lx, lz, y] = sid
@@ -113,11 +138,11 @@ class ChunkGeneratorOverworld:
         # 1.12.2-ish ore distribution by y-level.
         # Each vein: count, min_y, max_y, block id, size
         ores = [
-            (20, 0, 128, 16, 9),    # coal
-            (20, 0, 64, 15, 9),     # iron
-            (2, 0, 32, 14, 9),      # gold
-            (8, 0, 16, 56, 8),      # diamond
-            (1, 0, 32, 73, 7),      # redstone (ore block id 73)
+            (20, 0, 128, 16 << 4, 9),    # coal
+            (20, 0, 64, 15 << 4, 9),      # iron
+            (2, 0, 32, 14 << 4, 9),       # gold
+            (8, 0, 16, 56 << 4, 8),       # diamond
+            (1, 0, 32, 73 << 4, 7),       # redstone
         ]
         for count, ymin, ymax, ore_id, size in ores:
             for _ in range(count):
@@ -145,8 +170,9 @@ class ChunkGeneratorOverworld:
                 biome = self.biome_provider.get_biome_at(wx, wz)
                 chunk.biomes[lx, lz] = biome.biome_id
                 chunk.heightmap[lx, lz] = int(hm[lx, lz]) + 1
-        # deterministic rng per chunk
-        r = JavaRandom((cx * 341873128712 + cz * 132897987541 + self.seed) & 0xFFFFFFFF)
-        self.generate_caves(chunk, r)
-        self.generate_ores(chunk, r)
+        # Vanilla derives independent streams for MapGenBase and population.
+        # This fixes the previous ad-hoc linear coordinate hash, but the
+        # simplified cave/ore algorithms below are not full vanilla generators.
+        self.generate_caves(chunk, _mapgen_chunk_random(self.seed, cx, cz))
+        self.generate_ores(chunk, _population_chunk_random(self.seed, cx, cz))
         return chunk
