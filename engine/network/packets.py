@@ -18,9 +18,11 @@ def serverbound_chat(message: str) -> tuple[int, bytes]:
 
 
 def serverbound_keep_alive(keep_alive_id: int) -> tuple[int, bytes]:
-    payload = PacketBuffer()
-    payload.write_varint(keep_alive_id)
-    return PACKET_IDS[ConnectionState.PLAY]["serverbound_keep_alive"], payload.to_bytes()
+    if (isinstance(keep_alive_id, bool) or not isinstance(keep_alive_id, int)
+            or not -(1 << 63) <= keep_alive_id < (1 << 63)):
+        raise ValueError("keep_alive_id must be a signed 64-bit integer")
+    return (PACKET_IDS[ConnectionState.PLAY]["serverbound_keep_alive"],
+            struct.pack(">q", keep_alive_id))
 
 
 def serverbound_player(on_ground: bool) -> tuple[int, bytes]:
@@ -153,11 +155,9 @@ def decode_clientbound_chunk_data(payload: bytes) -> ChunkDataPacket:
 
 
 def decode_clientbound_keep_alive(payload: bytes) -> int:
-    buffer = PacketBuffer(payload)
-    value = buffer.read_varint()
-    if buffer.remaining:
-        raise ProtocolError("trailing keep-alive payload")
-    return value
+    if len(payload) != 8:
+        raise ProtocolError("Keep Alive payload must be exactly 8 bytes")
+    return struct.unpack(">q", payload)[0]
 
 
 def decode_clientbound_chat(payload: bytes) -> tuple[str, int]:
