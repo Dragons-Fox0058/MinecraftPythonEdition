@@ -40,3 +40,20 @@
 ## Status
 
 Phase 9 remains **in progress**, not complete. The game now has a first playable interaction loop, but it is not yet a complete Minecraft-style single-player Survival experience. The current inventory and item registry cover only a small block-item subset, not the complete 1.12.2 catalogue. HUD/inventory are basic geometry without actual item textures or count text. Crafting UI, mobs, audio, texture atlas, settings menu, and full save-selection menu remain absent. Windows workflow success does not prove a real GPU launch; desktop smoke testing remains outstanding.
+
+
+## Java Edition 1.12.2 parity review — 2026-11-22
+
+Verified against MCP 1.12.2 source:
+- Survival block reach is 4.5 blocks (creative is 5.0). Desktop single-player currently runs normal survival, so both block break and place ray traces now use 4.5.
+- Vanilla block damage uses digSpeed / hardness / 30 when the player can harvest, otherwise digSpeed / hardness / 100; unbreakable blocks return zero. Existing BlockBreaking.relative_hardness implements these divisors.
+- The client previously forced can_harvest=True and never passed the held ItemStack to BlockBreaking. This was not Java-compatible: bare hands could receive drops from blocks requiring a specific tool.
+- Client now creates a source-backed vanilla harvest-rule registry even while the starter inventory has no tools, passes the held stack into BlockBreaking, and lets the registry decide harvest eligibility. Stone/ores therefore do not drop as if mined with a suitable tool; ordinary dirt/sand remain hand-harvestable.
+- Added regression coverage for empty-hand harvest requirements.
+
+Known parity gaps (not marked complete):
+- Current terrain generator is explicitly simplified; its caves, ores, terrain noise, biome blending, structures, and feature population are not byte-for-byte Java 1.12.2.
+- Desktop movement still uses a simplified direct horizontal velocity model rather than the full vanilla movement-input/attribute/friction pipeline.
+- Block placement is still limited to the small starter block catalogue and does not yet implement all ItemBlock callbacks, metadata/orientation, replaceability, tile entities, and all collision shapes.
+- Drop resolver only maps a small starter set; block-specific loot tables and correct item IDs/drops need broader catalogue coverage.
+- Current client has no full vanilla creative/survival mode selector, recipe-book equivalent, full crafting/furnace screen flow, mob spawn loop, or full world tick integration.
