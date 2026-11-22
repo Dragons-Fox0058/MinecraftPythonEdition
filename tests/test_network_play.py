@@ -11,7 +11,8 @@ from engine.network.play import (
     decode_disconnect, decode_update_health, decode_time_update,
     decode_player_abilities, decode_respawn, decode_plugin_message,
     decode_multi_block_change,
-    decode_change_game_state,
+    decode_change_game_state, serverbound_player_abilities,
+    serverbound_plugin_message, serverbound_use_entity, serverbound_use_item,
 )
 
 
@@ -24,6 +25,37 @@ class TestPlayPackets(unittest.TestCase):
     def test_serverbound_client_status(self):
         packet_id, payload = serverbound_client_status(1)
         self.assertEqual(packet_id, SERVERBOUND["client_status"])
+        self.assertEqual(PacketBuffer(payload).read_varint(), 1)
+
+    def test_serverbound_player_abilities_and_plugin_message(self):
+        packet_id, payload = serverbound_player_abilities(0x06, 0.08, 0.12)
+        self.assertEqual(packet_id, 0x13)
+        self.assertEqual(struct.unpack(">Bff", payload), (0x06, 0.08, 0.12))
+        packet_id, payload = serverbound_plugin_message("MC|Brand", b"vanilla")
+        self.assertEqual(packet_id, 0x09)
+        buf = PacketBuffer(payload)
+        self.assertEqual(buf.read_string(20), "MC|Brand")
+        self.assertEqual(buf.read_remaining(), b"vanilla")
+        with self.assertRaises(ValueError):
+            serverbound_player_abilities(0x10)
+        with self.assertRaises(ValueError):
+            serverbound_plugin_message("", b"")
+
+    def test_serverbound_use_entity_and_use_item(self):
+        packet_id, payload = serverbound_use_entity(25, 1)
+        self.assertEqual(packet_id, 0x0A)
+        buf = PacketBuffer(payload)
+        self.assertEqual((buf.read_varint(), buf.read_varint()), (25, 1))
+        packet_id, payload = serverbound_use_entity(
+            25, 2, target=(0.25, 0.5, 0.75), hand=1
+        )
+        self.assertEqual(packet_id, 0x0A)
+        buf = PacketBuffer(payload)
+        self.assertEqual((buf.read_varint(), buf.read_varint()), (25, 2))
+        self.assertEqual(struct.unpack(">fff", buf.read(12)), (0.25, 0.5, 0.75))
+        self.assertEqual(buf.read_varint(), 1)
+        packet_id, payload = serverbound_use_item(1)
+        self.assertEqual(packet_id, 0x1F)
         self.assertEqual(PacketBuffer(payload).read_varint(), 1)
 
     def test_serverbound_client_settings(self):
