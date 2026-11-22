@@ -15,12 +15,14 @@ from engine.core import BlockPos, ChunkPos, CHUNK_SIZE, CHUNK_HEIGHT
 
 
 class Chunk:
-    __slots__ = ('pos', 'blocks', 'light', '_dirty')
+    __slots__ = ('pos', 'blocks', 'light', 'biomes', 'heightmap', '_dirty')
 
     def __init__(self, pos: ChunkPos):
         self.pos = pos
         self.blocks = np.zeros((CHUNK_SIZE, CHUNK_SIZE, CHUNK_HEIGHT), dtype=np.uint16)
         self.light = np.zeros((CHUNK_SIZE, CHUNK_SIZE, CHUNK_HEIGHT), dtype=np.uint8)
+        self.biomes = np.zeros((CHUNK_SIZE, CHUNK_SIZE), dtype=np.uint8)
+        self.heightmap = np.zeros((CHUNK_SIZE, CHUNK_SIZE), dtype=np.uint32)
         self._dirty = False
 
     # --- local coords ---
