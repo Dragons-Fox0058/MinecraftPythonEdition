@@ -1,6 +1,8 @@
 """Tests for dropped item entities and pickup."""
 import unittest
 
+from engine.core import BlockPos
+import engine.blocks.vanilla_blocks as VB
 from engine.gameplay import Inventory, Item, ItemStack
 from engine.gameplay.drops import EntityItem, ItemDropManager
 from engine.world import World
@@ -82,6 +84,7 @@ class TestItemDrops(unittest.TestCase):
         self.assertFalse(first.try_merge(second))
 
     def test_periodic_search_merges_nearby_entities(self):
+        self.world.set_block_state_id(BlockPos(0, 63, 0), VB.STONE.block_id)
         first = EntityItem(self.world, 0, 64, 0, ItemStack(self.stone, 2))
         second = EntityItem(self.world, 0.2, 64, 0, ItemStack(self.stone, 3))
         self.world.add_entity(first)
