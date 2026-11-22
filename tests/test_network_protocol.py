@@ -243,7 +243,7 @@ class TestProtocolHandshake(unittest.TestCase):
 
     def test_clientbound_chunk_section_palette_and_light_decode(self):
         section = PacketBuffer()
-        section.write(b"\\x04")
+        section.write(bytes((4,)))
         section.write_varint(1)
         section.write_varint(1)
         section.write_varint(256)
