@@ -10,6 +10,7 @@ from engine.core.nbt import TAG_BYTE, TAG_SHORT, TAG_INT, TAG_LONG, TAG_FLOAT, T
 from engine.gameplay.effects import EffectType, StatusEffect
 from engine.gameplay.items import ItemRegistry, ItemStack
 from engine.gameplay.player import PlayerController
+from engine.gameplay.game_mode import GameMode
 
 
 class PlayerDataError(ValueError):
@@ -87,6 +88,7 @@ def player_to_nbt(entity, controller: PlayerController, items: ItemRegistry,
         "UUIDMost": NBTTag(TAG_LONG, _signed64(uid >> 64)),
         "UUIDLeast": NBTTag(TAG_LONG, _signed64(uid & ((1 << 64) - 1))),
         "Health": NBTTag(TAG_FLOAT, float(entity.health)),
+        "playerGameType": NBTTag(TAG_INT, int(controller.game_mode)),
         "foodLevel": NBTTag(TAG_INT, controller.hunger.food_level),
         "foodSaturationLevel": NBTTag(TAG_FLOAT, float(controller.hunger.saturation)),
         "foodExhaustionLevel": NBTTag(TAG_FLOAT, float(controller.hunger.exhaustion)),
@@ -119,6 +121,7 @@ def player_from_nbt(document: NBTDocument, entity, controller: PlayerController,
         entity.on_ground = bool(data.get("OnGround", 0))
         entity.health = max(0.0, min(entity.max_health, float(data.get("Health", entity.max_health))))
         entity.dead = entity.health <= 0
+        controller.set_game_mode(int(data.get("playerGameType", int(getattr(controller.world, "default_game_mode", GameMode.SURVIVAL)))))
 
         controller.inventory.clear()
         for entry in data.get("Inventory", NBTList(TAG_COMPOUND, ())).values:
