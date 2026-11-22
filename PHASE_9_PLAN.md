@@ -81,3 +81,10 @@ Known parity gaps (not marked complete):
 - [ ] Fortune and Silk Touch are not yet extracted from held ItemStack enchantment NBT; the drop resolver supports explicit levels/flags only.
 - [ ] Crafting recipes and UI are not yet connected, so players cannot yet craft replacement tools through the desktop interface.
 - [ ] Full block/plant/mob loot tables and metadata-aware ItemBlock behavior remain incomplete.
+
+
+CI verification — 2026-11-22:
+- Python tests on the final implementation + handoff commit 37f2c6e: SUCCESS, 443 tests passed (run 45025822598).
+- Windows launcher build for desktop integration commit 593e533: SUCCESS; EXE build and artifact upload steps both passed (run 45025750661).
+- An intermediate run on commit 6b00163 failed because the test's scripted RNG values still reflected the old Fortune call order. The test fixture was corrected in commit be631c4; the subsequent complete suite passed.
+- These checks establish automated tests and packaging only; they do not establish an interactive Windows GPU playtest or complete Java 1.12.2 parity.
