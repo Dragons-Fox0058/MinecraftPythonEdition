@@ -166,6 +166,7 @@ def login_online(host: str, port: int, username: str, access_token: str,
             identity = _read_login_packet(connection, username)
             if identity.player_uuid != profile_uuid:
                 raise ProtocolError("authenticated UUID does not match selected profile")
+            connection.set_timeout(None)
             return connection, identity
     except Exception:
         connection.close()
@@ -193,6 +194,7 @@ def login_offline(host: str, port: int, username: str, timeout: float = 10.0):
         connection.send_handshake(host, port, ConnectionState.LOGIN)
         connection.send(0x00, _login_start_payload(username))
         identity = _read_login_packet(connection, username)
+        connection.set_timeout(None)
         return connection, identity
     except Exception:
         connection.close()
