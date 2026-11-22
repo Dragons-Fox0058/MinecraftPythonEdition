@@ -180,6 +180,20 @@ class TestProtocolHandshake(unittest.TestCase):
         self.assertEqual(identity.username, "TestPlayer")
         self.assertEqual(connection.state, ConnectionState.PLAY)
 
+    def test_online_login_rejects_success_before_encryption_challenge(self):
+        player_uuid = uuid.uuid4()
+        success = PacketBuffer()
+        success.write_string(str(player_uuid))
+        success.write_string("OnlineTest", max_chars=16)
+        fake = FakeSocket(encode_packet(0x02, success.to_bytes()))
+        connection = MinecraftConnection(fake)
+        with patch("engine.network.login.MinecraftConnection.connect",
+                   return_value=connection):
+            with self.assertRaises(ProtocolError):
+                login_online("localhost", 25565, "OnlineTest", "token",
+                             player_uuid, lambda *args: None)
+        self.assertTrue(fake.closed)
+
     def test_offline_login_rejects_online_mode_encryption(self):
         fake = FakeSocket(encode_packet(0x01, b""))
         connection = MinecraftConnection(fake)
