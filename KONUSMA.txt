@@ -927,3 +927,40 @@ Verification:
 - Python workflow 45028188916: SUCCESS, 464 tests passed.
 - Windows launcher workflow 45028039556: SUCCESS; EXE build and artifact upload both passed.
 - Manual Windows GPU playtest is still not claimed.
+
+
+PLAYER GAME MODES — 2026-11-22
+
+Implemented directly on main:
+- Added engine/gameplay/game_mode.py with Java 1.12.2 game mode IDs, display names, aliases, and Adventure CanDestroy/CanPlaceOn NBT checks.
+- Integrated Survival, Creative, Adventure, and Spectator behavior into PlayerController.
+- Creative: instant block breaking without drops, infinite block placement, flight movement, no hunger drain, ordinary damage immunity, and reusable crafting inputs.
+- Adventure: block breaking/placement restricted by item CanDestroy/CanPlaceOn NBT.
+- Spectator: noclip flight, no block interaction, no inventory access, no item pickup/drop.
+- Added F4 command entry for /gamemode <mode|0-3> in the desktop client.
+- Persisted playerGameType in playerdata and GameType in level.dat.
+- Added tests/test_game_modes.py for mode IDs, commands, mode-specific behavior, Adventure restrictions, and save/load.
+
+FILES UPDATED:
+- engine/gameplay/game_mode.py
+- engine/gameplay/player.py
+- engine/gameplay/breaking.py
+- engine/gameplay/placement.py
+- engine/gameplay/__init__.py
+- engine/world/world.py
+- engine/persistence/player.py
+- engine/persistence/world.py
+- engine/app/client.py
+- tests/test_game_modes.py
+- PHASE_9_PLAN.md
+
+TEST STATUS AT HANDOFF:
+- Initial new test run exposed one test assumption: Adventure mining is gradual, not instant. The regression test was corrected to advance normal mining ticks.
+- The corrected 473-test run passed (workflow 45029541027).
+- Subsequent creative-crafting/spectator-inventory integration has fresh CI runs in progress; verify those runs before treating this handoff as fully green.
+- No physical Windows GPU playtest is claimed.
+
+KNOWN SCOPE LIMITS:
+- Full Creative item catalogue/inventory UI is not yet implemented; Creative behavior applies to the items/blocks currently registered by the project.
+- Spectator entity-camera switching and multiplayer command/permission synchronization are not implemented.
+- F4 opens a desktop command dialog; there is no full chat command console yet.
