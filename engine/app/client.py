@@ -113,9 +113,9 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
     lan_server = None
     lan_client = None
     jump_requested = False
-    selected_hotbar_slot = 0
-    hotbar_block_ids = (1, 3, 4, 5, 12, 13, 20, 24, 49)
     inventory = Inventory()
+    selected_hotbar_slot = inventory.selected_hotbar_slot
+    hotbar_block_ids = (1, 3, 4, 5, 12, 13, 20, 24, 49)
     item_registry = ItemRegistry()
     from engine.blocks import BLOCK_REGISTRY
     block_items = {
@@ -161,6 +161,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                     jump_requested = True
                 if glfw.KEY_1 <= key <= glfw.KEY_9:
                     selected_hotbar_slot = key - glfw.KEY_1
+                    inventory.select_hotbar_slot(selected_hotbar_slot)
                     stack = inventory.get_hotbar_slot(selected_hotbar_slot)
                     label = "empty" if stack.is_empty else f"{stack.item.name} x{stack.count}"
                     glfw.set_window_title(window, f"Minecraft Python Edition — Slot {selected_hotbar_slot + 1}: {label}")
@@ -260,6 +261,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                             slot = row * 9 + col
                             if slot < 9:
                                 selected_hotbar_slot = slot
+                                inventory.select_hotbar_slot(slot)
                             else:
                                 inventory.swap_slots(selected_hotbar_slot, slot)
                 return
@@ -299,9 +301,17 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 return
             input_state.mouse_move(x, y)
 
+        def on_scroll(_window, _x_offset, y_offset):
+            nonlocal selected_hotbar_slot
+            if paused or inventory_open or y_offset == 0:
+                return
+            selected_hotbar_slot = (selected_hotbar_slot - int(math.copysign(1, y_offset))) % 9
+            inventory.select_hotbar_slot(selected_hotbar_slot)
+
         glfw.set_key_callback(window, on_key)
         glfw.set_cursor_pos_callback(window, on_mouse)
         glfw.set_mouse_button_callback(window, on_mouse_button)
+        glfw.set_scroll_callback(window, on_scroll)
         for key, mesh in meshes.items():
             renderer.upload_chunk_mesh(key, mesh)
 
