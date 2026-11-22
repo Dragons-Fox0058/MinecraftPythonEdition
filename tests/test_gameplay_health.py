@@ -88,6 +88,11 @@ class TestHungerManager(unittest.TestCase):
         self.assertEqual(player.health, 20)
         self.assertEqual(player.damage_calls, 0)
 
+    def test_non_finite_exhaustion_rejected(self):
+        hunger = HungerManager()
+        with self.assertRaises(ValueError):
+            hunger.add_exhaustion(float("nan"))
+
     def test_invalid_difficulty_rejected(self):
         with self.assertRaises(ValueError):
             HungerManager().tick(DummyLiving(), difficulty="impossible")
