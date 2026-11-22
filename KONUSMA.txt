@@ -809,3 +809,10 @@ NEXT:
 2. Add enchantment NBT parsing for Fortune/Silk Touch, with tests.
 3. Connect crafting recipes/UI and remove the temporary starting tool kit when legitimate tool crafting is playable.
 4. Expand remaining 1.12.2 drops/metadata rules in small source-verified batches.
+
+
+DOĞRULAMA EKİ — ORE / TOOL IMPLEMENTATION — 2026-11-22:
+- Final implementation + devir raporu commit'i 37f2c6e üzerinde Python tests workflow run 45025822598 SUCCESS; toplam 443 test geçti.
+- Desktop entegrasyon commit'i 593e533 için Windows launcher build run 45025750661 SUCCESS; "Build launcher EXE" ve "Upload launcher" adımları başarılı.
+- Ara commit 6b00163 üzerindeki test başarısızlığı, Fortune RNG çağrı sırası düzeltildikten sonra testte eski rastgele değer dizisinin kalmasından kaynaklandı. Test beklentisi be631c4 commit'inde güncellendi; sonraki tam Python test çalışması 443/443 başarılı.
+- Otomatik test ve EXE paketleme başarılıdır. Gerçek Windows GPU oturumunda oynanış testi ve Java 1.12.2 istemcisiyle yan yana runtime karşılaştırması yapılmamıştır.
