@@ -3,6 +3,9 @@ import json
 import struct
 import unittest
 
+from engine.entities.player import EntityPlayer
+from engine.gameplay.health import HungerManager
+
 from engine.core import BlockPos, ChunkPos
 from engine.network.codec import PacketBuffer
 from engine.network.play import CLIENTBOUND
