@@ -21,6 +21,8 @@ GRAVEL = 13 << 4
 SANDSTONE = 24 << 4
 SNOW = 80 << 4
 ICE = 79 << 4
+LOG = 17 << 4
+LEAVES = 18 << 4
 
 
 def _signed_long(value: int) -> int:
@@ -168,6 +170,42 @@ class ChunkGeneratorOverworld:
                         if chunk.blocks[x, z, y] == STONE:
                             chunk.blocks[x, z, y] = ore_id
 
+    # ---------------- surface trees ----------------
+    def generate_trees(self, chunk: Chunk, rng: JavaRandom) -> None:
+        """Populate simple deterministic oak trees on grass surfaces.
+
+        This is a playable tree-feature subset, not a byte-for-byte copy of
+        BiomeDecorator/WorldGenTrees. Tree placement uses the chunk population
+        RNG and stays inside the owning chunk to avoid cross-chunk writes.
+        """
+        for lx in range(16):
+            for lz in range(16):
+                if rng.next_int(48) != 0:
+                    continue
+                surface_y = int(chunk.heightmap[lx, lz]) - 1
+                if not 1 <= surface_y <= 248:
+                    continue
+                if chunk.blocks[lx, lz, surface_y] != GRASS:
+                    continue
+                trunk_height = 4 + rng.next_int(2)
+                if any(chunk.blocks[lx, lz, y] != AIR
+                       for y in range(surface_y + 1, surface_y + trunk_height + 1)):
+                    continue
+                for y in range(surface_y + 1, surface_y + trunk_height + 1):
+                    chunk.blocks[lx, lz, y] = LOG
+                crown_y = surface_y + trunk_height
+                for layer, radius in ((-2, 2), (-1, 2), (0, 2), (1, 1)):
+                    y = crown_y + layer
+                    if not 1 <= y < 256:
+                        continue
+                    for dx in range(-radius, radius + 1):
+                        for dz in range(-radius, radius + 1):
+                            if abs(dx) == radius and abs(dz) == radius and radius == 2:
+                                continue
+                            x, z = lx + dx, lz + dz
+                            if 0 <= x < 16 and 0 <= z < 16 and chunk.blocks[x, z, y] == AIR:
+                                chunk.blocks[x, z, y] = LEAVES
+
     # ---------------- provider interface ----------------
     def generate_chunk(self, cx: int, cz: int) -> Chunk:
         chunk = Chunk(ChunkPos(cx, cz))
@@ -185,5 +223,7 @@ class ChunkGeneratorOverworld:
         # This fixes the previous ad-hoc linear coordinate hash, but the
         # simplified cave/ore algorithms below are not full vanilla generators.
         self.generate_caves(chunk, _mapgen_chunk_random(self.seed, cx, cz))
-        self.generate_ores(chunk, _population_chunk_random(self.seed, cx, cz))
+        population_rng = _population_chunk_random(self.seed, cx, cz)
+        self.generate_ores(chunk, population_rng)
+        self.generate_trees(chunk, population_rng)
         return chunk
