@@ -242,7 +242,7 @@ class OpenGLRenderer:
         self.gl.glDeleteVertexArrays(1, [gpu.vao])
 
     @staticmethod
-    def _hud_vertices(selected_slot: int, health: float, food: int, paused: bool = False, inventory_slots=None, crafting_slots=None, crafting_result=None) -> np.ndarray:
+    def _hud_vertices(selected_slot: int, health: float, food: int, paused: bool = False, inventory_slots=None, crafting_slots=None, crafting_result=None, crafting_width: int = 3, crafting_height: int = 3) -> np.ndarray:
         vertices = []
 
         def rect(x0, y0, x1, y1, color):
@@ -305,7 +305,7 @@ class OpenGLRenderer:
                 slot_w, slot_h, gap_x, gap_y = 0.075, 0.105, 0.012, 0.025
                 grid_left, grid_top = -0.3915, 0.245
             else:
-                text_label("CRAFTING TABLE", -0.16, 0.315, 0.005, (1.0, 1.0, 1.0))
+                text_label("CRAFTING TABLE" if crafting_width == 3 else "CRAFTING", -0.16, 0.315, 0.005, (1.0, 1.0, 1.0))
                 text_label("INVENTORY", -0.10, 0.005, 0.0038, (1.0, 1.0, 1.0))
                 slot_w, slot_h, gap_x, gap_y = 0.070, 0.065, 0.008, 0.015
                 grid_left, grid_top = -0.37, -0.015
@@ -332,8 +332,8 @@ class OpenGLRenderer:
                     rect(x0 + 0.012, y0 + 0.010, x0 + 0.012 + min(1.0, int(count) / 64.0) * 0.05, y0 + 0.016, (0.92, 0.92, 0.92))
             if crafting_slots is not None:
                 text_label("3X3", -0.30, 0.275, 0.0035)
-                for index, entry in enumerate(crafting_slots[:9]):
-                    row, col = divmod(index, 3)
+                for index, entry in enumerate(crafting_slots[:crafting_width * crafting_height]):
+                    row, col = divmod(index, crafting_width)
                     x0 = -0.32 + col * 0.077
                     y1 = 0.22 - row * 0.087
                     rect(x0, y1 - 0.075, x0 + 0.065, y1, (0.75, 0.78, 0.84))
@@ -380,9 +380,11 @@ class OpenGLRenderer:
             inventory_slots = hud_state.get("inventory_slots")
             crafting_slots = hud_state.get("crafting_slots")
             crafting_result = hud_state.get("crafting_result")
+            crafting_width = int(hud_state.get("crafting_width", 3))
+            crafting_height = int(hud_state.get("crafting_height", 3))
             if not 0 <= selected < 9:
                 raise ValueError("selected hotbar slot must be in [0, 8]")
-            hud = self._hud_vertices(selected, health, food, paused, inventory_slots, crafting_slots, crafting_result)
+            hud = self._hud_vertices(selected, health, food, paused, inventory_slots, crafting_slots, crafting_result, crafting_width, crafting_height)
             gl.glDisable(gl.GL_DEPTH_TEST)
             gl.glDisable(gl.GL_CULL_FACE)
             gl.glUseProgram(self.hud_program)
