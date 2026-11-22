@@ -14,11 +14,11 @@ A Python 3 voxel-engine project targeting Minecraft Java Edition 1.12.2 behavior
 Run the current unit suite from the repository root:
 
 ```bash
-python -m pip install numpy cryptography
+python -m pip install numpy cryptography glfw PyOpenGL
 python -m unittest discover -s tests -v
 ```
 
-The GitHub Actions workflow runs this suite on pushes and pull requests.
+The GitHub Actions workflow runs this suite on pushes and pull requests. For the optional desktop OpenGL backend, install `glfw` and `PyOpenGL` as shown above.
 
 ## Target
 
