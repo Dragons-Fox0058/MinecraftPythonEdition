@@ -1,23 +1,42 @@
-"""Desktop first-person world preview with Python Edition LAN controls."""
+"""Desktop single-player survival foundation with Python Edition LAN controls."""
 from __future__ import annotations
 
 import math
 import time
 
+import numpy as np
+
+from engine.core import Vec3d
+from engine.entities.entity import Entity
 from engine.input.state import InputState
+from engine.network.python_edition import PythonEditionClient
 from engine.render.camera import Camera
 from engine.render.mesh import ChunkMeshBuilder
 from engine.render.opengl import OpenGLRenderer
-from engine.worldgen.generator import ChunkGeneratorOverworld
 from engine.server.local import PythonEditionServer, ServerConfig
-from engine.network.python_edition import PythonEditionClient
+from engine.world.world import World
+from engine.worldgen.generator import ChunkGeneratorOverworld
+
+
+TICK_RATE = 20.0
+PLAYER_WALK_SPEED = 4.3
+PLAYER_SPRINT_SPEED = 5.6
+PLAYER_JUMP_VELOCITY = 0.42
+
+
+def _surface_y(chunk, local_x: int, local_z: int) -> int:
+    """Return the highest non-air block at a local column."""
+    for y in range(255, -1, -1):
+        if chunk.get_block_state_id(local_x, y, local_z) != 0:
+            return y
+    return 0
 
 
 def main(*, seed: int = 0) -> None:
-    """Open a generated chunk preview.
+    """Open the desktop world.
 
-    WASD moves, Space/Ctrl moves vertically, Shift accelerates, mouse looks,
-    F6 toggles a Python Edition LAN host, F7 joins one, Escape closes.
+    WASD moves with collision and gravity, Space jumps, Shift sprints, mouse
+    looks, F6 toggles a Python Edition LAN host, F7 joins one, Escape closes.
     """
     try:
         import glfw
@@ -27,6 +46,22 @@ def main(*, seed: int = 0) -> None:
     generator = ChunkGeneratorOverworld(int(seed))
     chunks = {(cx, cz): generator.generate_chunk(cx, cz)
               for cz in range(-1, 2) for cx in range(-1, 2)}
+
+    world = World("New World")
+    world.seed = int(seed)
+    for chunk in chunks.values():
+        world.chunk_provider._chunks[chunk.pos] = chunk
+
+    spawn_chunk = chunks[(0, 0)]
+    spawn_y = _surface_y(spawn_chunk, 8, 8) + 1
+    player = Entity(world, 8.5, float(spawn_y), 8.5)
+    world.add_entity(player)
+    camera = Camera(position=(8.5, spawn_y + player.eye_height, 8.5), yaw=0.0, pitch=0.0)
+    input_state = InputState()
+    lan_server = None
+    lan_client = None
+    jump_requested = False
+
     mesh_builder = ChunkMeshBuilder()
     meshes = {}
     for (cx, cz), chunk in chunks.items():
@@ -34,19 +69,17 @@ def main(*, seed: int = 0) -> None:
                      for dx, dz in ((-1, 0), (1, 0), (0, -1), (0, 1))
                      if (cx + dx, cz + dz) in chunks}
         meshes[(cx, cz)] = mesh_builder.build(chunk, neighbors=neighbors)
-    camera = Camera(position=(8.0, 92.0, -22.0), yaw=0.0, pitch=28.0)
-    input_state = InputState()
-    lan_server = None
-    lan_client = None
 
     with OpenGLRenderer(1280, 720) as renderer:
         window = renderer.window
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
         def on_key(_window, key, _scancode, action, _mods):
-            nonlocal lan_server, lan_client
+            nonlocal lan_server, lan_client, jump_requested
             if action == glfw.PRESS:
                 input_state.key_down(key)
+                if key == glfw.KEY_SPACE:
+                    jump_requested = True
                 if key == glfw.KEY_ESCAPE:
                     glfw.set_window_should_close(window, True)
                 elif key == glfw.KEY_F6:
@@ -96,29 +129,60 @@ def main(*, seed: int = 0) -> None:
         glfw.set_cursor_pos_callback(window, on_mouse)
         for key, mesh in meshes.items():
             renderer.upload_chunk_mesh(key, mesh)
+
         previous = time.perf_counter()
+        tick_accumulator = 0.0
+        tick_duration = 1.0 / TICK_RATE
         network_send_timer = 0.0
         try:
             while not renderer.should_close():
                 now = time.perf_counter()
-                dt = min(now - previous, 0.05)
+                frame_dt = min(now - previous, 0.1)
                 previous = now
-                speed = 18.0 if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else 6.0
-                right = float(input_state.is_key_down(glfw.KEY_D)) - float(input_state.is_key_down(glfw.KEY_A))
-                forward = float(input_state.is_key_down(glfw.KEY_W)) - float(input_state.is_key_down(glfw.KEY_S))
-                up = float(input_state.is_key_down(glfw.KEY_SPACE)) - float(input_state.is_key_down(glfw.KEY_LEFT_CONTROL))
-                length = math.hypot(right, forward)
-                if length > 0:
-                    right, forward = right / length, forward / length
-                camera.move_local(right=right * speed * dt, up=up * speed * dt,
-                                  forward=forward * speed * dt)
                 camera.rotate(-input_state.mouse_dx * 0.12, input_state.mouse_dy * 0.12)
+
+                forward = camera.forward.copy()
+                forward[1] = 0.0
+                forward_length = float(np.linalg.norm(forward))
+                if forward_length:
+                    forward /= forward_length
+                right = camera.right.copy()
+                right[1] = 0.0
+                right_length = float(np.linalg.norm(right))
+                if right_length:
+                    right /= right_length
+
+                move_x = (float(input_state.is_key_down(glfw.KEY_D))
+                          - float(input_state.is_key_down(glfw.KEY_A)))
+                move_z = (float(input_state.is_key_down(glfw.KEY_W))
+                          - float(input_state.is_key_down(glfw.KEY_S)))
+                move_length = math.hypot(move_x, move_z)
+                if move_length:
+                    move_x /= move_length
+                    move_z /= move_length
+                speed = PLAYER_SPRINT_SPEED if input_state.is_key_down(glfw.KEY_LEFT_SHIFT) else PLAYER_WALK_SPEED
+                horizontal = (right * move_x + forward * move_z) * (speed / TICK_RATE)
+
+                tick_accumulator += frame_dt
+                while tick_accumulator >= tick_duration:
+                    if jump_requested and player.on_ground:
+                        player.motion = Vec3d(player.motion.x, PLAYER_JUMP_VELOCITY, player.motion.z)
+                        player.on_ground = False
+                    jump_requested = False
+                    player.motion = Vec3d(float(horizontal[0]), player.motion.y, float(horizontal[2]))
+                    player.on_update()
+                    tick_accumulator -= tick_duration
+
+                camera.position = np.asarray(
+                    (player.pos.x, player.pos.y + player.eye_height, player.pos.z),
+                    dtype=np.float64,
+                )
 
                 if lan_client is not None:
                     for message in lan_client.poll():
                         if message.get("type") in ("chat", "player_joined", "player_left", "disconnect"):
                             print(f"[LAN] {message}")
-                    network_send_timer += dt
+                    network_send_timer += frame_dt
                     if network_send_timer >= 0.1:
                         network_send_timer = 0.0
                         try:
@@ -128,7 +192,6 @@ def main(*, seed: int = 0) -> None:
                             lan_client.close()
                             lan_client = None
 
-                # Clear deltas only after consuming them; render() polls GLFW at frame end.
                 input_state.begin_frame()
                 width, height = glfw.get_framebuffer_size(window)
                 if width > 0 and height > 0:
