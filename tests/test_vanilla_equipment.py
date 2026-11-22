@@ -58,6 +58,7 @@ class TestVanillaEquipment(unittest.TestCase):
         grid.set_slot(1, ItemStack(self.ingredients["iron_ingot"], 1))
         grid.set_slot(2, ItemStack(self.ingredients["iron_ingot"], 1))
         grid.set_slot(4, ItemStack(self.ingredients["stick"], 1))
+        grid.set_slot(7, ItemStack(self.ingredients["stick"], 1))
         result = grid.craft(self.recipes)
         self.assertIs(result.item, self.items["iron_hoe"])
 
