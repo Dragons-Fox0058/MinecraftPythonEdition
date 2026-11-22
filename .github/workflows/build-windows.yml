@@ -7,6 +7,7 @@ on:
       - "launcher.py"
       - "engine/app/**"
       - "engine/render/**"
+      - "engine/network/**"
       - "engine/server/**"
       - "requirements.txt"
       - "build_windows.bat"
