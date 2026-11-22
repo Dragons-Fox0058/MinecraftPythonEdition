@@ -37,6 +37,8 @@ class PacketBuffer:
         result = 0
         for index in range(5):
             byte = self.read(1)[0]
+            if index == 4 and byte & 0xF0:
+                raise ProtocolError("VarInt exceeds signed 32-bit range")
             result |= (byte & 0x7F) << (7 * index)
             if not byte & 0x80:
                 if result & (1 << 31):
@@ -173,10 +175,13 @@ def decode_compressed_packet(frame: bytes, threshold: int,
         try:
             decompressor = zlib.decompressobj()
             raw = decompressor.decompress(encoded, max_length + 1)
-            raw += decompressor.flush()
+            if len(raw) > max_length or decompressor.unconsumed_tail:
+                raise ProtocolError("decompressed packet exceeds maximum length")
+            raw += decompressor.flush(max_length + 1 - len(raw))
         except zlib.error as exc:
             raise ProtocolError("invalid compressed packet payload") from exc
-        if len(raw) != uncompressed_length or len(raw) > max_length or not decompressor.eof:
+        if (len(raw) != uncompressed_length or len(raw) > max_length
+                or not decompressor.eof or decompressor.unused_data):
             raise ProtocolError("compressed packet length mismatch")
     packet = PacketBuffer(raw)
     packet_id = packet.read_varint()
