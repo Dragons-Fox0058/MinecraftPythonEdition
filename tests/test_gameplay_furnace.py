@@ -74,6 +74,33 @@ class TestFurnace(unittest.TestCase):
         self.assertIs(furnace.fuel.item, bucket)
         self.assertEqual(furnace.fuel.count, 1)
 
+    def test_smelting_experience_accumulates(self):
+        self.furnace.input = ItemStack(self.ore, 3)
+        self.furnace.fuel = ItemStack(self.coal, 1)
+        for _ in range(9):
+            self.furnace.update()
+        self.assertAlmostEqual(self.furnace.experience_pending, 2.1)
+        self.assertEqual(self.furnace.output.count, 3)
+
+    def test_fractional_experience_rounding(self):
+        self.furnace.experience_pending = 2.1
+        self.assertEqual(self.furnace.collect_experience(0.05), 3)
+        self.assertEqual(self.furnace.experience_pending, 0.0)
+        self.furnace.experience_pending = 2.1
+        self.assertEqual(self.furnace.collect_experience(0.9), 2)
+
+    def test_output_extraction_collects_experience(self):
+        self.furnace.output = ItemStack(self.ingot, 2)
+        self.furnace.experience_pending = 1.4
+        stack, xp = self.furnace.take_output_with_experience(1, fraction_roll=0.2)
+        self.assertEqual(stack.count, 1)
+        self.assertEqual(xp, 2)
+        self.assertEqual(self.furnace.output.count, 1)
+
+    def test_invalid_experience_roll_rejected(self):
+        with self.assertRaises(ValueError):
+            self.furnace.collect_experience(1.0)
+
     def test_fuel_registry(self):
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.coal, 1)), 1600)
         self.assertEqual(self.fuels.get_burn_time(ItemStack(self.ore, 1)), 0)
