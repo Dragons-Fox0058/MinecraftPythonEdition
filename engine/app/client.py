@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 import time
+from pathlib import Path
 
 import numpy as np
 
@@ -18,6 +19,7 @@ from engine.render.opengl import OpenGLRenderer
 from engine.server.local import PythonEditionServer, ServerConfig
 from engine.world.world import World
 from engine.worldgen.generator import ChunkGeneratorOverworld
+from engine.persistence.world import load_world, save_world
 
 
 TICK_RATE = 20.0
@@ -34,7 +36,7 @@ def _surface_y(chunk, local_x: int, local_z: int) -> int:
     return 0
 
 
-def main(*, seed: int = 0) -> None:
+def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None = None) -> None:
     """Open the desktop world.
 
     WASD moves with collision and gravity, Space jumps, Shift sprints, mouse
@@ -45,18 +47,31 @@ def main(*, seed: int = 0) -> None:
     except ImportError as exc:
         raise RuntimeError("Desktop mode requires glfw and PyOpenGL; install requirements.txt") from exc
 
-    generator = ChunkGeneratorOverworld(int(seed))
-    chunks = {(cx, cz): generator.generate_chunk(cx, cz)
-              for cz in range(-1, 2) for cx in range(-1, 2)}
+    save_directory = Path(save_path) if save_path else Path("saves") / world_name
+    if (save_directory / "level.dat").is_file():
+        world = load_world(save_directory)
+        seed = world.seed
+    else:
+        world = World(world_name)
+        world.seed = int(seed)
+        world._provider = __import__(
+            "engine.worldgen.provider", fromlist=["ChunkProviderOverworld"]
+        ).ChunkProviderOverworld(world.seed)
 
-    world = World("New World")
-    world.seed = int(seed)
-    for chunk in chunks.values():
-        world.chunk_provider._chunks[chunk.pos] = chunk
+    spawn = world.spawn_point
+    center_cx, center_cz = spawn.x >> 4, spawn.z >> 4
+    chunks = {}
+    for cz in range(center_cz - 1, center_cz + 2):
+        for cx in range(center_cx - 1, center_cx + 2):
+            chunks[(cx, cz)] = world.chunk_provider.get_or_create(cx, cz)
 
-    spawn_chunk = chunks[(0, 0)]
-    spawn_y = _surface_y(spawn_chunk, 8, 8) + 1
-    player = Entity(world, 8.5, float(spawn_y), 8.5)
+    spawn_chunk = chunks[(center_cx, center_cz)]
+    local_x, local_z = spawn.x & 15, spawn.z & 15
+    if spawn.y <= 0 or spawn.y >= 255:
+        spawn_y = _surface_y(spawn_chunk, local_x, local_z) + 1
+    else:
+        spawn_y = spawn.y
+    player = Entity(world, spawn.x + 0.5, float(spawn_y), spawn.z + 0.5)
     world.add_entity(player)
     camera = Camera(position=(8.5, spawn_y + player.eye_height, 8.5), yaw=0.0, pitch=0.0)
     input_state = InputState()
@@ -77,7 +92,7 @@ def main(*, seed: int = 0) -> None:
                      if (cx + dx, cz + dz) in chunks}
         meshes[(cx, cz)] = mesh_builder.build(chunk, neighbors=neighbors)
 
-    with OpenGLRenderer(1280, 720) as renderer:
+    with OpenGLRenderer(1280, 720, title=f"Minecraft Python Edition — {world.name}") as renderer:
         window = renderer.window
         glfw.set_input_mode(window, glfw.CURSOR, glfw.CURSOR_DISABLED)
 
@@ -258,6 +273,10 @@ def main(*, seed: int = 0) -> None:
                     renderer.gl.glViewport(0, 0, width, height)
                     renderer.render(camera.view_projection_matrix(width / height))
         finally:
+            world.spawn_point = BlockPos(
+                math.floor(player.pos.x), math.floor(player.pos.y), math.floor(player.pos.z)
+            )
+            save_world(world, save_directory)
             if lan_client is not None:
                 lan_client.close()
             if lan_server is not None:
