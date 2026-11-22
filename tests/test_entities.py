@@ -4,6 +4,7 @@ from engine.core import BlockPos
 from engine.world import World
 from engine.entities import (
     Entity, EntityLivingBase, EntityPlayer,
+    AITask,
     PathFinder, EntityAITasks, AIWander, JUMP_VELOCITY, GRAVITY,
 )
 
@@ -156,6 +157,51 @@ class TestAI(unittest.TestCase):
         tasks.add(AIWander())
         tasks.on_update(mob)
         self.assertTrue(True)
+
+
+    def test_task_lifecycle_starts_once_and_updates_while_active(self):
+        class CountingTask(AITask):
+            def __init__(self):
+                self.starts = 0
+                self.updates = 0
+                self.resets = 0
+                self.remaining = 2
+            def should_execute(self, mob):
+                return True
+            def should_continue(self, mob):
+                return self.remaining > 0
+            def start(self, mob):
+                self.starts += 1
+            def update(self, mob):
+                self.updates += 1
+                self.remaining -= 1
+            def reset(self, mob):
+                self.resets += 1
+
+        mob = EntityLivingBase(World(), 0, 64, 0)
+        scheduler = EntityAITasks()
+        task = CountingTask()
+        scheduler.add(task)
+        scheduler.on_update(mob)
+        self.assertTrue(scheduler.is_running(task))
+        scheduler.on_update(mob)
+        self.assertEqual(task.starts, 1)
+        self.assertEqual(task.updates, 2)
+        scheduler.on_update(mob)
+        self.assertFalse(scheduler.is_running(task))
+        self.assertEqual(task.resets, 1)
+
+    def test_wander_goal_keeps_target_across_ticks(self):
+        import random
+        mob = EntityLivingBase(World(), 0, 64, 0)
+        scheduler = EntityAITasks()
+        task = AIWander(rng=random.Random(7))
+        scheduler.add(task)
+        scheduler.on_update(mob)
+        first_target = task.target
+        scheduler.on_update(mob)
+        self.assertEqual(task.target, first_target)
+        self.assertTrue(scheduler.is_running(task))
 
 
 if __name__ == '__main__':
