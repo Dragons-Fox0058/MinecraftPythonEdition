@@ -109,6 +109,11 @@ class TestJavaRandom(unittest.TestCase):
         self.assertEqual(r.next_int(), -723955400)
         self.assertEqual(r.next_int(), 1033096058)
 
+    def test_next_long_matches_openjdk_seed_0(self):
+        # OpenJDK: new Random(0L).nextLong()
+        r = JavaRandom(0)
+        self.assertEqual(r.next_long(), -4962768465676381896)
+
     def test_known_sequence_seed_12345(self):
         # Verified against OpenJDK on this machine (see research/java_random_reference.txt).
         r = JavaRandom(12345)
