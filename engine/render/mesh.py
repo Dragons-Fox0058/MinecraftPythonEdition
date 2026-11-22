@@ -112,7 +112,8 @@ class ChunkMeshBuilder:
             face_colors = np.asarray([_block_color(int(i)) for i in block_ids], dtype=np.float32)
             colors.append(np.repeat(face_colors, 4, axis=0))
             face_indices = np.asarray((0, 1, 2, 0, 2, 3), dtype=np.uint32)
-            indices.append((face_indices[None, :] + base_vertex).reshape(-1))
+            per_block = np.arange(len(cells), dtype=np.uint32)[:, None] * 4
+            indices.append((per_block + face_indices[None, :] + base_vertex).reshape(-1))
             base_vertex += len(cells) * 4
 
         if not positions:
