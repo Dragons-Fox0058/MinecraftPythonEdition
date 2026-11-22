@@ -34,6 +34,20 @@ class TestPlayerController(unittest.TestCase):
         self.assertAlmostEqual(player.health, 11.6)
         self.assertEqual(controller.inventory.armor[1].damage, 3)
 
+    def test_hurt_resistance_rejects_weaker_hits_without_armor_wear(self):
+        armor_item = Item(702, "test:resistant_chestplate", max_stack_size=1, max_damage=100)
+        armor_registry = ArmorRegistry()
+        armor_registry.register(ArmorDefinition(armor_item, 8, 2.0))
+        player = EntityPlayer(self.world, 6, 64, 6)
+        controller = PlayerController(player, armor_registry=armor_registry)
+        controller.inventory.set_armor_slot(1, ItemStack(armor_item, 1))
+        self.assertTrue(controller.damage(5.0))
+        health_after_first_hit = player.health
+        durability_after_first_hit = controller.inventory.armor[1].damage
+        self.assertFalse(controller.damage(3.0))
+        self.assertEqual(player.health, health_after_first_hit)
+        self.assertEqual(controller.inventory.armor[1].damage, durability_after_first_hit)
+
     def test_unblockable_player_damage_bypasses_armor_and_wear(self):
         armor_item = Item(701, "test:helmet", max_stack_size=1, max_damage=100)
         armor_registry = ArmorRegistry()
