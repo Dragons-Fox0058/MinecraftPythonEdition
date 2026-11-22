@@ -31,6 +31,7 @@ class TestVanillaToolRecipes(unittest.TestCase):
         planks = grid.craft(self.recipes)
         self.assertIs(planks.item, self.items["planks"])
         self.assertEqual(planks.count, 4)
+        self.assertEqual(planks.metadata, 3)
 
         grid.set_slot(0, ItemStack(self.items["planks"], 1, metadata=3))
         grid.set_slot(2, ItemStack(self.items["planks"], 1, metadata=3))
