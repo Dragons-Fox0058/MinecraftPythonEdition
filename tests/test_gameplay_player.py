@@ -51,7 +51,9 @@ class TestPlayerController(unittest.TestCase):
         self.assertEqual(self.controller.held_item.count, 1)
 
     def test_drop_and_pickup(self):
-        drop = self.controller.drop_item(ItemStack(self.stone_item, 3))
+        source = ItemStack(self.stone_item, 3)
+        drop = self.controller.drop_item(source)
+        self.assertTrue(source.is_empty)
         self.assertIsNotNone(drop)
         self.assertTrue(drop.stack.count == 3)
         drop.pickup_delay = 0
