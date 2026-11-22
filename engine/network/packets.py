@@ -106,6 +106,7 @@ class ChunkDataPacket:
     ground_up: bool
     primary_bitmask: int
     data: bytes
+    block_entities_payload: bytes
 
 
 def decode_clientbound_join_game(payload: bytes) -> JoinGamePacket:
@@ -148,7 +149,7 @@ def decode_clientbound_chunk_data(payload: bytes) -> ChunkDataPacket:
     # Block-entity NBT compounds follow this byte array. Keep the remainder
     # opaque until the complete tile-entity schema is available.
     return ChunkDataPacket(chunk_x, chunk_z, bool(ground_up), bitmask,
-                           chunk_data + buffer.read_remaining())
+                           chunk_data, buffer.read_remaining())
 
 
 def decode_clientbound_keep_alive(payload: bytes) -> int:
