@@ -17,7 +17,7 @@ class PlayerController:
 
     def __init__(self, entity, inventory: Inventory | None = None,
                  hunger: HungerManager | None = None,
-                 difficulty: str = "normal") -> None:
+                 difficulty: str = "normal", block_drop_resolver=None) -> None:
         if not hasattr(entity, "world"):
             raise TypeError("entity must have a world")
         if difficulty not in ("peaceful", "easy", "normal", "hard"):
@@ -27,7 +27,7 @@ class PlayerController:
         self.inventory = inventory or Inventory()
         self.hunger = hunger or HungerManager()
         self.difficulty = difficulty
-        self.breaking = BlockBreaking(self.world)
+        self.breaking = BlockBreaking(self.world, drop_resolver=block_drop_resolver)
         self.drops = ItemDropManager(self.world)
         self.interaction = InteractionManager(self.world)
         entity.inventory = self.inventory
