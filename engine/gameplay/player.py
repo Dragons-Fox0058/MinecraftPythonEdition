@@ -141,7 +141,7 @@ class PlayerController:
             raise TypeError("source must be a DamageSource")
         if self.entity.dead:
             return False
-        if self.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR) and source.kind not in ("void", "out_of_world"):
+        if self.game_mode in (GameMode.CREATIVE, GameMode.SPECTATOR) and source.name not in ("void", "out_of_world", "outOfWorld"):
             return False
         armor_stacks = tuple(self.inventory.armor)
         if self.armor_registry is not None:
