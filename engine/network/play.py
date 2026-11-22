@@ -152,6 +152,76 @@ def serverbound_client_status(action: int) -> tuple[int, bytes]:
     return SERVERBOUND["client_status"], out.to_bytes()
 
 
+def serverbound_player_abilities(flags: int, flying_speed: float = 0.05,
+                                 walking_speed: float = 0.1) -> tuple[int, bytes]:
+    if isinstance(flags, bool) or not isinstance(flags, int) or flags & ~0x0F:
+        raise ValueError("player ability flags must be a 4-bit mask")
+    if not all(math.isfinite(value) and value >= 0
+               for value in (flying_speed, walking_speed)):
+        raise ValueError("player ability speeds must be finite and non-negative")
+    return SERVERBOUND["player_abilities"], struct.pack(
+        ">Bff", flags, float(flying_speed), float(walking_speed)
+    )
+
+
+def serverbound_plugin_message(channel: str, data: bytes) -> tuple[int, bytes]:
+    if not isinstance(channel, str) or not 1 <= len(channel) <= 20:
+        raise ValueError("plugin channel must contain 1..20 characters")
+    if not isinstance(data, bytes):
+        raise TypeError("plugin message data must be bytes")
+    out = PacketBuffer()
+    out.write_string(channel, max_chars=20)
+    out.write(data)
+    return SERVERBOUND["plugin_message"], out.to_bytes()
+
+
+def serverbound_use_entity(entity_id: int, action: int, *,
+                           target: tuple[float, float, float] | None = None,
+                           hand: int = 0) -> tuple[int, bytes]:
+    if isinstance(entity_id, bool) or not isinstance(entity_id, int) or entity_id < 0:
+        raise ValueError("entity_id must be a non-negative integer")
+    if action not in (0, 1, 2):
+        raise ValueError("entity interaction action must be 0, 1, or 2")
+    if action == 2:
+        if target is None or len(target) != 3 or not all(math.isfinite(v) for v in target):
+            raise ValueError("interact-at action requires a finite 3D target")
+    elif target is not None:
+        raise ValueError("target coordinates are only valid for interact-at")
+    if action in (0, 2) and hand not in (0, 1):
+        raise ValueError("hand must be 0 or 1")
+    out = PacketBuffer()
+    out.write_varint(entity_id)
+    out.write_varint(action)
+    if action == 2:
+        out.write(struct.pack(">fff", *target))
+    if action in (0, 2):
+        out.write_varint(hand)
+    return SERVERBOUND["use_entity"], out.to_bytes()
+
+
+def serverbound_entity_action(entity_id: int, action: int,
+                              jump_boost: int = 0) -> tuple[int, bytes]:
+    if isinstance(entity_id, bool) or not isinstance(entity_id, int):
+        raise ValueError("entity_id must be an integer")
+    if isinstance(action, bool) or not isinstance(action, int) or not 0 <= action <= 8:
+        raise ValueError("entity action must be 0..8")
+    if isinstance(jump_boost, bool) or not isinstance(jump_boost, int) or jump_boost < 0:
+        raise ValueError("jump_boost must be non-negative")
+    out = PacketBuffer()
+    out.write(struct.pack(">i", entity_id))
+    out.write_varint(action)
+    out.write_varint(jump_boost)
+    return SERVERBOUND["entity_action"], out.to_bytes()
+
+
+def serverbound_use_item(hand: int = 0) -> tuple[int, bytes]:
+    if isinstance(hand, bool) or not isinstance(hand, int) or hand not in (0, 1):
+        raise ValueError("hand must be 0 or 1")
+    out = PacketBuffer()
+    out.write_varint(hand)
+    return SERVERBOUND["use_item"], out.to_bytes()
+
+
 def serverbound_client_settings(locale: str = "en_US", view_distance: int = 10,
                                 chat_mode: int = 0, chat_colors: bool = True,
                                 skin_parts: int = 0x7F, main_hand: int = 1
@@ -299,7 +369,7 @@ def decode_update_health(payload: bytes) -> UpdateHealth:
     health = struct.unpack(">f", buf.read(4))[0]
     food = buf.read_varint()
     saturation = struct.unpack(">f", buf.read(4))[0]
-    if buf.remaining or not math.isfinite(health) or not math.isfinite(saturation) or food < 0:
+    if buf.remaining or not math.isfinite(health) or not math.isfinite(saturation) or not 0 <= food <= 20 or saturation < 0:
         raise ProtocolError("invalid Update Health payload")
     return UpdateHealth(health, food, saturation)
 
@@ -392,6 +462,8 @@ __all__ = [
     "decode_unload_chunk", "decode_disconnect",
     "decode_update_health", "decode_time_update", "decode_player_abilities",
     "decode_respawn", "decode_plugin_message", "decode_change_game_state",
+    "serverbound_player_abilities", "serverbound_plugin_message",
+    "serverbound_use_entity", "serverbound_entity_action", "serverbound_use_item",
     "PlayPacketDispatcher",
     "create_clientbound_dispatcher",
 ]
