@@ -54,7 +54,16 @@ class PlayerController:
         )
 
     def consume_food(self) -> bool:
-        return self.hunger.consume(self.held_item, self.food_registry)
+        consumed = self.hunger.consume(self.held_item, self.food_registry)
+        if consumed:
+            for returned in self.hunger.take_container_returns():
+                remainder = self.inventory.insert(returned)
+                if not remainder.is_empty:
+                    self.drops.spawn(
+                        self.entity.pos.x, self.entity.pos.y + 0.5,
+                        self.entity.pos.z, remainder,
+                    )
+        return consumed
 
     def eat(self, food_points: int, saturation_modifier: float) -> None:
         self.hunger.eat(food_points, saturation_modifier)
