@@ -8,10 +8,13 @@ from typing import Any
 class Item:
     """A registered item type. Numeric IDs must come from verified 1.12.2 data."""
 
-    __slots__ = ("item_id", "name", "max_stack_size", "max_damage", "has_subtypes")
+    __slots__ = ("item_id", "name", "max_stack_size", "max_damage", "has_subtypes",
+                 "container_item", "container_item_metadata")
 
     def __init__(self, item_id: int, name: str, max_stack_size: int = 64,
-                 max_damage: int = 0, has_subtypes: bool = False) -> None:
+                 max_damage: int = 0, has_subtypes: bool = False,
+                 container_item: "Item | None" = None,
+                 container_item_metadata: int = 0) -> None:
         if isinstance(item_id, bool) or not isinstance(item_id, int) or item_id < 0:
             raise ValueError("item_id must be a non-negative integer")
         if not isinstance(name, str) or not name.strip():
@@ -26,11 +29,19 @@ class Item:
             raise ValueError("damageable items must have max_stack_size=1")
         if not isinstance(has_subtypes, bool):
             raise ValueError("has_subtypes must be a bool")
+        if container_item is not None and not isinstance(container_item, Item):
+            raise TypeError("container_item must be an Item or None")
+        if (isinstance(container_item_metadata, bool)
+                or not isinstance(container_item_metadata, int)
+                or not 0 <= container_item_metadata <= 32767):
+            raise ValueError("container_item_metadata must be an integer from 0 to 32767")
         self.item_id = item_id
         self.name = name.strip()
         self.max_stack_size = max_stack_size
         self.max_damage = max_damage
         self.has_subtypes = has_subtypes
+        self.container_item = container_item
+        self.container_item_metadata = container_item_metadata
 
     @property
     def is_damageable(self) -> bool:
@@ -39,7 +50,8 @@ class Item:
     def __repr__(self) -> str:
         return (f"Item(item_id={self.item_id!r}, name={self.name!r}, "
                 f"max_stack_size={self.max_stack_size!r}, "
-                f"max_damage={self.max_damage!r}, has_subtypes={self.has_subtypes!r})")
+                f"max_damage={self.max_damage!r}, has_subtypes={self.has_subtypes!r}, "
+                f"container_item={self.container_item!r})")
 
 
 class ItemRegistry:
