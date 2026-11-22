@@ -310,7 +310,7 @@ def main(*, seed: int = 0, world_name: str = "New World", save_path: str | None 
                 renderer.upload_chunk_mesh(key, mesh_builder.build(chunk, neighbors=neighbors))
 
         def on_mouse_button(_window, button, action, _mods):
-            nonlocal mouse_left_down, selected_hotbar_slot
+            nonlocal mouse_left_down, selected_hotbar_slot, crafting_open
             if inventory_open:
                 if button == glfw.MOUSE_BUTTON_LEFT and action == glfw.PRESS:
                     cursor_x, cursor_y = glfw.get_cursor_pos(window)
