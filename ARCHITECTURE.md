@@ -29,8 +29,8 @@ Lower layers never import from higher layers. Each arrow means depends on.
 | engine.gameplay         | Inventory, crafting, furnace, redstone, fluids, day cycle | 6     |
 | engine.persistence      | Region file (.mca) read/write, level.dat, chunk NBT       | 7     |
 | engine.network          | Protocol 340 (1.12.2), packets (later)                    | 8     |
-| engine.render           | OpenGL/Vulkan renderer (later)                            | 9     |
-| engine.input            | Keyboard/mouse, controller (later)                        | 9     |
+| engine.render           | Chunk mesh extraction and OpenGL renderer                 | 9     |
+| engine.input            | Keyboard/mouse state and input adapters                   | 9     |
 | engine.app              | Launcher, main loop, config                               | 1     |
 
 Phases are developed in order. Later phases do not start until earlier
