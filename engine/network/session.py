@@ -199,8 +199,7 @@ class PlaySession:
             self.last_time = decode_time_update(payload)
             if self.world is not None:
                 self.world.world_time.total_time = max(0, self.last_time.world_age)
-                if self.last_time.time_of_day >= 0:
-                    self.world.world_time.day_time = self.last_time.time_of_day
+                self.world.world_time.day_time = abs(self.last_time.time_of_day)
             return self._emit("time", self.last_time)
 
         if packet_id == CLIENTBOUND["player_abilities"]:
@@ -211,7 +210,7 @@ class PlaySession:
                 self.player.can_fly = bool(self.last_abilities.flags & 0x04)
                 self.player.creative_mode = bool(self.last_abilities.flags & 0x08)
                 self.player.flying_speed = self.last_abilities.flying_speed
-                self.player.walking_speed = self.last_abilities.walking_speed
+                self.player.field_of_view_modifier = self.last_abilities.fov_modifier
             return self._emit("abilities", self.last_abilities)
 
         if packet_id == CLIENTBOUND["respawn"]:
