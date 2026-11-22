@@ -7,12 +7,13 @@
 - [x] Backend-independent keyboard/mouse state, pressed/released edges, pointer deltas, scrolling, and focus-loss clearing.
 - [x] CPU-side opaque chunk face extraction with adjacent-face culling and optional neighboring-chunk boundary culling.
 - [x] Typed mesh buffers for positions, deterministic placeholder colors, and indexed triangles.
+- [x] Optional GLFW/OpenGL 3.3 renderer with shader compilation, VAO/VBO/EBO upload, indexed drawing, and resource cleanup.
 - [x] Unit tests for the loop, input state, empty/single/adjacent blocks, and chunk boundaries.
 
 ## Remaining implementation
 
-- [ ] Window/context creation and platform lifecycle (GLFW or equivalent).
-- [ ] Actual OpenGL GPU buffers, shaders, camera matrices, depth/cull state, and draw submission.
+- [x] GLFW window/context creation and platform lifecycle implemented; actual desktop smoke testing remains outstanding.
+- [x] OpenGL GPU buffers, basic shaders, externally supplied MVP camera matrix, depth/cull state, and draw submission.
 - [ ] Texture atlas and resource-pack loading; replace placeholder colors with 1.12.2 textures.
 - [ ] Frustum culling, chunk render scheduling, dirty-mesh rebuilds, and render-distance management.
 - [ ] Player camera, mouse capture, keyboard movement, block raycast, and interaction wiring.
