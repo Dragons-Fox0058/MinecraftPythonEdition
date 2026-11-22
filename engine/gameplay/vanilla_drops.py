@@ -91,8 +91,7 @@ def resolve_vanilla_block_drops(
     elif name == "snow":
         return [ItemStack(block_items[332], 4)] if 332 in block_items else []
     elif name == "glowstone":
-        count = 2 + rng.randrange(3)
-        count = min(4, count + (rng.randrange(fortune + 1) if fortune else 0))
+        count = (2 + rng.randrange(3)) * _fortune_multiplier(rng, fortune)
         return [ItemStack(block_items[348], count)] if 348 in block_items else []
     elif name == "coal_ore":
         drop_id, count, metadata = 263, _fortune_multiplier(rng, fortune), 0
