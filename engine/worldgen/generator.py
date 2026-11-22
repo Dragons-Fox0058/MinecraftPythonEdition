@@ -69,6 +69,8 @@ class ChunkGeneratorOverworld:
         seed_value = int(seed) & 0xFFFFFFFFFFFFFFFF
         self._seed_offset_x = ((seed_value * 0x9E3779B1) & 0xFFFF) / 257.0
         self._seed_offset_z = ((seed_value * 0x85EBCA77) & 0xFFFF) / 263.0
+        seed_mix = ((seed_value & 0xFFFFFFFF) * 1664525 + 1013904223) & 0xFFFFFFFF
+        self._seed_height_bias = (seed_mix / 0xFFFFFFFF) * 12.0 - 6.0
         rng = JavaRandom(seed)
         self.noise_min = NoiseGeneratorOctaves(rng, 16)
         self.noise_max = NoiseGeneratorOctaves(rng, 16)
@@ -88,7 +90,7 @@ class ChunkGeneratorOverworld:
                 base = biome.base_height * 30.0
                 var = biome.height_variation * 80.0
                 avg = (n_min + n_max) * 0.5
-                h = 64.0 + base + avg * var
+                h = 64.0 + base + avg * var + self._seed_height_bias
                 hm[lx, lz] = int(max(1, min(254, h)))
         return hm
 
