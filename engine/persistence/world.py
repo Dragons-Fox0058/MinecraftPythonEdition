@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+import uuid
 import shutil
 from pathlib import Path
 
@@ -9,6 +10,9 @@ from engine.core import BlockPos, ChunkPos, NBTTag, NBTDocument, read_nbt, write
 from engine.gameplay.time import GameRules, WorldTime
 from engine.persistence.chunk import chunk_from_nbt, chunk_to_nbt
 from engine.persistence.region import RegionFile, region_coordinates
+from engine.persistence.player import save_player_data, load_player_data
+from engine.gameplay.items import ItemRegistry
+from engine.gameplay.player import PlayerController
 from engine.world.world import World
 
 DATA_VERSION_1_12_2 = 1343
@@ -155,4 +159,24 @@ def load_world(directory: str | os.PathLike) -> World:
         raise WorldSaveError("malformed or unreadable 1.12.2 world save") from exc
 
 
-__all__ = ["DATA_VERSION_1_12_2", "WorldSaveError", "save_world", "load_world"]
+__all__ = ["DATA_VERSION_1_12_2", "WorldSaveError", "save_world", "load_world", "save_world_player", "load_world_player"]
+
+
+def save_world_player(directory: str | os.PathLike, entity, controller: PlayerController,
+                      items: ItemRegistry, *, player_uuid: uuid.UUID | None = None) -> uuid.UUID:
+    """Save one player's vanilla-style playerdata/<uuid>.dat file."""
+    if player_uuid is None:
+        player_uuid = getattr(entity, "uuid", None) or uuid.uuid4()
+    elif not isinstance(player_uuid, uuid.UUID):
+        player_uuid = uuid.UUID(str(player_uuid))
+    path = Path(directory) / "playerdata" / f"{player_uuid}.dat"
+    return save_player_data(path, entity, controller, items, player_uuid=player_uuid)
+
+
+def load_world_player(directory: str | os.PathLike, player_uuid: uuid.UUID,
+                      entity, controller: PlayerController, items: ItemRegistry) -> uuid.UUID:
+    """Restore one player's vanilla-style playerdata/<uuid>.dat file."""
+    if not isinstance(player_uuid, uuid.UUID):
+        player_uuid = uuid.UUID(str(player_uuid))
+    path = Path(directory) / "playerdata" / f"{player_uuid}.dat"
+    return load_player_data(path, entity, controller, items)
