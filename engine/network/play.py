@@ -46,13 +46,6 @@ CLIENTBOUND = {
 }
 
 
-def _finite(value: float, name: str) -> float:
-    value = float(value)
-    if not math.isfinite(value):
-        raise ValueError(f"{name} must be finite")
-    return value
-
-
 def serverbound_teleport_confirm(teleport_id: int) -> tuple[int, bytes]:
     if isinstance(teleport_id, bool) or not isinstance(teleport_id, int) or teleport_id < 0:
         raise ValueError("teleport_id must be a non-negative integer")
@@ -164,11 +157,13 @@ def decode_disconnect(payload: bytes) -> Disconnect:
 
 
 def decode_update_health(payload: bytes) -> UpdateHealth:
-    if len(payload) != 9:
-        raise ProtocolError("Update Health payload must be exactly 9 bytes")
-    health, food, saturation = struct.unpack(">fif", payload)
-    if not math.isfinite(health) or not math.isfinite(saturation) or food < 0:
-        raise ProtocolError("invalid Update Health values")
+    # 1.12.2 encodes food as a VarInt, not a fixed-width 32-bit integer.
+    buf = PacketBuffer(payload)
+    health = struct.unpack(">f", buf.read(4))[0]
+    food = buf.read_varint()
+    saturation = struct.unpack(">f", buf.read(4))[0]
+    if buf.remaining or not math.isfinite(health) or not math.isfinite(saturation) or food < 0:
+        raise ProtocolError("invalid Update Health payload")
     return UpdateHealth(health, food, saturation)
 
 
