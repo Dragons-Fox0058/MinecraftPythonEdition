@@ -12,11 +12,10 @@ The CFG builder identifies basic-block leaders, validates that branch targets la
 
 ## Descriptor parser
 
-Field and method descriptor parsing supports primitive types, object internal names, arrays up to the JVM limit of 255 dimensions, and void method returns. It rejects void fields/parameters, malformed object names, missing delimiters, and trailing data.
+Field and method descriptor parsing supports primitive types, object internal names, arrays up to the JVM limit of 255 dimensions, and void method returns. It rejects void fields/parameters, malformed object names, missing delimiters, and trailing data. Slot accounting follows JVM local-variable rules: `long` and `double` consume two slots, while arrays and references consume one. `validate_method_parameter_slots` enforces the 255-slot method parameter limit and can include the receiver slot for instance methods; the caller must supply the correct static/instance context.
 
 ## Next
 
 - Resolve constant-pool references into typed symbols.
 - Parse generic Signature attributes separately from JVM descriptors.
-- Decode branch targets and build basic blocks / a control-flow graph.
-- Add stack/local data-flow analysis and bytecode verifier checks.
+- Add typed stack/local data-flow analysis and bytecode verifier checks.
