@@ -104,6 +104,11 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
         } else if (is_iload(instruction)) {
             const auto index = local_index(instruction);
             require_local(index, max_locals, instruction);
+            if (!initialized_locals[index]) {
+                throw CodegenError("read of uninitialized local-variable slot " +
+                                   std::to_string(index) + " at bytecode offset " +
+                                   std::to_string(instruction.offset));
+            }
             body << "    stack.push_back(locals[" << index << "]);\n";
             ++stack_depth;
         } else if (is_istore(instruction)) {
@@ -111,6 +116,7 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
             require_local(index, max_locals, instruction);
             require_stack(stack_depth, 1, instruction);
             body << "    locals[" << index << "] = stack.back(); stack.pop_back();\n";
+            initialized_locals[index] = true;
             --stack_depth;
         } else if (op == 0x84 || (op == 0xc4 && instruction.operands.at(0) == 0x84)) {
             const bool wide = op == 0xc4;
