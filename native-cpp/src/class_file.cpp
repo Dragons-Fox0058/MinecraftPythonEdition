@@ -83,7 +83,8 @@ std::vector<AttributeInfo> read_attributes(Reader& reader,
 
         const auto name = cp[attribute.name_index].text;
         if (parse_code && name == "Code") {
-            Reader code_reader(reader.bytes(attribute.length));
+            const auto attribute_bytes = reader.bytes(attribute.length);
+            Reader code_reader(attribute_bytes);
             CodeAttribute code;
             code.max_stack = code_reader.u2();
             code.max_locals = code_reader.u2();
