@@ -1,0 +1,11 @@
+{
+  "project": "Minecraft C++ Native",
+  "target_game": "Minecraft Java Edition",
+  "target_version": "26.3",
+  "language": "C++",
+  "cpp_standard": "20",
+  "translation_mode": "java-bytecode-analysis-and-native-code-generation",
+  "reference_runtime_required": true,
+  "game_files_policy": "user-provided-local-installation",
+  "status": "scaffold"
+}
