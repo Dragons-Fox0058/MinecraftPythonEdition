@@ -79,8 +79,13 @@ int main() {
     }
     assert(rejected);
 
-    const auto guarded_uninitialized = generate_int_method_cpp({0x1a, 0xac}, 1);
-    assert(guarded_uninitialized.find("read of uninitialized local") != std::string::npos);
+    rejected = false;
+    try {
+        (void)generate_int_method_cpp({0x1a, 0xac}, 1);
+    } catch (const CodegenError&) {
+        rejected = true;
+    }
+    assert(rejected); // definite-initialization is now rejected statically
 
     rejected = false;
     try {
