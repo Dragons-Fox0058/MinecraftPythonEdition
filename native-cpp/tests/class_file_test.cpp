@@ -117,5 +117,46 @@ int main() {
     }
     assert(rejected);
 
+    // Exception table addresses must point to decoded instruction boundaries.
+    auto exception_mid_instruction = with_method;
+    const std::vector<std::uint8_t> original_code{0x05, 0x06, 0x60, 0xAC};
+    const auto code_pos = std::search(exception_mid_instruction.begin(), exception_mid_instruction.end(),
+                                      original_code.begin(), original_code.end());
+    assert(code_pos != exception_mid_instruction.end());
+    const auto code_offset = static_cast<std::size_t>(code_pos - exception_mid_instruction.begin());
+    // Replace iconst_2 with bipush, making bytecode offset 1 the middle of an instruction.
+    exception_mid_instruction[code_offset] = 0x10;
+    exception_mid_instruction[code_offset + 1] = 0x05;
+    exception_mid_instruction[code_offset + 2] = 0xAC;
+    exception_mid_instruction.erase(exception_mid_instruction.begin() + static_cast<std::ptrdiff_t>(code_offset + 3));
+    const std::vector<std::uint8_t> old_code_length{0x00, 0x00, 0x00, 0x04};
+    const auto code_length_it = std::search(exception_mid_instruction.begin(), exception_mid_instruction.end(),
+                                            old_code_length.begin(), old_code_length.end());
+    assert(code_length_it != exception_mid_instruction.end());
+    *(code_length_it + 3) = 0x03;
+    // Code attribute shrinks by one byte: 16 -> 15.
+    const std::vector<std::uint8_t> old_attribute_length{0x00, 0x00, 0x00, 0x10};
+    const auto attribute_length_it = std::search(exception_mid_instruction.begin(), exception_mid_instruction.end(),
+                                                 old_attribute_length.begin(), old_attribute_length.end());
+    assert(attribute_length_it != exception_mid_instruction.end());
+    *(attribute_length_it + 3) = 0x0F;
+    // Locate exception_table_length immediately after the three byte instructions.
+    const auto exception_count_pos = code_offset + 3;
+    assert(exception_count_pos + 4 <= exception_mid_instruction.size());
+    exception_mid_instruction[exception_count_pos] = 0x00;
+    exception_mid_instruction[exception_count_pos + 1] = 0x01;
+    // Handler: [0, 2), handler_pc=1 (inside bipush), catch_type=0.
+    const std::vector<std::uint8_t> invalid_handler{0x00,0x00, 0x00,0x02, 0x00,0x01, 0x00,0x00};
+    exception_mid_instruction.insert(exception_mid_instruction.begin() +
+                                     static_cast<std::ptrdiff_t>(exception_count_pos + 2),
+                                     invalid_handler.begin(), invalid_handler.end());
+    rejected = false;
+    try {
+        (void)ClassFileParser::parse(exception_mid_instruction);
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
     return 0;
 }
