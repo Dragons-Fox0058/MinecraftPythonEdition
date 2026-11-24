@@ -10,6 +10,7 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - Class, superclass, interface, field, and method metadata.
 - JVM bytecode decoder, including `tableswitch`, `lookupswitch`, and `wide`.
 - JVM descriptor parser and control-flow graph builder.
+- JVM method descriptor to native C++ signature mapping, including static/instance parameter local-slot layout and category-2 parameters.
 - Typed operand-stack verification and definite-initialization analysis for integer locals across reachable control-flow merges.
 - Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
 - `inspect-class`, `translate-int`, `translate-method`, and `index-classes` CLI commands.
