@@ -1,4 +1,5 @@
 #include "mcnative/class_file.hpp"
+#include "mcnative/codegen.hpp"
 
 #include <cassert>
 #include <cstdint>
@@ -40,5 +41,37 @@ int main() {
         rejected = true;
     }
     assert(rejected);
+
+    // Class with one public static int answer() method whose bytecode computes 2 + 3.
+    const std::vector<std::uint8_t> with_method{
+        0xCA,0xFE,0xBA,0xBE, 0x00,0x00, 0x00,0x3E,
+        0x00,0x08,
+        0x01,0x00,0x04,'T','e','s','t',
+        0x07,0x00,0x01,
+        0x01,0x00,0x10,'j','a','v','a','/','l','a','n','g','/','O','b','j','e','c','t',
+        0x07,0x00,0x03,
+        0x01,0x00,0x06,'a','n','s','w','e','r',
+        0x01,0x00,0x03,'(',')','I',
+        0x01,0x00,0x04,'C','o','d','e',
+        0x00,0x21, 0x00,0x02, 0x00,0x04,
+        0x00,0x00, 0x00,0x00,
+        0x00,0x01,
+        0x00,0x09, 0x00,0x05, 0x00,0x06,
+        0x00,0x01,
+        0x00,0x07, 0x00,0x00,0x00,0x10,
+        0x00,0x02, 0x00,0x00, 0x00,0x00,0x00,0x04,
+        0x05,0x06,0x60,0xAC,
+        0x00,0x00, 0x00,0x00,
+        0x00,0x00
+    };
+    const auto method_class = ClassFileParser::parse(with_method);
+    assert(method_class.methods.size() == 1);
+    assert(method_class.utf8(method_class.methods[0].name_index) == "answer");
+    assert(method_class.methods[0].attributes.size() == 1);
+    assert(method_class.methods[0].attributes[0].code.has_value());
+    const auto generated = mcnative::jvm::generate_int_method_cpp(
+        method_class.methods[0].attributes[0].code->bytecode);
+    assert(generated.find("lhs + rhs") != std::string::npos);
+
     return 0;
 }
