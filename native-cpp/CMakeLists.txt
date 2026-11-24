@@ -13,6 +13,7 @@ add_library(mcnative_core
     src/class_file.cpp
     src/bytecode.cpp
     src/descriptor.cpp
+    src/codegen.cpp
 )
 target_include_directories(mcnative_core PUBLIC include)
 target_compile_features(mcnative_core PUBLIC cxx_std_20)
@@ -46,4 +47,8 @@ if(MCNATIVE_BUILD_TESTS)
     add_executable(mcnative_descriptor_test tests/descriptor_test.cpp)
     target_link_libraries(mcnative_descriptor_test PRIVATE mcnative_core)
     add_test(NAME mcnative_descriptor_test COMMAND mcnative_descriptor_test)
+
+    add_executable(mcnative_codegen_test tests/codegen_test.cpp)
+    target_link_libraries(mcnative_codegen_test PRIVATE mcnative_core)
+    add_test(NAME mcnative_codegen_test COMMAND mcnative_codegen_test)
 endif()
