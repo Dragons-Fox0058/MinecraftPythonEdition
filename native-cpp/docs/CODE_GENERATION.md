@@ -11,14 +11,15 @@ The backend translates a limited subset of JVM integer methods into a standalone
 - `istore`, `istore_0` through `istore_3`
 - `iinc`
 - `wide iload`, `wide istore`, `wide iinc`
-- `iadd`, `isub`, `imul`, `ineg`
+- `iadd`, `isub`, `imul`, `idiv`, `irem`, `ineg`
+- `ishl`, `ishr`, `iushr`, `iand`, `ior`, `ixor`
 - `i2b`, `i2c`, `i2s`
 - `ifeq`, `ifne`, `iflt`, `ifge`, `ifgt`, `ifle`
 - `if_icmpeq`, `if_icmpne`, `if_icmplt`, `if_icmpge`, `if_icmpgt`, `if_icmple`
 - `goto`, `goto_w`
 - `ireturn`
 
-Branches are emitted as C++ labels and jumps. Before code generation, the control-flow graph builder validates branch destinations and instruction boundaries. Operand-stack underflow and uninitialized local reads are guarded in the generated function at runtime. For class-file methods, `max_locals` is taken from the method's `Code` attribute.
+Branches are emitted as C++ labels and jumps. Before code generation, the control-flow graph builder validates branch destinations and instruction boundaries. Operand-stack underflow, integer division by zero, and uninitialized local reads are guarded in the generated function at runtime. Integer division handles the JVM `INT_MIN / -1` edge case without triggering C++ signed-overflow undefined behavior. Shift distances are masked to five bits as required for JVM int shifts. For class-file methods, `max_locals` is taken from the method's `Code` attribute.
 
 ## Current limitations
 
