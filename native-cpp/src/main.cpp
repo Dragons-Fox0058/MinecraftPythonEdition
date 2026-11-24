@@ -1,5 +1,6 @@
 #include "mcnative/class_file.hpp"
 #include "mcnative/codegen.hpp"
+#include "mcnative/descriptor.hpp"
 #include "mcnative/version.hpp"
 
 #include <exception>
@@ -67,6 +68,34 @@ int translate_int(std::string_view hex) {
     return 0;
 }
 
+int translate_class_method(const char* path, std::string_view method_name,
+                          std::string_view descriptor) {
+    const auto parsed_descriptor = mcnative::jvm::parse_method_descriptor(descriptor);
+    if (!parsed_descriptor.parameters.empty() ||
+        parsed_descriptor.return_type.kind != mcnative::jvm::TypeKind::int_type ||
+        parsed_descriptor.return_type.array_dimensions != 0) {
+        throw std::invalid_argument("translate-method currently supports only methods with descriptor ()I");
+    }
+
+    const auto file = mcnative::jvm::ClassFileParser::parse_file(path);
+    for (const auto& method : file.methods) {
+        if (file.utf8(method.name_index) != method_name ||
+            file.utf8(method.descriptor_index) != descriptor) {
+            continue;
+        }
+        for (const auto& attribute : method.attributes) {
+            if (attribute.code) {
+                std::cout << "// Source class: " << file.this_name() << "\n"
+                          << "// Source method: " << method_name << descriptor << "\n"
+                          << mcnative::jvm::generate_int_method_cpp(attribute.code->bytecode);
+                return 0;
+            }
+        }
+        throw std::invalid_argument("matching method has no Code attribute (it may be abstract or native)");
+    }
+    throw std::invalid_argument("method and descriptor were not found in the class file");
+}
+
 void print_usage() {
     std::cout << "Minecraft C++ Native — target Java Edition "
               << mcnative::target_game_version() << "\n\n"
@@ -92,6 +121,9 @@ int main(int argc, char** argv) {
         }
         if (argc == 3 && std::string_view{argv[1]} == "translate-int") {
             return translate_int(argv[2]);
+        }
+        if (argc == 5 && std::string_view{argv[1]} == "translate-method") {
+            return translate_class_method(argv[2], argv[3], argv[4]);
         }
 
         print_usage();
