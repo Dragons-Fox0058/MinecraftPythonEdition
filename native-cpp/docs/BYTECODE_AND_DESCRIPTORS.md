@@ -19,3 +19,8 @@ Field and method descriptor parsing supports primitive types, object internal na
 - Resolve constant-pool references into typed symbols.
 - Parse generic Signature attributes separately from JVM descriptors.
 - Add typed stack/local data-flow analysis and bytecode verifier checks.
+
+
+## Typed operand-stack verification
+
+The current verifier tracks JVM operand-stack value categories for integer, float, long, double, reference/null values, checks typed arithmetic and return instructions, and requires compatible stack states at control-flow merges. Long and double values count as two JVM stack slots. This is a deliberately bounded verification subset, not the complete JVM type verifier: object initialization, full local-variable type frames, invocation descriptors, arrays, and StackMapTable semantics remain future work.
