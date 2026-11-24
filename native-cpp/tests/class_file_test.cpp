@@ -100,6 +100,24 @@ int main() {
     assert(interface_ref.owner == "Test");
     assert(interface_ref.is_interface);
 
+    const auto virtual_call = mcnative::jvm::resolve_method_invocation(
+        refs_class, mcnative::jvm::Instruction{0, 0xb6, {0x00, 0x08}, 3});
+    assert(virtual_call.target.name == "call");
+    assert(virtual_call.opcode == 0xb6);
+    const auto interface_call = mcnative::jvm::resolve_method_invocation(
+        refs_class, mcnative::jvm::Instruction{0, 0xb9, {0x00, 0x09, 0x01, 0x00}, 5});
+    assert(interface_call.target.is_interface);
+    assert(interface_call.argument_count == 1);
+
+    rejected = false;
+    try {
+        (void)mcnative::jvm::resolve_method_invocation(
+            refs_class, mcnative::jvm::Instruction{0, 0xb9, {0x00, 0x08, 0x01, 0x00}, 5});
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
     rejected = false;
     try {
         (void)refs_class.method_reference(1); // UTF-8 is not a method reference.
