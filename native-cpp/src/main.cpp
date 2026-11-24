@@ -1,7 +1,11 @@
 #include "mcnative/class_file.hpp"
+#include "mcnative/codegen.hpp"
 #include "mcnative/version.hpp"
 
 #include <exception>
+#include <iomanip>
+#include <sstream>
+#include <vector>
 #include <iostream>
 #include <string_view>
 
@@ -34,6 +38,29 @@ int inspect_class(const char* path) {
         }
         std::cout << '\n';
     }
+    return 0;
+}
+
+std::vector<std::uint8_t> parse_hex_bytecode(std::string_view hex) {
+    if (hex.empty() || (hex.size() % 2) != 0) {
+        throw std::invalid_argument("bytecode hex must contain a non-empty even number of digits");
+    }
+    std::vector<std::uint8_t> bytes;
+    bytes.reserve(hex.size() / 2);
+    for (std::size_t i = 0; i < hex.size(); i += 2) {
+        unsigned value = 0;
+        std::istringstream part(std::string(hex.substr(i, 2)));
+        part >> std::hex >> value;
+        if (!part || !part.eof() || value > 0xFFU) {
+            throw std::invalid_argument("invalid hexadecimal bytecode at character " + std::to_string(i));
+        }
+        bytes.push_back(static_cast<std::uint8_t>(value));
+    }
+    return bytes;
+}
+
+int translate_int(std::string_view hex) {
+    std::cout << mcnative::jvm::generate_int_method_cpp(parse_hex_bytecode(hex));
     return 0;
 }
 
