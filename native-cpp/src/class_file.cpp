@@ -147,6 +147,17 @@ std::vector<MemberInfo> read_members(Reader& reader,
             throw ClassFileError(std::string("invalid member descriptor: ") + error.what());
         }
         member.attributes = read_attributes(reader, cp, methods);
+        if (methods) {
+            const auto parsed = parse_method_descriptor(descriptor);
+            const std::uint16_t acc_static = 0x0008;
+            const bool is_instance_method = (member.access_flags & acc_static) == 0;
+            const auto required_locals = method_parameter_slots(parsed, is_instance_method);
+            for (const auto& attribute : member.attributes) {
+                if (attribute.code && required_locals > attribute.code->max_locals) {
+                    throw ClassFileError("Code.max_locals is smaller than the method parameter slot count");
+                }
+            }
+        }
         members.push_back(std::move(member));
     }
     return members;
