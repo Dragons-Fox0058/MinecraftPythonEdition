@@ -14,6 +14,10 @@ public:
     using std::runtime_error::runtime_error;
 };
 
+// Verifies operand-stack value categories for the supported JVM verification subset.
+// Category-2 values (long/double) occupy two JVM stack slots.
+void verify_typed_stack(const std::vector<std::uint8_t>& bytecode);
+
 // Emits a standalone C++20 function for the supported straight-line JVM int subset.
 // max_locals comes from the method's Code attribute; all locals start at JVM default zero.
 [[nodiscard]] std::string generate_int_method_cpp(
