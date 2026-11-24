@@ -1,0 +1,11 @@
+/build/
+/out/
+/.cache/
+*.obj
+*.o
+*.pdb
+*.ilk
+*.exe
+*.dll
+*.so
+*.dylib
