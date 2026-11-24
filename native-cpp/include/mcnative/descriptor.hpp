@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <string>
 #include <string_view>
+#include <cstdint>
 #include <vector>
 
 namespace mcnative::jvm {
@@ -39,5 +40,16 @@ struct MethodDescriptor {
 // Throws DescriptorError when parameter slots exceed the JVM limit of 255.
 void validate_method_parameter_slots(const MethodDescriptor& descriptor,
                                      bool include_receiver = false);
+
+// Maps JVM types to stable C++20 ABI types used by the native translation layer.
+[[nodiscard]] std::string cpp_type_name(const JvmType& type);
+[[nodiscard]] std::string generate_cpp_method_signature(
+    std::string_view method_name, const MethodDescriptor& descriptor,
+    bool is_static = true);
+
+// Returns the JVM local-variable slot for each explicit parameter, accounting
+// for the optional instance receiver and category-2 long/double parameters.
+[[nodiscard]] std::vector<std::uint16_t> method_parameter_local_indices(
+    const MethodDescriptor& descriptor, bool is_static = true);
 
 } // namespace mcnative::jvm
