@@ -100,7 +100,8 @@ void print_usage() {
               << "Usage:\n"
               << "  mc-native-tool --version\n"
               << "  mc-native-tool inspect-class <path-to-class-file>\n"
-              << "  mc-native-tool translate-int <hex-bytecode>\n";
+              << "  mc-native-tool translate-int <hex-bytecode>\n"
+              << "  mc-native-tool translate-method <class-file> <method-name> <descriptor>\n";
 }
 
 } // namespace
