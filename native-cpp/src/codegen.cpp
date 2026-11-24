@@ -27,7 +27,7 @@ std::uint16_t local_index(const Instruction& instruction) {
     const auto op = instruction.opcode;
     if (op == 0xc4) return operand_u2(instruction, 1);
     if ((op >= 0x1a && op <= 0x1d) || (op >= 0x3b && op <= 0x3e)) {
-        return static_cast<std::uint16_t>((op - 0x1a) % 4);
+        return static_cast<std::uint16_t>(op <= 0x1d ? op - 0x1a : op - 0x3b);
     }
     return instruction.operands.at(0);
 }
