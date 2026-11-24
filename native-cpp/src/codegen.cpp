@@ -3,6 +3,7 @@
 
 #include <bit>
 #include <cstdint>
+#include <limits>
 #include <sstream>
 
 namespace mcnative::jvm {
@@ -127,10 +128,34 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
                  << "    locals[" << index << "] += static_cast<std::uint32_t>(" << amount << ");\n";
         } else if (op == 0x00) {
             body << "    // nop\n";
-        } else if (op == 0x60 || op == 0x64 || op == 0x68) {
-            const char* operation = op == 0x60 ? "+" : (op == 0x64 ? "-" : "*");
-            body << "    { const auto rhs = pop_int(); const auto lhs = pop_int();\n"
-                 << "      stack.push_back(lhs " << operation << " rhs); }\n";
+        } else if (op == 0x60 || op == 0x64 || op == 0x68 ||
+                   op == 0x7e || op == 0x80 || op == 0x82 ||
+                   op == 0x78 || op == 0x7a || op == 0x7c) {
+            const char* operation = op == 0x60 ? "+" : op == 0x64 ? "-" :
+                op == 0x68 ? "*" : op == 0x7e ? "&" : op == 0x80 ? "|" :
+                op == 0x82 ? "^" : op == 0x78 ? "<<" : op == 0x7a ? ">>" : ">>>"; 
+            body << "    { const auto rhs = pop_int(); const auto lhs = pop_int();\n";
+            if (op == 0x7a) {
+                body << "      stack.push_back(static_cast<std::uint32_t>(std::bit_cast<std::int32_t>(lhs) >> (rhs & 0x1FU))); }\n";
+            } else if (op == 0x7c) {
+                body << "      stack.push_back(lhs >> (rhs & 0x1FU)); }\n";
+            } else if (op == 0x78) {
+                body << "      stack.push_back(lhs << (rhs & 0x1FU)); }\n";
+            } else if (op == 0x60 || op == 0x64 || op == 0x68 ||
+                       op == 0x7e || op == 0x80 || op == 0x82) {
+                body << "      stack.push_back(lhs " << operation << " rhs); }\n";
+            }
+        } else if (op == 0x6c || op == 0x70) {
+            body << "    { const auto rhs = std::bit_cast<std::int32_t>(pop_int());\n"
+                 << "      const auto lhs = std::bit_cast<std::int32_t>(pop_int());\n"
+                 << "      if (rhs == 0) throw std::runtime_error(\"integer division by zero\");\n";
+            if (op == 0x6c) {
+                body << "      if (lhs == std::numeric_limits<std::int32_t>::min() && rhs == -1) stack.push_back(static_cast<std::uint32_t>(lhs));\n"
+                     << "      else stack.push_back(static_cast<std::uint32_t>(lhs / rhs)); }\n";
+            } else {
+                body << "      if (lhs == std::numeric_limits<std::int32_t>::min() && rhs == -1) stack.push_back(0U);\n"
+                     << "      else stack.push_back(static_cast<std::uint32_t>(lhs % rhs)); }\n";
+            }
         } else if (op == 0x74) {
             body << "    stack.push_back(0U - pop_int());\n";
         } else if (op == 0x91 || op == 0x92 || op == 0x93) {
