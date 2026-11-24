@@ -2,6 +2,8 @@
 #include "mcnative/control_flow.hpp"
 
 #include <algorithm>
+#include <bit>
+#include <limits>
 #include <cstdint>
 #include <optional>
 #include <sstream>
