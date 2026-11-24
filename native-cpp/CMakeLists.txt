@@ -11,6 +11,7 @@ option(MCNATIVE_BUILD_TESTS "Build unit and smoke tests" ON)
 add_library(mcnative_core
     src/version.cpp
     src/class_file.cpp
+    src/bytecode.cpp
 )
 target_include_directories(mcnative_core PUBLIC include)
 target_compile_features(mcnative_core PUBLIC cxx_std_20)
@@ -36,4 +37,8 @@ if(MCNATIVE_BUILD_TESTS)
     add_executable(mcnative_class_file_test tests/class_file_test.cpp)
     target_link_libraries(mcnative_class_file_test PRIVATE mcnative_core)
     add_test(NAME mcnative_class_file_test COMMAND mcnative_class_file_test)
+
+    add_executable(mcnative_bytecode_test tests/bytecode_test.cpp)
+    target_link_libraries(mcnative_bytecode_test PRIVATE mcnative_core)
+    add_test(NAME mcnative_bytecode_test COMMAND mcnative_bytecode_test)
 endif()
