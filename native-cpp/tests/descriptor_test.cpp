@@ -38,5 +38,17 @@ int main() {
         rejected = true;
     }
     assert(rejected);
+    assert(type_slot_width(method.parameters[0]) == 1);
+    assert(type_slot_width(method.parameters[1]) == 2);
+    assert(type_slot_width(method.parameters[2]) == 1);
+    assert(method_parameter_slots(method) == 5);
+    assert(method_parameter_slots(method, true) == 6);
+    assert(type_slot_width(method.return_type) == 2);
+    assert(type_slot_width(ctor.return_type) == 0);
+
+    const auto arrays = parse_method_descriptor("([J[D[[I)J");
+    assert(method_parameter_slots(arrays) == 3);
+    assert(type_slot_width(arrays.return_type) == 2);
+
     return 0;
 }
