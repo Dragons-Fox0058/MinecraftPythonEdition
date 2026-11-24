@@ -4,6 +4,8 @@
 #include "mcnative/version.hpp"
 
 #include <exception>
+#include <filesystem>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <sstream>
@@ -94,6 +96,64 @@ int translate_class_method(const char* path, std::string_view method_name,
     throw std::invalid_argument("method and descriptor were not found in the class file");
 }
 
+
+std::string csv_escape(std::string_view value) {
+    std::string escaped = "\"";
+    for (const char ch : value) {
+        if (ch == '"') escaped += "\"\"";
+        else escaped += ch;
+    }
+    escaped += '"';
+    return escaped;
+}
+
+int index_classes(const std::filesystem::path& root, const std::filesystem::path& output_path) {
+    if (!std::filesystem::is_directory(root)) {
+        throw std::invalid_argument("class root is not a directory: " + root.string());
+    }
+    std::ofstream output(output_path, std::ios::binary);
+    if (!output) {
+        throw std::invalid_argument("cannot create index file: " + output_path.string());
+    }
+    output << "relative_path,internal_name,super_name,major,minor,interfaces,fields,methods,methods_with_code\n";
+
+    std::size_t parsed = 0;
+    std::size_t failed = 0;
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(root)) {
+        if (!entry.is_regular_file() || entry.path().extension() != ".class") continue;
+        try {
+            const auto file = mcnative::jvm::ClassFileParser::parse_file(entry.path());
+            std::size_t methods_with_code = 0;
+            for (const auto& method : file.methods) {
+                for (const auto& attribute : method.attributes) {
+                    if (attribute.code) {
+                        ++methods_with_code;
+                        break;
+                    }
+                }
+            }
+            const auto relative = std::filesystem::relative(entry.path(), root).generic_string();
+            output << csv_escape(relative) << ','
+                   << csv_escape(file.this_name()) << ','
+                   << csv_escape(file.super_name()) << ','
+                   << file.major_version << ',' << file.minor_version << ','
+                   << file.interfaces.size() << ',' << file.fields.size() << ','
+                   << file.methods.size() << ',' << methods_with_code << '\n';
+            ++parsed;
+        } catch (const std::exception& error) {
+            ++failed;
+            std::cerr << "warning: " << entry.path().string() << ": " << error.what() << '\n';
+        }
+    }
+    output.flush();
+    if (!output) {
+        throw std::runtime_error("failed while writing class index: " + output_path.string());
+    }
+    std::cout << "Indexed " << parsed << " class files; " << failed
+              << " failed. Output: " << output_path.string() << '\n';
+    return failed == 0 ? 0 : 1;
+}
+
 void print_usage() {
     std::cout << "Minecraft C++ Native — target Java Edition "
               << mcnative::target_game_version() << "\n\n"
@@ -101,7 +161,8 @@ void print_usage() {
               << "  mc-native-tool --version\n"
               << "  mc-native-tool inspect-class <path-to-class-file>\n"
               << "  mc-native-tool translate-int <hex-bytecode>\n"
-              << "  mc-native-tool translate-method <class-file> <method-name> <descriptor>\n";
+              << "  mc-native-tool translate-method <class-file> <method-name> <descriptor>\n"
+              << "  mc-native-tool index-classes <extracted-classes-directory> <output.csv>\n";
 }
 
 } // namespace
@@ -123,6 +184,9 @@ int main(int argc, char** argv) {
         }
         if (argc == 5 && std::string_view{argv[1]} == "translate-method") {
             return translate_class_method(argv[2], argv[3], argv[4]);
+        }
+        if (argc == 4 && std::string_view{argv[1]} == "index-classes") {
+            return index_classes(argv[2], argv[3]);
         }
 
         print_usage();
