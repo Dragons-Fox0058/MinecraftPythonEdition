@@ -20,14 +20,14 @@ int main() {
 
     // tableswitch at offset zero: one padding byte, default, low=0, high=0, one jump.
     const auto table = decode_bytecode({
-        0xaa, 0x00,
+        0xaa, 0x00,0x00,0x00,
         0x00,0x00,0x00,0x00,
         0x00,0x00,0x00,0x00,
         0x00,0x00,0x00,0x00,
         0x00,0x00,0x00,0x00
     });
     assert(table.size() == 1);
-    assert(table[0].next_offset == 18);
+    assert(table[0].next_offset == 20);
 
     bool rejected = false;
     try {
