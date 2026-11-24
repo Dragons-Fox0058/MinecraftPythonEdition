@@ -1,13 +1,31 @@
 #include "mcnative/codegen.hpp"
 #include "mcnative/control_flow.hpp"
 
-#include <bit>
+#include <algorithm>
 #include <cstdint>
-#include <limits>
+#include <optional>
 #include <sstream>
 
 namespace mcnative::jvm {
 namespace {
+
+enum class ValueType { Int, Float, Long, Double, Reference, Null };
+
+int slot_width(ValueType type) {
+    return type == ValueType::Long || type == ValueType::Double ? 2 : 1;
+}
+
+std::string type_name(ValueType type) {
+    switch (type) {
+    case ValueType::Int: return "int";
+    case ValueType::Float: return "float";
+    case ValueType::Long: return "long";
+    case ValueType::Double: return "double";
+    case ValueType::Reference: return "reference";
+    case ValueType::Null: return "null";
+    }
+    return "unknown";
+}
 
 std::uint16_t operand_u2(const Instruction& instruction, std::size_t offset = 0) {
     return static_cast<std::uint16_t>(
@@ -80,72 +98,123 @@ void require_local(std::uint16_t index, std::uint16_t max_locals,
     }
 }
 
+} // namespace
 
-void verify_stack_heights(const ControlFlowGraph& graph) {
+void verify_typed_stack(const std::vector<std::uint8_t>& bytecode) {
+    const auto graph = build_control_flow_graph(bytecode);
     if (graph.blocks.empty()) throw CodegenError("method has no basic blocks");
-
-    std::vector<int> incoming(graph.blocks.size(), -1);
+    using Stack = std::vector<ValueType>;
+    std::vector<std::optional<Stack>> incoming(graph.blocks.size());
     std::vector<std::size_t> worklist{0};
-    incoming[0] = 0;
+    incoming[0] = Stack{};
 
-    auto find_block = [&](std::uint32_t offset) -> std::size_t {
-        for (std::size_t i = 0; i < graph.blocks.size(); ++i) {
-            if (graph.blocks[i].start_offset == offset) return i;
-        }
-        throw CodegenError("control-flow edge targets a missing basic block");
+    auto block_index = [&](std::uint32_t offset) {
+        const auto it = std::find_if(graph.blocks.begin(), graph.blocks.end(),
+            [&](const BasicBlock& block) { return block.start_offset == offset; });
+        if (it == graph.blocks.end()) throw CodegenError("control-flow edge targets a missing basic block");
+        return static_cast<std::size_t>(it - graph.blocks.begin());
     };
 
     while (!worklist.empty()) {
-        const auto block_index = worklist.back();
+        const auto index = worklist.back();
         worklist.pop_back();
-        const auto& block = graph.blocks[block_index];
-        int depth = incoming[block_index];
+        Stack stack = *incoming[index];
+        const auto& block = graph.blocks[index];
+
+        auto pop = [&](ValueType expected, const Instruction& ins) {
+            if (stack.empty()) throw CodegenError("operand-stack underflow at bytecode offset " +
+                                                  std::to_string(ins.offset));
+            const auto actual = stack.back();
+            stack.pop_back();
+            if (actual != expected) {
+                throw CodegenError("type mismatch at bytecode offset " + std::to_string(ins.offset) +
+                    ": expected " + type_name(expected) + ", found " + type_name(actual));
+            }
+        };
+        auto push = [&](ValueType type) {
+            stack.push_back(type);
+            std::size_t slots = 0;
+            for (const auto value : stack) slots += static_cast<std::size_t>(slot_width(value));
+            if (slots > 65535) throw CodegenError("operand stack exceeds JVM slot limit");
+        };
 
         for (const auto& ins : block.instructions) {
             const auto op = ins.opcode;
-            int pop = 0;
-            int push = 0;
-            if ((op >= 0x02 && op <= 0x08) || op == 0x10 || op == 0x11 || is_iload(ins)) {
-                push = 1;
-            } else if (is_istore(ins) || (op >= 0x99 && op <= 0x9e) || op == 0xac) {
-                pop = 1;
+            if (op == 0x00 || op == 0x84 || (op == 0xc4 && ins.operands.at(0) == 0x84)) {
+                continue;
+            } else if ((op >= 0x02 && op <= 0x08) || op == 0x10 || op == 0x11 || is_iload(ins)) {
+                push(ValueType::Int);
+            } else if (op == 0x09 || op == 0x0a) {
+                push(ValueType::Long);
+            } else if (op >= 0x0b && op <= 0x0d) {
+                push(ValueType::Float);
+            } else if (op == 0x0e || op == 0x0f) {
+                push(ValueType::Double);
+            } else if (op == 0x01) {
+                push(ValueType::Null);
+            } else if (is_istore(ins)) {
+                pop(ValueType::Int, ins);
+            } else if (op >= 0x60 && op <= 0x73) {
+                const auto group = (op - 0x60) % 4;
+                const auto type = group == 0 ? ValueType::Int : group == 1 ? ValueType::Long :
+                                  group == 2 ? ValueType::Float : ValueType::Double;
+                pop(type, ins); pop(type, ins); push(type);
+            } else if (op == 0x74 || op == 0x75 || op == 0x76 || op == 0x77) {
+                const auto type = op == 0x74 ? ValueType::Int : op == 0x75 ? ValueType::Long :
+                                  op == 0x76 ? ValueType::Float : ValueType::Double;
+                pop(type, ins); push(type);
+            } else if (op == 0x78 || op == 0x7a || op == 0x7c) {
+                pop(ValueType::Int, ins); pop(ValueType::Int, ins); push(ValueType::Int);
+            } else if (op == 0x79 || op == 0x7b || op == 0x7d) {
+                pop(ValueType::Int, ins); pop(ValueType::Long, ins); push(ValueType::Long);
+            } else if (op == 0x7e || op == 0x80 || op == 0x82) {
+                pop(ValueType::Int, ins); pop(ValueType::Int, ins); push(ValueType::Int);
+            } else if (op == 0x7f || op == 0x81 || op == 0x83) {
+                pop(ValueType::Long, ins); pop(ValueType::Long, ins); push(ValueType::Long);
+            } else if (op >= 0x91 && op <= 0x93) {
+                pop(ValueType::Int, ins); push(ValueType::Int);
+            } else if (op >= 0x99 && op <= 0x9e) {
+                pop(ValueType::Int, ins);
             } else if (op >= 0x9f && op <= 0xa4) {
-                pop = 2;
-            } else if (op == 0x84 || (op == 0xc4 && ins.operands.at(0) == 0x84) ||
-                       op == 0x00 || op == 0xa7 || op == 0xc8) {
-                // No operand-stack effect.
-            } else if (op == 0x60 || op == 0x64 || op == 0x68 || op == 0x6c ||
-                       op == 0x70 || op == 0x7e || op == 0x80 || op == 0x82 ||
-                       op == 0x78 || op == 0x7a || op == 0x7c) {
-                pop = 2; push = 1;
-            } else if (op == 0x74 || op == 0x91 || op == 0x92 || op == 0x93) {
-                pop = 1; push = 1;
+                pop(ValueType::Int, ins); pop(ValueType::Int, ins);
+            } else if (op == 0xac) {
+                pop(ValueType::Int, ins);
+                if (!stack.empty()) throw CodegenError("non-empty operand stack at ireturn");
+            } else if (op == 0xad) {
+                pop(ValueType::Long, ins);
+                if (!stack.empty()) throw CodegenError("non-empty operand stack at lreturn");
+            } else if (op == 0xae) {
+                pop(ValueType::Float, ins);
+                if (!stack.empty()) throw CodegenError("non-empty operand stack at freturn");
+            } else if (op == 0xaf) {
+                pop(ValueType::Double, ins);
+                if (!stack.empty()) throw CodegenError("non-empty operand stack at dreturn");
+            } else if (op == 0xb0) {
+                if (stack.empty() || (stack.back() != ValueType::Reference && stack.back() != ValueType::Null))
+                    throw CodegenError("areturn requires a reference value");
+                stack.pop_back();
+                if (!stack.empty()) throw CodegenError("non-empty operand stack at areturn");
+            } else if (op == 0xb1) {
+                if (!stack.empty()) throw CodegenError("non-empty operand stack at return");
+            } else if (op == 0xa7 || op == 0xc8) {
+                // Unconditional control transfer.
             } else {
                 unsupported(ins);
             }
-
-            if (depth < pop) {
-                throw CodegenError("operand-stack underflow at bytecode offset " +
-                                   std::to_string(ins.offset));
-            }
-            depth += push - pop;
-            if (depth > 65535) throw CodegenError("operand stack exceeds JVM limit");
         }
 
         for (const auto successor : block.successors) {
-            const auto target = find_block(successor);
-            if (incoming[target] == -1) {
-                incoming[target] = depth;
+            const auto target = block_index(successor);
+            if (!incoming[target]) {
+                incoming[target] = stack;
                 worklist.push_back(target);
-            } else if (incoming[target] != depth) {
-                throw CodegenError("inconsistent operand-stack height at control-flow merge " +
-                                   std::to_string(successor));
+            } else if (*incoming[target] != stack) {
+                throw CodegenError("incompatible operand-stack types at control-flow merge " +
+                                    std::to_string(successor));
             }
         }
     }
 }
-
-} // namespace
 
 std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
                                    std::uint16_t max_locals) {
@@ -290,3 +359,4 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
 }
 
 } // namespace mcnative::jvm
+
