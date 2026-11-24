@@ -75,5 +75,18 @@ int main() {
     assert(method_parameter_slots(wide_boundary) == 253);
     validate_method_parameter_slots(wide_boundary, true);
 
+
+    const auto abi = parse_method_descriptor("(IDLjava/lang/String;[J)Ljava/lang/Object;");
+    assert(cpp_type_name(abi.parameters[0]) == "std::int32_t");
+    assert(cpp_type_name(abi.parameters[1]) == "double");
+    assert(cpp_type_name(abi.parameters[2]) == "mcnative::jvm::JObject");
+    assert(cpp_type_name(abi.parameters[3]) == "mcnative::jvm::JArray");
+    assert(generate_cpp_method_signature("calculate-value", abi) ==
+           "mcnative::jvm::JObject calculate_value(std::int32_t arg0, double arg1, mcnative::jvm::JObject arg2, mcnative::jvm::JArray arg3)");
+    const auto static_slots = method_parameter_local_indices(abi, true);
+    assert((static_slots == std::vector<std::uint16_t>{0, 1, 3, 4}));
+    const auto instance_slots = method_parameter_local_indices(abi, false);
+    assert((instance_slots == std::vector<std::uint16_t>{1, 2, 4, 5}));
+
     return 0;
 }
