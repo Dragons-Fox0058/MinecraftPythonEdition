@@ -90,12 +90,24 @@ std::vector<AttributeInfo> read_attributes(Reader& reader,
             code.max_stack = code_reader.u2();
             code.max_locals = code_reader.u2();
             const auto code_length = code_reader.u4();
+            if (code_length == 0 || code_length >= 65536U) {
+                throw ClassFileError("Code.code_length must be between 1 and 65535 bytes");
+            }
             code.bytecode = code_reader.bytes(code_length);
             const auto exception_count = code_reader.u2();
             code.exception_table.reserve(exception_count);
             for (std::uint16_t j = 0; j < exception_count; ++j) {
-                code.exception_table.push_back(
-                    {code_reader.u2(), code_reader.u2(), code_reader.u2(), code_reader.u2()});
+                ExceptionHandler handler{code_reader.u2(), code_reader.u2(),
+                                         code_reader.u2(), code_reader.u2()};
+                if (handler.start_pc >= handler.end_pc || handler.end_pc > code_length ||
+                    handler.handler_pc >= code_length) {
+                    throw ClassFileError("invalid exception-handler bytecode range");
+                }
+                if (handler.catch_type != 0 &&
+                    (handler.catch_type >= cp.size() || cp[handler.catch_type].tag != 7)) {
+                    throw ClassFileError("exception-handler catch_type is not CONSTANT_Class");
+                }
+                code.exception_table.push_back(handler);
             }
             // Nested Code attributes (LineNumberTable, StackMapTable, LocalVariableTable, etc.)
             // are structurally skipped for now; their enclosing attribute boundary is validated.
