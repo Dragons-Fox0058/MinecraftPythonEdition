@@ -87,7 +87,7 @@ int translate_class_method(const char* path, std::string_view method_name,
         }
         for (const auto& attribute : method.attributes) {
             if (attribute.code) {
-                std::cout << mcnative::jvm::generate_int_method_cpp(attribute.code->bytecode);
+                std::cout << mcnative::jvm::generate_int_method_cpp(attribute.code->bytecode, attribute.code->max_locals);
                 return 0;
             }
         }
