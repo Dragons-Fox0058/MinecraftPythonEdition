@@ -86,11 +86,11 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode) {
                                    std::to_string(instruction.offset));
             }
             if (op == 0x91) {
-                body << "    stack.back() = static_cast<std::uint32_t>(static_cast<std::int32_t>(static_cast<std::int8_t>(stack.back())));\n";
+                body << "    { const auto v = stack.back() & 0xFFU; stack.back() = (v & 0x80U) ? (v | 0xFFFFFF00U) : v; }\n";
             } else if (op == 0x92) {
                 body << "    stack.back() &= 0xFFFFU;\n";
             } else {
-                body << "    stack.back() = static_cast<std::uint32_t>(static_cast<std::int32_t>(static_cast<std::int16_t>(stack.back())));\n";
+                body << "    { const auto v = stack.back() & 0xFFFFU; stack.back() = (v & 0x8000U) ? (v | 0xFFFF0000U) : v; }\n";
             }
         } else if (op == 0xac) { // ireturn
             if (stack_depth < 1) {
