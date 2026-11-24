@@ -6,6 +6,26 @@
 using namespace mcnative::jvm;
 
 int main() {
+    verify_typed_stack({0x0a, 0xad}); // lconst_1; lreturn
+    verify_typed_stack({0x0b, 0xae}); // fconst_0; freturn
+    verify_typed_stack({0x0e, 0xaf}); // dconst_0; dreturn
+
+    bool type_rejected = false;
+    try {
+        verify_typed_stack({0x0b, 0xac}); // float value cannot be returned as int
+    } catch (const CodegenError&) {
+        type_rejected = true;
+    }
+    assert(type_rejected);
+
+    type_rejected = false;
+    try {
+        verify_typed_stack({0x05, 0x0b, 0x60, 0xac}); // iadd cannot consume float
+    } catch (const CodegenError&) {
+        type_rejected = true;
+    }
+    assert(type_rejected);
+
     const auto generated = generate_int_method_cpp({0x05, 0x06, 0x60, 0xac});
     assert(generated.find("std::int32_t translated_method()") != std::string::npos);
     assert(generated.find("lhs + rhs") != std::string::npos);
