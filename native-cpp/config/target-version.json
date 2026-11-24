@@ -7,13 +7,15 @@
   "translation_mode": "java-bytecode-analysis-and-native-code-generation",
   "reference_runtime_required": true,
   "game_files_policy": "user-provided-local-installation",
-  "status": "analyzer-bytecode-decoder-cfg-and-limited-codegen",
+  "status": "jvm-integer-control-flow-codegen",
   "implemented_components": [
     "class-file-parser",
     "bytecode-decoder",
     "descriptor-parser",
     "control-flow-graph",
-    "straight-line-int-code-generator",
+    "integer-local-variable-code-generator",
+    "integer-branch-code-generator",
+    "integer-arithmetic-and-bitwise-code-generator",
     "class-directory-indexer"
   ]
 }
