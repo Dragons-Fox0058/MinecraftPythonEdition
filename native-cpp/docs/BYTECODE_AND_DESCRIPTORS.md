@@ -6,6 +6,10 @@ The instruction decoder converts a Code attribute's byte array into offset-prese
 
 The decoder rejects truncated instructions, invalid switch bounds, negative lookup pair counts, illegal \`wide\` sub-opcodes, and reserved opcodes. It does not yet resolve branch targets, constant-pool operands, stack effects, or verify control flow.
 
+## Control-flow graph
+
+The CFG builder identifies basic-block leaders, validates that branch targets land on instruction boundaries, and creates successor edges for conditional/unconditional branches, switch instructions, fallthrough, returns, and throws. Legacy `jsr`/ `ret` subroutine semantics are represented only conservatively; `ret` has no statically resolved successor. This graph is a structural foundation, not yet a verifier or optimizer.
+
 ## Descriptor parser
 
 Field and method descriptor parsing supports primitive types, object internal names, arrays up to the JVM limit of 255 dimensions, and void method returns. It rejects void fields/parameters, malformed object names, missing delimiters, and trailing data.
