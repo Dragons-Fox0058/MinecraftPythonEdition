@@ -1,6 +1,8 @@
 #include "mcnative/descriptor.hpp"
 
 #include <cstddef>
+#include <cctype>
+#include <sstream>
 
 namespace mcnative::jvm {
 namespace {
@@ -130,6 +132,61 @@ void validate_method_parameter_slots(const MethodDescriptor& descriptor, bool in
     if (slots > 255U) {
         throw DescriptorError("method parameter slots exceed JVM limit of 255");
     }
+}
+
+
+std::string cpp_type_name(const JvmType& type) {
+    if (type.array_dimensions != 0) return "mcnative::jvm::JArray";
+    switch (type.kind) {
+    case TypeKind::byte_type: return "std::int8_t";
+    case TypeKind::char_type: return "char16_t";
+    case TypeKind::double_type: return "double";
+    case TypeKind::float_type: return "float";
+    case TypeKind::int_type: return "std::int32_t";
+    case TypeKind::long_type: return "std::int64_t";
+    case TypeKind::short_type: return "std::int16_t";
+    case TypeKind::boolean_type: return "bool";
+    case TypeKind::void_type: return "void";
+    case TypeKind::object_type: return "mcnative::jvm::JObject";
+    }
+    throw DescriptorError("unknown JVM type cannot be mapped to C++");
+}
+
+std::string generate_cpp_method_signature(std::string_view method_name,
+                                          const MethodDescriptor& descriptor,
+                                          bool is_static) {
+    if (method_name.empty()) throw DescriptorError("C++ method name cannot be empty");
+    validate_method_parameter_slots(descriptor, !is_static);
+    std::string identifier;
+    identifier.reserve(method_name.size() + 1);
+    for (const unsigned char ch : method_name) {
+        identifier.push_back((std::isalnum(ch) || ch == '_') ? static_cast<char>(ch) : '_');
+    }
+    if (identifier.empty() || std::isdigit(static_cast<unsigned char>(identifier.front())))
+        identifier.insert(identifier.begin(), '_');
+
+    std::ostringstream out;
+    out << cpp_type_name(descriptor.return_type) << ' ' << identifier << '(';
+    for (std::size_t i = 0; i < descriptor.parameters.size(); ++i) {
+        if (i != 0) out << ", ";
+        out << cpp_type_name(descriptor.parameters[i]) << " arg" << i;
+    }
+    out << ')';
+    return out.str();
+}
+
+std::vector<std::uint16_t> method_parameter_local_indices(
+    const MethodDescriptor& descriptor, bool is_static) {
+    validate_method_parameter_slots(descriptor, !is_static);
+    unsigned slot = is_static ? 0U : 1U;
+    std::vector<std::uint16_t> result;
+    result.reserve(descriptor.parameters.size());
+    for (const auto& parameter : descriptor.parameters) {
+        if (slot > 65535U) throw DescriptorError("parameter local index exceeds JVM limit");
+        result.push_back(static_cast<std::uint16_t>(slot));
+        slot += type_slot_width(parameter);
+    }
+    return result;
 }
 
 } // namespace mcnative::jvm
