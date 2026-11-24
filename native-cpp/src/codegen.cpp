@@ -14,11 +14,13 @@ std::uint16_t operand_u2(const Instruction& instruction) {
 }
 
 std::int32_t signed_u8(std::uint8_t value) {
-    return static_cast<std::int8_t>(value);
+    return value < 0x80U ? static_cast<std::int32_t>(value)
+                         : static_cast<std::int32_t>(value) - 0x100;
 }
 
 std::int32_t signed_u16(std::uint16_t value) {
-    return static_cast<std::int16_t>(value);
+    return value < 0x8000U ? static_cast<std::int32_t>(value)
+                           : static_cast<std::int32_t>(value) - 0x10000;
 }
 
 [[noreturn]] void unsupported(const Instruction& instruction) {
