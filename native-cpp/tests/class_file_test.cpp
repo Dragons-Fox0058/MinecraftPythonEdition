@@ -89,6 +89,20 @@ int main() {
     }
     assert(rejected);
 
+    auto empty_code_attribute = with_method;
+    const std::vector<std::uint8_t> code_length_four{0x00, 0x00, 0x00, 0x04};
+    const auto code_length_pos = std::search(empty_code_attribute.begin(), empty_code_attribute.end(),
+                                             code_length_four.begin(), code_length_four.end());
+    assert(code_length_pos != empty_code_attribute.end());
+    std::fill(code_length_pos, code_length_pos + 4, 0x00);
+    rejected = false;
+    try {
+        (void)ClassFileParser::parse(empty_code_attribute);
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
     auto missing_receiver_local = with_method;
     const std::vector<std::uint8_t> static_method_flags{0x00, 0x09, 0x00, 0x05};
     const auto flags_pos = std::search(missing_receiver_local.begin(), missing_receiver_local.end(),
