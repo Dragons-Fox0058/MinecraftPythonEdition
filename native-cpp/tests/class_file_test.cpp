@@ -89,5 +89,19 @@ int main() {
     }
     assert(rejected);
 
+    auto missing_receiver_local = with_method;
+    const std::vector<std::uint8_t> static_method_flags{0x00, 0x09, 0x00, 0x05};
+    const auto flags_pos = std::search(missing_receiver_local.begin(), missing_receiver_local.end(),
+                                       static_method_flags.begin(), static_method_flags.end());
+    assert(flags_pos != missing_receiver_local.end());
+    *(flags_pos + 1) = 0x01; // Make answer() an instance method without allocating its this slot.
+    rejected = false;
+    try {
+        (void)ClassFileParser::parse(missing_receiver_local);
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
     return 0;
 }
