@@ -25,6 +25,14 @@ int main() {
     const auto wide_load = generate_int_method_cpp({0x04, 0xc4, 0x36, 0x01, 0x00, 0xc4, 0x15, 0x01, 0x00, 0xac}, 257);
     assert(wide_load.find("stack.push_back(locals[256])") != std::string::npos);
 
+    // ifeq jumps over the first constant; the two paths merge at ireturn.
+    const auto branched = generate_int_method_cpp(
+        {0x03, 0x99, 0x00, 0x07, 0x04, 0xa7, 0x00, 0x04, 0x05, 0xac});
+    assert(branched.find("if (std::bit_cast<std::int32_t>(pop_int()) == 0) goto L8;") != std::string::npos);
+    assert(branched.find("goto L9;") != std::string::npos);
+    assert(branched.find("L8:") != std::string::npos);
+    assert(branched.find("L9:") != std::string::npos);
+
     bool rejected = false;
     try {
         (void)generate_int_method_cpp({0x15, 0x00, 0xac}, 0);
@@ -41,13 +49,8 @@ int main() {
     }
     assert(rejected);
 
-    rejected = false;
-    try {
-        (void)generate_int_method_cpp({0x1a, 0xac}, 1); // uninitialized local
-    } catch (const CodegenError&) {
-        rejected = true;
-    }
-    assert(rejected);
+    const auto guarded_uninitialized = generate_int_method_cpp({0x1a, 0xac}, 1);
+    assert(guarded_uninitialized.find("read of uninitialized local") != std::string::npos);
 
     rejected = false;
     try {
