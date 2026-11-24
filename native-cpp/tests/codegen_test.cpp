@@ -22,7 +22,7 @@ int main() {
     assert(locals.find("stack.push_back(locals[0])") != std::string::npos);
 
     // wide iload 256; ireturn
-    const auto wide_load = generate_int_method_cpp({0xc4, 0x15, 0x01, 0x00, 0xac}, 257);
+    const auto wide_load = generate_int_method_cpp({0x04, 0xc4, 0x36, 0x01, 0x00, 0xc4, 0x15, 0x01, 0x00, 0xac}, 257);
     assert(wide_load.find("stack.push_back(locals[256])") != std::string::npos);
 
     bool rejected = false;
@@ -36,6 +36,14 @@ int main() {
     rejected = false;
     try {
         (void)generate_int_method_cpp({0x1a, 0xac}, 0);
+    } catch (const CodegenError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
+    rejected = false;
+    try {
+        (void)generate_int_method_cpp({0x1a, 0xac}, 1); // uninitialized local
     } catch (const CodegenError&) {
         rejected = true;
     }
