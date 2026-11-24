@@ -80,6 +80,7 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
 
     std::ostringstream body;
     std::size_t stack_depth = 0;
+    std::vector<bool> initialized_locals(max_locals, false);
     bool returned = false;
 
     for (const auto& instruction : instructions) {
@@ -118,6 +119,11 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
             const auto amount = wide ? signed_u16(operand_u2(instruction, 3))
                                      : signed_u8(instruction.operands.at(1));
             require_local(index, max_locals, instruction);
+            if (!initialized_locals[index]) {
+                throw CodegenError("iinc on uninitialized local-variable slot " +
+                                   std::to_string(index) + " at bytecode offset " +
+                                   std::to_string(instruction.offset));
+            }
             body << "    locals[" << index << "] += static_cast<std::uint32_t>("
                  << amount << ");\n";
         } else if (op == 0x00) {
