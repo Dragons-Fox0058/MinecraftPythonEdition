@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mcnative/bytecode.hpp"
+
 #include <cstdint>
 #include <filesystem>
 #include <optional>
@@ -76,6 +78,15 @@ struct ClassFile {
     [[nodiscard]] std::string super_name() const;
     [[nodiscard]] MethodReference method_reference(std::uint16_t index) const;
 };
+
+struct MethodInvocation {
+    std::uint8_t opcode{};
+    MethodReference target;
+    std::uint8_t argument_count{}; // invokeinterface count, zero for other invocation opcodes
+};
+
+[[nodiscard]] MethodInvocation resolve_method_invocation(const ClassFile& class_file,
+                                                          const Instruction& instruction);
 
 class ClassFileParser {
 public:
