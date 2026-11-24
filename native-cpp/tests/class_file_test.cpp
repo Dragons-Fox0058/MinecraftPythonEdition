@@ -74,6 +74,40 @@ int main() {
         method_class.methods[0].attributes[0].code->bytecode);
     assert(generated.find("lhs + rhs") != std::string::npos);
 
+    // Resolve both class and interface method references through NameAndType.
+    const std::vector<std::uint8_t> with_method_refs{
+        0xCA,0xFE,0xBA,0xBE, 0x00,0x00, 0x00,0x3E,
+        0x00,0x0A,
+        0x01,0x00,0x04,'T','e','s','t',
+        0x07,0x00,0x01,
+        0x01,0x00,0x10,'j','a','v','a','/','l','a','n','g','/','O','b','j','e','c','t',
+        0x07,0x00,0x03,
+        0x01,0x00,0x04,'c','a','l','l',
+        0x01,0x00,0x03,'(',')','I',
+        0x0C,0x00,0x05,0x00,0x06, // #7 NameAndType
+        0x0A,0x00,0x02,0x00,0x07, // #8 Methodref
+        0x0B,0x00,0x02,0x00,0x07, // #9 InterfaceMethodref
+        0x00,0x21, 0x00,0x02, 0x00,0x04,
+        0x00,0x00, 0x00,0x00, 0x00,0x00, 0x00,0x00
+    };
+    const auto refs_class = ClassFileParser::parse(with_method_refs);
+    const auto class_ref = refs_class.method_reference(8);
+    assert(class_ref.owner == "Test");
+    assert(class_ref.name == "call");
+    assert(class_ref.descriptor == "()I");
+    assert(!class_ref.is_interface);
+    const auto interface_ref = refs_class.method_reference(9);
+    assert(interface_ref.owner == "Test");
+    assert(interface_ref.is_interface);
+
+    rejected = false;
+    try {
+        (void)refs_class.method_reference(1); // UTF-8 is not a method reference.
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
     auto invalid_descriptor_class = with_method;
     const std::vector<std::uint8_t> valid_descriptor{'(', ')', 'I'};
     const auto descriptor_pos = std::search(invalid_descriptor_class.begin(),
