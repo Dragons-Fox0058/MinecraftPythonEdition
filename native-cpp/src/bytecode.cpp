@@ -34,12 +34,6 @@ constexpr std::array<std::string_view, 202> names{
     throw BytecodeError(out.str());
 }
 
-std::uint16_t read_u2(const std::vector<std::uint8_t>& code, std::size_t pos,
-                      std::uint32_t instruction_offset) {
-    if (pos + 2 > code.size()) fail(instruction_offset, "truncated 16-bit operand");
-    return static_cast<std::uint16_t>((static_cast<std::uint16_t>(code[pos]) << 8U) | code[pos + 1]);
-}
-
 std::uint32_t read_u4(const std::vector<std::uint8_t>& code, std::size_t pos,
                       std::uint32_t instruction_offset) {
     if (pos + 4 > code.size()) fail(instruction_offset, "truncated 32-bit operand");
