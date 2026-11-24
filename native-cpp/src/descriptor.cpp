@@ -106,4 +106,23 @@ MethodDescriptor parse_method_descriptor(std::string_view descriptor) {
     return result;
 }
 
+
+unsigned type_slot_width(const JvmType& type) {
+    if (type.array_dimensions != 0) return 1;
+    switch (type.kind) {
+    case TypeKind::void_type: return 0;
+    case TypeKind::long_type:
+    case TypeKind::double_type: return 2;
+    default: return 1;
+    }
+}
+
+unsigned method_parameter_slots(const MethodDescriptor& descriptor, bool include_receiver) {
+    unsigned slots = include_receiver ? 1U : 0U;
+    for (const auto& parameter : descriptor.parameters) {
+        slots += type_slot_width(parameter);
+    }
+    return slots;
+}
+
 } // namespace mcnative::jvm
