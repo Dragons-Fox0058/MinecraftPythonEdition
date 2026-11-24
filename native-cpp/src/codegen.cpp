@@ -80,6 +80,71 @@ void require_local(std::uint16_t index, std::uint16_t max_locals,
     }
 }
 
+
+void verify_stack_heights(const ControlFlowGraph& graph) {
+    if (graph.blocks.empty()) throw CodegenError("method has no basic blocks");
+
+    std::vector<int> incoming(graph.blocks.size(), -1);
+    std::vector<std::size_t> worklist{0};
+    incoming[0] = 0;
+
+    auto find_block = [&](std::uint32_t offset) -> std::size_t {
+        for (std::size_t i = 0; i < graph.blocks.size(); ++i) {
+            if (graph.blocks[i].start_offset == offset) return i;
+        }
+        throw CodegenError("control-flow edge targets a missing basic block");
+    };
+
+    while (!worklist.empty()) {
+        const auto block_index = worklist.back();
+        worklist.pop_back();
+        const auto& block = graph.blocks[block_index];
+        int depth = incoming[block_index];
+
+        for (const auto& ins : block.instructions) {
+            const auto op = ins.opcode;
+            int pop = 0;
+            int push = 0;
+            if ((op >= 0x02 && op <= 0x08) || op == 0x10 || op == 0x11 || is_iload(ins)) {
+                push = 1;
+            } else if (is_istore(ins) || (op >= 0x99 && op <= 0x9e) || op == 0xac) {
+                pop = 1;
+            } else if (op >= 0x9f && op <= 0xa4) {
+                pop = 2;
+            } else if (op == 0x84 || (op == 0xc4 && ins.operands.at(0) == 0x84) ||
+                       op == 0x00 || op == 0xa7 || op == 0xc8) {
+                // No operand-stack effect.
+            } else if (op == 0x60 || op == 0x64 || op == 0x68 || op == 0x6c ||
+                       op == 0x70 || op == 0x7e || op == 0x80 || op == 0x82 ||
+                       op == 0x78 || op == 0x7a || op == 0x7c) {
+                pop = 2; push = 1;
+            } else if (op == 0x74 || op == 0x91 || op == 0x92 || op == 0x93) {
+                pop = 1; push = 1;
+            } else {
+                unsupported(ins);
+            }
+
+            if (depth < pop) {
+                throw CodegenError("operand-stack underflow at bytecode offset " +
+                                   std::to_string(ins.offset));
+            }
+            depth += push - pop;
+            if (depth > 65535) throw CodegenError("operand stack exceeds JVM limit");
+        }
+
+        for (const auto successor : block.successors) {
+            const auto target = find_block(successor);
+            if (incoming[target] == -1) {
+                incoming[target] = depth;
+                worklist.push_back(target);
+            } else if (incoming[target] != depth) {
+                throw CodegenError("inconsistent operand-stack height at control-flow merge " +
+                                   std::to_string(successor));
+            }
+        }
+    }
+}
+
 } // namespace
 
 std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
@@ -89,7 +154,8 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
         throw CodegenError("cannot generate a method from empty bytecode");
     }
     // Validate all branch destinations before emitting labels and gotos.
-    (void)build_control_flow_graph(bytecode);
+    const auto control_flow = build_control_flow_graph(bytecode);
+    verify_stack_heights(control_flow);
 
     std::ostringstream body;
     bool has_return = false;
