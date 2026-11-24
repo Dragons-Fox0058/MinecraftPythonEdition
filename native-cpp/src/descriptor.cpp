@@ -125,4 +125,11 @@ unsigned method_parameter_slots(const MethodDescriptor& descriptor, bool include
     return slots;
 }
 
+void validate_method_parameter_slots(const MethodDescriptor& descriptor, bool include_receiver) {
+    const unsigned slots = method_parameter_slots(descriptor, include_receiver);
+    if (slots > 255U) {
+        throw DescriptorError("method parameter slots exceed JVM limit of 255");
+    }
+}
+
 } // namespace mcnative::jvm
