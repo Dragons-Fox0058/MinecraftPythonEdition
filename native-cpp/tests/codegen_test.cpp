@@ -33,6 +33,16 @@ int main() {
     assert(branched.find("L8:") != std::string::npos);
     assert(branched.find("L9:") != std::string::npos);
 
+    const auto arithmetic = generate_int_method_cpp({0x10, 0x0c, 0x10, 0x03, 0x6c, 0xac});
+    assert(arithmetic.find("lhs / rhs") != std::string::npos);
+    assert(arithmetic.find("integer division by zero") != std::string::npos);
+
+    const auto bitwise = generate_int_method_cpp({0x05, 0x06, 0x7e, 0xac});
+    assert(bitwise.find("lhs & rhs") != std::string::npos);
+
+    const auto unsigned_shift = generate_int_method_cpp({0x10, 0xff, 0x05, 0x7c, 0xac});
+    assert(unsigned_shift.find("lhs >> (rhs & 0x1FU)") != std::string::npos);
+
     bool rejected = false;
     try {
         (void)generate_int_method_cpp({0x15, 0x00, 0xac}, 0);
