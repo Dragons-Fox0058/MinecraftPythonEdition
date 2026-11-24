@@ -36,5 +36,8 @@ struct MethodDescriptor {
 // Includes the receiver slot for non-static instance methods when requested.
 [[nodiscard]] unsigned method_parameter_slots(const MethodDescriptor& descriptor,
                                               bool include_receiver = false);
+// Throws DescriptorError when parameter slots exceed the JVM limit of 255.
+void validate_method_parameter_slots(const MethodDescriptor& descriptor,
+                                     bool include_receiver = false);
 
 } // namespace mcnative::jvm
