@@ -8,11 +8,12 @@ int main() {
     // iconst_0; ifeq +4; iconst_1; ireturn; iconst_2; ireturn
     const auto graph = build_control_flow_graph({0x03, 0x99, 0x00, 0x04, 0x04, 0xac, 0x05, 0xac});
     assert(graph.code_size == 8);
-    assert(graph.blocks.size() == 3);
+    assert(graph.blocks.size() == 4);
     assert(graph.blocks[0].start_offset == 0);
     assert(graph.blocks[0].successors.size() == 2);
     assert(graph.blocks[1].start_offset == 4);
-    assert(graph.blocks[2].start_offset == 6);
+    assert(graph.blocks[2].start_offset == 5);
+    assert(graph.blocks[3].start_offset == 6);
 
     bool rejected = false;
     try {
