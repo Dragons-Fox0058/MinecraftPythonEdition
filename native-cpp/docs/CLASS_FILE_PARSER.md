@@ -10,7 +10,7 @@ The first analyzer component reads JVM class files from a user-selected local in
 - Reads class flags, this/super class, interfaces, fields, methods, and class attributes.
 - Parses method \`Code\` attributes, including max stack/locals, raw bytecode, and exception table.
 - Validates field and method descriptors while reading members, enforces the JVM 255 parameter-slot limit, and checks that each concrete method's \`Code.max_locals\` can hold its receiver and parameters.
-- Enforces the JVM Code attribute bytecode-length bounds and validates exception-handler ranges and catch-type constant-pool references.
+- Enforces the JVM Code attribute bytecode-length bounds and validates exception-handler ranges, instruction-boundary alignment, and catch-type constant-pool references; malformed bytecode instruction streams are rejected.
 - Bounds-checks every read, skips unknown attributes by declared length, and rejects malformed/truncated files.
 - CLI command: \`mc-native-tool inspect-class path/to/SomeClass.class\`.
 
