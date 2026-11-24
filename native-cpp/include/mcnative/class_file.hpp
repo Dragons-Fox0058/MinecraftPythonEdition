@@ -23,6 +23,13 @@ struct ConstantPoolEntry {
     std::string text;
 };
 
+struct MethodReference {
+    std::string owner;
+    std::string name;
+    std::string descriptor;
+    bool is_interface{};
+};
+
 struct ExceptionHandler {
     std::uint16_t start_pc{};
     std::uint16_t end_pc{};
@@ -67,6 +74,7 @@ struct ClassFile {
     [[nodiscard]] std::string class_name(std::uint16_t class_index) const;
     [[nodiscard]] std::string this_name() const;
     [[nodiscard]] std::string super_name() const;
+    [[nodiscard]] MethodReference method_reference(std::uint16_t index) const;
 };
 
 class ClassFileParser {
