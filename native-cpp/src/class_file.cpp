@@ -1,5 +1,8 @@
 #include "mcnative/class_file.hpp"
 #include "mcnative/descriptor.hpp"
+#include "mcnative/bytecode.hpp"
+
+#include <unordered_set>
 
 #include <fstream>
 #include <limits>
@@ -94,6 +97,14 @@ std::vector<AttributeInfo> read_attributes(Reader& reader,
                 throw ClassFileError("Code.code_length must be between 1 and 65535 bytes");
             }
             code.bytecode = code_reader.bytes(code_length);
+            std::unordered_set<std::uint32_t> instruction_offsets;
+            try {
+                for (const auto& instruction : decode_bytecode(code.bytecode)) {
+                    instruction_offsets.insert(instruction.offset);
+                }
+            } catch (const BytecodeError& error) {
+                throw ClassFileError(std::string("invalid Code bytecode: ") + error.what());
+            }
             const auto exception_count = code_reader.u2();
             code.exception_table.reserve(exception_count);
             for (std::uint16_t j = 0; j < exception_count; ++j) {
@@ -102,6 +113,12 @@ std::vector<AttributeInfo> read_attributes(Reader& reader,
                 if (handler.start_pc >= handler.end_pc || handler.end_pc > code_length ||
                     handler.handler_pc >= code_length) {
                     throw ClassFileError("invalid exception-handler bytecode range");
+                }
+                if (!instruction_offsets.contains(handler.start_pc) ||
+                    (handler.end_pc != code_length &&
+                     !instruction_offsets.contains(handler.end_pc)) ||
+                    !instruction_offsets.contains(handler.handler_pc)) {
+                    throw ClassFileError("exception-handler address is not an instruction boundary");
                 }
                 if (handler.catch_type != 0 &&
                     (handler.catch_type >= cp.size() || cp[handler.catch_type].tag != 7)) {
