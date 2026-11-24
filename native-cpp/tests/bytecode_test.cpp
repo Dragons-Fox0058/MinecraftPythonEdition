@@ -18,7 +18,7 @@ int main() {
     assert(wide.size() == 1);
     assert(wide[0].operands.size() == 5);
 
-    // tableswitch at offset zero: one padding byte, default, low=0, high=0, one jump.
+    // tableswitch at offset zero: three alignment bytes, default, low=0, high=0, one jump.
     const auto table = decode_bytecode({
         0xaa, 0x00,0x00,0x00,
         0x00,0x00,0x00,0x00,
