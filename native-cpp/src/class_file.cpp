@@ -225,6 +225,40 @@ std::string ClassFile::super_name() const {
     return super_class == 0 ? std::string{} : class_name(super_class);
 }
 
+MethodReference ClassFile::method_reference(std::uint16_t index) const {
+    const auto& reference = cp(index);
+    if (reference.tag != 10 && reference.tag != 11) {
+        throw ClassFileError("method reference index must point to CONSTANT_Methodref or CONSTANT_InterfaceMethodref");
+    }
+
+    MethodReference result;
+    result.owner = class_name(reference.first_index);
+    result.is_interface = reference.tag == 11;
+
+    const auto& name_and_type = cp(reference.second_index);
+    if (name_and_type.tag != 12) {
+        throw ClassFileError("method reference name_and_type_index does not reference CONSTANT_NameAndType");
+    }
+
+    result.name = utf8(name_and_type.first_index);
+    result.descriptor = utf8(name_and_type.second_index);
+    if (result.name.empty()) {
+        throw ClassFileError("method reference has an empty method name");
+    }
+    try {
+        (void)parse_method_descriptor(result.descriptor);
+    } catch (const DescriptorError& error) {
+        throw ClassFileError(std::string("invalid method-reference descriptor: ") + error.what());
+    }
+    if (result.name == "<clinit>") {
+        throw ClassFileError("CONSTANT_Methodref cannot reference <clinit>");
+    }
+    if (result.name == "<init>" && result.is_interface) {
+        throw ClassFileError("CONSTANT_InterfaceMethodref cannot reference <init>");
+    }
+    return result;
+}
+
 ClassFile ClassFileParser::parse(const std::vector<std::uint8_t>& bytes) {
     Reader reader(bytes);
     if (reader.u4() != 0xCAFEBABEU) {
