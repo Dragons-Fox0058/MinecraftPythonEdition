@@ -259,6 +259,35 @@ MethodReference ClassFile::method_reference(std::uint16_t index) const {
     return result;
 }
 
+MethodInvocation resolve_method_invocation(const ClassFile& class_file,
+                                           const Instruction& instruction) {
+    if (instruction.opcode < 0xb6 || instruction.opcode > 0xb9) {
+        throw ClassFileError("instruction is not a supported JVM method invocation opcode");
+    }
+    if (instruction.operands.size() != (instruction.opcode == 0xb9 ? 4U : 2U)) {
+        throw ClassFileError("method invocation has an invalid operand length");
+    }
+
+    const auto index = static_cast<std::uint16_t>(
+        (static_cast<std::uint16_t>(instruction.operands[0]) << 8U) |
+        instruction.operands[1]);
+    auto target = class_file.method_reference(index);
+
+    if (instruction.opcode == 0xb6 && target.is_interface) {
+        throw ClassFileError("invokevirtual requires CONSTANT_Methodref");
+    }
+    if (instruction.opcode == 0xb9 && !target.is_interface) {
+        throw ClassFileError("invokeinterface requires CONSTANT_InterfaceMethodref");
+    }
+    if (instruction.opcode == 0xb9) {
+        if (instruction.operands[3] != 0 || instruction.operands[2] == 0) {
+            throw ClassFileError("invokeinterface requires a nonzero count and zero reserved byte");
+        }
+        return MethodInvocation{instruction.opcode, std::move(target), instruction.operands[2]};
+    }
+    return MethodInvocation{instruction.opcode, std::move(target), 0};
+}
+
 ClassFile ClassFileParser::parse(const std::vector<std::uint8_t>& bytes) {
     Reader reader(bytes);
     if (reader.u4() != 0xCAFEBABEU) {
