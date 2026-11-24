@@ -1,0 +1,30 @@
+name: Native C++ 26.3 CI
+
+on:
+  push:
+    branches: [native-cpp-26.3]
+    paths:
+      - "native-cpp/**"
+      - ".github/workflows/native-cpp-26.3.yml"
+  pull_request:
+    branches: [native-cpp-26.3]
+    paths:
+      - "native-cpp/**"
+      - ".github/workflows/native-cpp-26.3.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S native-cpp -B native-cpp/build -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build native-cpp/build --config Release --parallel
+      - name: Test
+        run: ctest --test-dir native-cpp/build -C Release --output-on-failure
