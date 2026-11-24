@@ -4,10 +4,11 @@
 
 #include <exception>
 #include <iomanip>
-#include <sstream>
-#include <vector>
 #include <iostream>
+#include <sstream>
+#include <stdexcept>
 #include <string_view>
+#include <vector>
 
 namespace {
 
@@ -25,16 +26,18 @@ int inspect_class(const char* path) {
     for (const auto& method : file.methods) {
         const auto name = file.utf8(method.name_index);
         const auto descriptor = file.utf8(method.descriptor_index);
-        std::size_t code_size = 0;
+        const mcnative::jvm::CodeAttribute* code = nullptr;
         for (const auto& attribute : method.attributes) {
             if (attribute.code) {
-                code_size = attribute.code->bytecode.size();
+                code = &*attribute.code;
                 break;
             }
         }
         std::cout << "  " << name << descriptor;
-        if (code_size != 0) {
-            std::cout << "  [" << code_size << " bytecode bytes]";
+        if (code != nullptr) {
+            const auto instructions = mcnative::jvm::decode_bytecode(code->bytecode);
+            std::cout << "  [" << code->bytecode.size() << " bytes, "
+                      << instructions.size() << " instructions]";
         }
         std::cout << '\n';
     }
@@ -49,7 +52,7 @@ std::vector<std::uint8_t> parse_hex_bytecode(std::string_view hex) {
     bytes.reserve(hex.size() / 2);
     for (std::size_t i = 0; i < hex.size(); i += 2) {
         unsigned value = 0;
-        std::istringstream part(std::string(hex.substr(i, 2)));
+        std::istringstream part{std::string(hex.substr(i, 2))};
         part >> std::hex >> value;
         if (!part || !part.eof() || value > 0xFFU) {
             throw std::invalid_argument("invalid hexadecimal bytecode at character " + std::to_string(i));
@@ -69,7 +72,8 @@ void print_usage() {
               << mcnative::target_game_version() << "\n\n"
               << "Usage:\n"
               << "  mc-native-tool --version\n"
-              << "  mc-native-tool inspect-class <path-to-class-file>\n";
+              << "  mc-native-tool inspect-class <path-to-class-file>\n"
+              << "  mc-native-tool translate-int <hex-bytecode>\n";
 }
 
 } // namespace
@@ -85,6 +89,9 @@ int main(int argc, char** argv) {
 
         if (argc == 3 && std::string_view{argv[1]} == "inspect-class") {
             return inspect_class(argv[2]);
+        }
+        if (argc == 3 && std::string_view{argv[1]} == "translate-int") {
+            return translate_int(argv[2]);
         }
 
         print_usage();
