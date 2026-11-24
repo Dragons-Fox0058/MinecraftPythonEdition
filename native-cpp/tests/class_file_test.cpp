@@ -1,6 +1,7 @@
 #include "mcnative/class_file.hpp"
 #include "mcnative/codegen.hpp"
 
+#include <algorithm>
 #include <cassert>
 #include <cstdint>
 #include <vector>
@@ -72,6 +73,21 @@ int main() {
     const auto generated = mcnative::jvm::generate_int_method_cpp(
         method_class.methods[0].attributes[0].code->bytecode);
     assert(generated.find("lhs + rhs") != std::string::npos);
+
+    auto invalid_descriptor_class = with_method;
+    const std::vector<std::uint8_t> valid_descriptor{'(', ')', 'I'};
+    const auto descriptor_pos = std::search(invalid_descriptor_class.begin(),
+                                            invalid_descriptor_class.end(),
+                                            valid_descriptor.begin(), valid_descriptor.end());
+    assert(descriptor_pos != invalid_descriptor_class.end());
+    invalid_descriptor_class[static_cast<std::size_t>(descriptor_pos - invalid_descriptor_class.begin() + 1)] = 'V';
+    rejected = false;
+    try {
+        (void)ClassFileParser::parse(invalid_descriptor_class);
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
 
     return 0;
 }
