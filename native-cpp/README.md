@@ -1,39 +1,49 @@
 # Minecraft C++ Native — target 26.3
 
-This directory is a separate C++20 workstream for a native compatibility/translation project targeting **Minecraft Java Edition 26.3**.
+A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is not a voxel prototype and does not claim to translate the complete game yet. It is being built as an analyzer, compatibility layer, code generator, and parity-testing system.
 
-The goal is not to build a small voxel prototype. The goal is to build tooling that can inspect a user's locally installed game version, analyze Java class files and metadata, produce a native C++ representation where semantics can be preserved, and verify behavior against the reference Java runtime.
+## Implemented
 
-## Current status
-
-This is the initial project scaffold. It does **not** yet translate Minecraft or produce a playable native client.
-
-## Principles
-
-- Keep the existing Python project and its history untouched.
-- Never assume that Java bytecode can be mechanically translated to equivalent C++ without a compatibility runtime.
-- Separate bytecode analysis, intermediate representation (IR), code generation, runtime compatibility, native engine integration, and parity testing.
-- Treat Minecraft 26.3 as the target version. Do not silently substitute an older version.
-- Read game files from a user-provided local installation. Do not commit proprietary game binaries, assets, credentials, or launcher data.
-- Generated output must be reproducible and traceable to source class/method metadata.
+- CMake/C++20 project and CLI.
+- Bounded JVM class-file parser.
+- Constant-pool parsing for standard tags 1, 3–12, and 15–20.
+- Class, superclass, interface, field, and method metadata.
+- Method \`Code\` attributes, raw bytecode, and exception tables.
+- \`inspect-class\` CLI command.
+- Smoke and parser tests.
+- Windows/Linux GitHub Actions build workflow.
 
 ## Build
 
 Requirements: CMake 3.24+ and a C++20 compiler (MSVC 2022, Clang 16+, or GCC 13+).
 
-```bash
-cmake -S . -B build
+\`\`\`bash
+cmake -S native-cpp -B build
 cmake --build build --config Release
 ctest --test-dir build --output-on-failure
-```
+\`\`\`
 
-## Initial milestone
+Inspect a class file:
 
-1. Build a class-file reader for Java 26.3's locally installed client/server artifacts.
-2. Extract class, field, method, descriptor, constant-pool, and bytecode metadata.
-3. Build a typed, control-flow-aware IR.
-4. Implement a small, testable bytecode-to-C++ subset.
-5. Add a compatibility runtime for Java object, array, exception, numeric, and method-dispatch semantics.
-6. Differential-test supported operations against the reference Java runtime.
+\`\`\`bash
+mc-native-tool inspect-class path/to/SomeClass.class
+\`\`\`
 
-Unsupported bytecode or runtime features must fail explicitly; never emit silently incorrect C++.
+## Architecture and next milestones
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/CLASS_FILE_PARSER.md](docs/CLASS_FILE_PARSER.md).
+
+Next engineering steps:
+1. Constant-pool reference resolver and modified UTF-8 decoder.
+2. Bytecode instruction decoder, including \`tableswitch\`, \`lookupswitch\`, and \`wide\`.
+3. Control-flow graph and typed intermediate representation.
+4. JVM descriptor/signature parser and verifier checks.
+5. A deliberately limited, tested bytecode-to-C++ backend.
+6. Java-semantics compatibility runtime and differential tests.
+
+## Correctness and game-file policy
+
+- Target version is pinned in \`config/target-version.json\`; do not silently substitute another Minecraft version.
+- The user supplies their own local game installation. Do not commit proprietary game binaries, assets, credentials, or launcher data.
+- Unknown features must fail explicitly. Never emit silently incorrect native code.
+- Automatic class analysis is not the same as full Java-to-C++ conversion. Reflection, dynamic loading, invokedynamic, native methods, concurrency, object identity, exceptions, and Java library behavior require explicit support.
