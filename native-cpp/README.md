@@ -5,45 +5,52 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 ## Implemented
 
 - CMake/C++20 project and CLI.
-- Bounded JVM class-file parser.
+- Bounded JVM class-file parser, including method `Code` attributes and exception tables.
 - Constant-pool parsing for standard tags 1, 3–12, and 15–20.
 - Class, superclass, interface, field, and method metadata.
-- Method \`Code\` attributes, raw bytecode, and exception tables.
-- \`inspect-class\` CLI command.
-- Smoke and parser tests.
-- Windows/Linux GitHub Actions build workflow.
+- JVM bytecode decoder, including `tableswitch`, `lookupswitch`, and `wide`.
+- JVM descriptor parser and control-flow graph builder.
+- Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
+- `inspect-class`, `translate-int`, `translate-method`, and `index-classes` CLI commands.
+- Tests and GitHub Actions builds for Linux and Windows.
 
 ## Build
 
-Requirements: CMake 3.24+ and a C++20 compiler (MSVC 2022, Clang 16+, or GCC 13+).
+Requirements: CMake 3.24+ and a C++20 compiler.
 
-\`\`\`bash
+```bash
 cmake -S native-cpp -B build
 cmake --build build --config Release
 ctest --test-dir build --output-on-failure
-\`\`\`
+```
 
-Inspect a class file:
+Inspect and translate a class method:
 
-\`\`\`bash
+```bash
 mc-native-tool inspect-class path/to/SomeClass.class
-\`\`\`
+mc-native-tool translate-method path/to/SomeClass.class methodName "()I"
+```
 
-## Architecture and next milestones
+Index an extracted class directory:
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and [docs/CLASS_FILE_PARSER.md](docs/CLASS_FILE_PARSER.md).
+```bash
+mc-native-tool index-classes path/to/extracted/classes classes.csv
+```
 
-Next engineering steps:
-1. Constant-pool reference resolver and modified UTF-8 decoder.
-2. Bytecode instruction decoder, including \`tableswitch\`, \`lookupswitch\`, and \`wide\`.
-3. Control-flow graph and typed intermediate representation.
-4. JVM descriptor/signature parser and verifier checks.
-5. A deliberately limited, tested bytecode-to-C++ backend.
-6. Java-semantics compatibility runtime and differential tests.
+## Next engineering milestones
+
+1. Constant-pool reference resolution and modified UTF-8 decoding.
+2. Typed JVM operand-stack and local-variable dataflow verification across control-flow merges.
+3. Method arguments, fields, invocation semantics, arrays, and object operations.
+4. Exception tables, stack-map verification, class initialization, and Java runtime compatibility.
+5. JAR ingestion and full classpath dependency resolution.
+6. Differential testing against the reference JVM, then Minecraft-specific class migration.
 
 ## Correctness and game-file policy
 
-- Target version is pinned in \`config/target-version.json\`; do not silently substitute another Minecraft version.
+- Target version is pinned in `config/target-version.json`; do not silently substitute another Minecraft version.
 - The user supplies their own local game installation. Do not commit proprietary game binaries, assets, credentials, or launcher data.
 - Unknown features must fail explicitly. Never emit silently incorrect native code.
-- Automatic class analysis is not the same as full Java-to-C++ conversion. Reflection, dynamic loading, invokedynamic, native methods, concurrency, object identity, exceptions, and Java library behavior require explicit support.
+- The current backend is a narrow integer-method compiler, not a complete JVM and not a playable native Minecraft build. Reflection, dynamic loading, invokedynamic, native methods, concurrency, object identity, exceptions, and Java library behavior still require explicit support.
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md), [docs/CLASS_FILE_PARSER.md](docs/CLASS_FILE_PARSER.md), and [docs/CODE_GENERATION.md](docs/CODE_GENERATION.md).
