@@ -57,10 +57,6 @@ bool is_istore(const Instruction& instruction) {
            (op == 0xc4 && instruction.operands.at(0) == 0x36);
 }
 
-bool is_conditional_int_branch(std::uint8_t op) {
-    return (op >= 0x99 && op <= 0xa4);
-}
-
 std::string label(std::uint32_t offset) {
     return "L" + std::to_string(offset);
 }
