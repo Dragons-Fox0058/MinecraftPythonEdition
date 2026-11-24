@@ -218,6 +218,78 @@ void verify_typed_stack(const std::vector<std::uint8_t>& bytecode) {
     }
 }
 
+
+void verify_int_local_dataflow(const std::vector<std::uint8_t>& bytecode,
+                               std::uint16_t max_locals) {
+    const auto graph = build_control_flow_graph(bytecode);
+    if (graph.blocks.empty()) throw CodegenError("method has no basic blocks");
+
+    using State = std::vector<bool>;
+    std::vector<std::optional<State>> incoming(graph.blocks.size());
+    std::vector<std::size_t> worklist{0};
+    incoming[0] = State(max_locals, false);
+
+    auto block_index = [&](std::uint32_t offset) {
+        const auto it = std::find_if(graph.blocks.begin(), graph.blocks.end(),
+            [&](const BasicBlock& block) { return block.start_offset == offset; });
+        if (it == graph.blocks.end())
+            throw CodegenError("control-flow edge targets a missing basic block");
+        return static_cast<std::size_t>(it - graph.blocks.begin());
+    };
+
+    while (!worklist.empty()) {
+        const auto index = worklist.back();
+        worklist.pop_back();
+        auto initialized = *incoming[index];
+
+        for (const auto& ins : graph.blocks[index].instructions) {
+            const auto op = ins.opcode;
+            if (is_iload(ins) || is_istore(ins) ||
+                op == 0x84 || (op == 0xc4 && ins.operands.at(0) == 0x84)) {
+                const auto slot = local_index(ins);
+                require_local(slot, max_locals, ins);
+                if (is_iload(ins) && !initialized[slot]) {
+                    throw CodegenError("read of local variable " + std::to_string(slot) +
+                        " that is not initialized on every incoming path at bytecode offset " +
+                        std::to_string(ins.offset));
+                }
+                if (op == 0x84 || (op == 0xc4 && ins.operands.at(0) == 0x84)) {
+                    if (!initialized[slot]) {
+                        throw CodegenError("iinc of local variable " + std::to_string(slot) +
+                            " that is not initialized at bytecode offset " +
+                            std::to_string(ins.offset));
+                    }
+                } else if (is_istore(ins)) {
+                    initialized[slot] = true;
+                }
+            }
+        }
+
+        for (const auto successor : graph.blocks[index].successors) {
+            const auto target = block_index(successor);
+            if (!incoming[target]) {
+                incoming[target] = initialized;
+                worklist.push_back(target);
+                continue;
+            }
+
+            State merged = *incoming[target];
+            bool changed = false;
+            for (std::size_t slot = 0; slot < merged.size(); ++slot) {
+                const bool value = merged[slot] && initialized[slot];
+                if (value != merged[slot]) {
+                    merged[slot] = value;
+                    changed = true;
+                }
+            }
+            if (changed) {
+                incoming[target] = std::move(merged);
+                worklist.push_back(target);
+            }
+        }
+    }
+}
+
 std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
                                    std::uint16_t max_locals) {
     const auto instructions = decode_bytecode(bytecode);
@@ -227,6 +299,7 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
     // Validate all branch destinations before emitting labels and gotos.
     const auto control_flow = build_control_flow_graph(bytecode);
     verify_stack_heights(control_flow);
+    verify_int_local_dataflow(bytecode, max_locals);
 
     std::ostringstream body;
     bool has_return = false;
