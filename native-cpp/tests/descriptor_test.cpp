@@ -50,5 +50,30 @@ int main() {
     assert(method_parameter_slots(arrays) == 3);
     assert(type_slot_width(arrays.return_type) == 2);
 
+    std::string max_static_descriptor = "(" + std::string(255, 'I') + ")V";
+    const auto max_static = parse_method_descriptor(max_static_descriptor);
+    assert(method_parameter_slots(max_static) == 255);
+    validate_method_parameter_slots(max_static);
+    rejected = false;
+    try {
+        validate_method_parameter_slots(max_static, true);
+    } catch (const DescriptorError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
+    const auto too_many = parse_method_descriptor("(" + std::string(256, 'I') + ")V");
+    rejected = false;
+    try {
+        validate_method_parameter_slots(too_many);
+    } catch (const DescriptorError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
+    const auto wide_boundary = parse_method_descriptor("(" + std::string(126, 'J') + "I)V");
+    assert(method_parameter_slots(wide_boundary) == 253);
+    validate_method_parameter_slots(wide_boundary, true);
+
     return 0;
 }
