@@ -297,8 +297,7 @@ std::string generate_int_method_cpp(const std::vector<std::uint8_t>& bytecode,
         throw CodegenError("cannot generate a method from empty bytecode");
     }
     // Validate all branch destinations before emitting labels and gotos.
-    const auto control_flow = build_control_flow_graph(bytecode);
-    verify_stack_heights(control_flow);
+    verify_typed_stack(bytecode);
     verify_int_local_dataflow(bytecode, max_locals);
 
     std::ostringstream body;
