@@ -109,5 +109,21 @@ int main() {
     }
     assert(rejected);
 
+
+    // A local initialized on only one incoming branch must be rejected.
+    rejected = false;
+    try {
+        verify_int_local_dataflow(
+            {0x03, 0x99, 0x00, 0x08, 0x04, 0x3b, 0xa7, 0x00, 0x03, 0x1a, 0xac}, 1);
+    } catch (const CodegenError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
+    // Both incoming branches initialize local 0, so the merge is valid.
+    verify_int_local_dataflow(
+        {0x03, 0x99, 0x00, 0x08, 0x04, 0x3b, 0xa7, 0x00, 0x06,
+         0x05, 0x3b, 0x00, 0x1a, 0xac}, 1);
+
     return 0;
 }
