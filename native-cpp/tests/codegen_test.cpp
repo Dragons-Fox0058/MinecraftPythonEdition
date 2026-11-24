@@ -69,5 +69,25 @@ int main() {
         rejected = true;
     }
     assert(rejected);
+
+    // A branch merge with stack depths 0 and 2 must be rejected statically.
+    rejected = false;
+    try {
+        (void)generate_int_method_cpp(
+            {0x03, 0x99, 0x00, 0x08, 0x04, 0x05, 0xa7, 0x00, 0x03, 0xac});
+    } catch (const CodegenError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
+    // Stack underflow is rejected before C++ is emitted.
+    rejected = false;
+    try {
+        (void)generate_int_method_cpp({0x60, 0xac});
+    } catch (const CodegenError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
     return 0;
 }
