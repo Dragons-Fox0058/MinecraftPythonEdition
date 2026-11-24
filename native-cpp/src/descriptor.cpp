@@ -54,7 +54,7 @@ public:
     }
 
     char peek() const noexcept {
-        return position_ < input_.size() ? input_[position_] : '\\0';
+        return position_ < input_.size() ? input_[position_] : '\0';
     }
 
     char take() {
@@ -93,7 +93,7 @@ MethodDescriptor parse_method_descriptor(std::string_view descriptor) {
     parser.expect('(');
     MethodDescriptor result;
     while (parser.peek() != ')') {
-        if (parser.peek() == '\\0') {
+        if (parser.peek() == '\0') {
             throw DescriptorError("method descriptor is missing closing ')'");
         }
         result.parameters.push_back(parser.type(false));
