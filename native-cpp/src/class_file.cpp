@@ -1,4 +1,5 @@
 #include "mcnative/class_file.hpp"
+#include "mcnative/descriptor.hpp"
 
 #include <fstream>
 #include <limits>
@@ -131,6 +132,19 @@ std::vector<MemberInfo> read_members(Reader& reader,
             member.descriptor_index == 0 || member.descriptor_index >= cp.size() ||
             cp[member.descriptor_index].tag != 1) {
             throw ClassFileError("member name or descriptor does not reference CONSTANT_Utf8");
+        }
+        const std::string descriptor = cp[member.descriptor_index].text;
+        try {
+            if (methods) {
+                const auto parsed = parse_method_descriptor(descriptor);
+                constexpr std::uint16_t acc_static = 0x0008;
+                const bool is_instance_method = (member.access_flags & acc_static) == 0;
+                validate_method_parameter_slots(parsed, is_instance_method);
+            } else {
+                (void)parse_field_descriptor(descriptor);
+            }
+        } catch (const DescriptorError& error) {
+            throw ClassFileError(std::string("invalid member descriptor: ") + error.what());
         }
         member.attributes = read_attributes(reader, cp, methods);
         members.push_back(std::move(member));
