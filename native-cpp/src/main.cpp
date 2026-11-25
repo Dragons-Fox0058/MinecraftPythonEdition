@@ -227,8 +227,8 @@ int emit_class_declarations(const std::filesystem::path& class_path,
     output << generated;
     output.flush();
     if (!output) throw std::runtime_error("failed writing generated declaration output: " + output_path.string());
-    std::cout << "Generated declarations for " << class_file.this_name() << ".\\n"
-              << "Output: " << output_path << '\\n';
+    std::cout << "Generated declarations for " << class_file.this_name() << ".\n"
+              << "Output: " << output_path << '\n';
     return 0;
 }
 
