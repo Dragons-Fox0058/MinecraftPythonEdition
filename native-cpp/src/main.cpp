@@ -164,7 +164,7 @@ int index_dependencies(const std::filesystem::path& root, const std::filesystem:
     }
     std::ofstream output(output_path, std::ios::binary);
     if (!output) throw std::invalid_argument("cannot create dependency index: " + output_path.string());
-    output << "source_class,source_method,source_descriptor,bytecode_offset,opcode,target_class,target_method,target_descriptor,interface_reference\\n";
+    output << "source_class,source_method,source_descriptor,bytecode_offset,opcode,target_class,target_method,target_descriptor,interface_reference\n";
 
     std::size_t classes = 0, invocations = 0, unresolved = 0;
     for (const auto& entry : std::filesystem::recursive_directory_iterator(root)) {
@@ -190,28 +190,28 @@ int index_dependencies(const std::filesystem::path& root, const std::filesystem:
                                    << csv_escape(invocation.target.owner) << ','
                                    << csv_escape(invocation.target.name) << ','
                                    << csv_escape(invocation.target.descriptor) << ','
-                                   << (invocation.target.is_interface ? "true" : "false") << '\\n';
+                                   << (invocation.target.is_interface ? "true" : "false") << '\n';
                             ++invocations;
                         } catch (const std::exception& error) {
                             ++unresolved;
                             std::cerr << "warning: unresolved invocation in " << file.this_name()
                                       << "." << source_method << source_descriptor
                                       << " at bytecode offset " << instruction.offset
-                                      << ": " << error.what() << '\\n';
+                                      << ": " << error.what() << '\n';
                         }
                     }
                 }
             }
         } catch (const std::exception& error) {
             ++unresolved;
-            std::cerr << "warning: cannot index " << entry.path().string() << ": " << error.what() << '\\n';
+            std::cerr << "warning: cannot index " << entry.path().string() << ": " << error.what() << '\n';
         }
     }
     output.flush();
     if (!output) throw std::runtime_error("failed writing dependency index: " + output_path.string());
     std::cout << "Indexed " << classes << " classes and " << invocations
-              << " method invocations; " << unresolved << " unresolved records.\\n"
-              << "Dependency index: " << output_path << '\\n';
+              << " method invocations; " << unresolved << " unresolved records.\n"
+              << "Dependency index: " << output_path << '\n';
     return unresolved == 0 ? 0 : 1;
 }
 
