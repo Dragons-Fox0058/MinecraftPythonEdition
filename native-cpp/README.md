@@ -14,7 +14,7 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - Typed operand-stack verification and definite-initialization analysis for integer locals across reachable control-flow merges.
 - Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
 - JVM method-reference and invocation-instruction resolution, including `invokeinterface` descriptor-slot validation.
-- C++ call-statement generation for the narrow `invokestatic` + `()I` case, using the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention. This is an emission primitive; class-level linking and invocation inside the full method compiler are not yet implemented.
+- C++ call-statement generation and a class-aware caller compiler for the exact `invokestatic <method-ref>; ireturn` pattern with static `()I` caller/callee signatures. Calls use the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention; class-level symbol declarations/linking and general method-body integration remain outstanding.
 - `inspect-class`, `translate-int`, `translate-method`, and `index-classes` CLI commands.
 - Tests and GitHub Actions builds for Linux and Windows.
 
@@ -43,9 +43,9 @@ mc-native-tool index-classes path/to/extracted/classes classes.csv
 
 ## Next engineering milestones
 
-1. Constant-pool reference resolution and modified UTF-8 decoding.
-2. Extend local-variable dataflow to all JVM verification types and category-2 slot rules.
-3. Method arguments, fields, invocation semantics, arrays, and object operations.
+1. Emit class-level method declarations/definitions so generated invocation symbols link into one native translation unit.
+2. Extend invocation compilation to primitive arguments and integrate calls into the general method-body compiler.
+3. Extend local-variable dataflow to all JVM verification types and category-2 slot rules; then add fields, arrays, and object operations.
 4. Exception tables, stack-map verification, class initialization, and Java runtime compatibility.
 5. JAR ingestion and full classpath dependency resolution.
 6. Differential testing against the reference JVM, then Minecraft-specific class migration.
