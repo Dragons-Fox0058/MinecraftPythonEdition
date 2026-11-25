@@ -18,6 +18,7 @@ add_library(mcnative_core
     src/bytecode.cpp
     src/descriptor.cpp
     src/codegen.cpp
+    src/symbol_table.cpp
     src/control_flow.cpp
 )
 target_include_directories(mcnative_core PUBLIC include)
@@ -61,6 +62,10 @@ if(MCNATIVE_BUILD_TESTS)
     add_executable(mcnative_control_flow_test tests/control_flow_test.cpp)
     target_link_libraries(mcnative_control_flow_test PRIVATE mcnative_core)
     add_test(NAME mcnative_control_flow_test COMMAND mcnative_control_flow_test)
+
+    add_executable(mcnative_symbol_table_test tests/symbol_table_test.cpp)
+    target_link_libraries(mcnative_symbol_table_test PRIVATE mcnative_core)
+    add_test(NAME mcnative_symbol_table_test COMMAND mcnative_symbol_table_test)
     add_executable(mcnative_jar_test tests/jar_test.cpp)
     target_link_libraries(mcnative_jar_test PRIVATE mcnative_core)
     add_test(NAME mcnative_jar_test COMMAND mcnative_jar_test)
