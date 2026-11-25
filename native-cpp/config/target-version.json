@@ -7,7 +7,7 @@
   "translation_mode": "java-bytecode-analysis-and-native-code-generation",
   "reference_runtime_required": true,
   "game_files_policy": "user-provided-local-installation",
-  "status": "jvm-integer-control-flow-codegen",
+  "status": "verified-local-game-preparation-and-limited-jvm-codegen",
   "implemented_components": [
     "class-file-parser",
     "bytecode-decoder",
@@ -16,6 +16,9 @@
     "integer-local-variable-code-generator",
     "integer-branch-code-generator",
     "integer-arithmetic-and-bitwise-code-generator",
-    "class-directory-indexer"
+    "class-directory-indexer",
+    "local-minecraft-26.3-installation-validator",
+    "client-jar-sha1-verification",
+    "local-preparation-manifest"
   ]
 }
