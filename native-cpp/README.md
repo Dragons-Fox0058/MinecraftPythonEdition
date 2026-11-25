@@ -13,6 +13,8 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - JVM method descriptor to native C++ signature mapping, including static/instance parameter local-slot layout and category-2 parameters.
 - Typed operand-stack verification and definite-initialization analysis for integer locals across reachable control-flow merges.
 - Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
+- JVM method-reference and invocation-instruction resolution, including `invokeinterface` descriptor-slot validation.
+- C++ call-statement generation for the narrow `invokestatic` + `()I` case, using the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention. This is an emission primitive; class-level linking and invocation inside the full method compiler are not yet implemented.
 - `inspect-class`, `translate-int`, `translate-method`, and `index-classes` CLI commands.
 - Tests and GitHub Actions builds for Linux and Windows.
 
