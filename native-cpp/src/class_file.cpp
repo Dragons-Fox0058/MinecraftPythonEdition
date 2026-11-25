@@ -279,9 +279,23 @@ MethodInvocation resolve_method_invocation(const ClassFile& class_file,
     if (instruction.opcode == 0xb9 && !target.is_interface) {
         throw ClassFileError("invokeinterface requires CONSTANT_InterfaceMethodref");
     }
+
+    const bool is_constructor = target.name == "<init>";
+    if (is_constructor && instruction.opcode != 0xb7) {
+        throw ClassFileError("<init> may only be invoked with invokespecial");
+    }
+    if (instruction.opcode == 0xb8 && is_constructor) {
+        throw ClassFileError("invokestatic cannot invoke a constructor");
+    }
+
     if (instruction.opcode == 0xb9) {
         if (instruction.operands[3] != 0 || instruction.operands[2] == 0) {
             throw ClassFileError("invokeinterface requires a nonzero count and zero reserved byte");
+        }
+        const auto descriptor = parse_method_descriptor(target.descriptor);
+        const auto expected_count = method_parameter_slots(descriptor, true);
+        if (expected_count != instruction.operands[2]) {
+            throw ClassFileError("invokeinterface count does not match descriptor parameter slots plus receiver");
         }
         return MethodInvocation{instruction.opcode, std::move(target), instruction.operands[2]};
     }
