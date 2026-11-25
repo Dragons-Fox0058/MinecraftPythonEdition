@@ -10,6 +10,7 @@ option(MCNATIVE_BUILD_TESTS "Build unit and smoke tests" ON)
 
 add_library(mcnative_core
     src/version.cpp
+    src/prepare.cpp
     src/class_file.cpp
     src/bytecode.cpp
     src/descriptor.cpp
@@ -57,3 +58,7 @@ if(MCNATIVE_BUILD_TESTS)
     target_link_libraries(mcnative_control_flow_test PRIVATE mcnative_core)
     add_test(NAME mcnative_control_flow_test COMMAND mcnative_control_flow_test)
 endif()
+
+    add_executable(mcnative_prepare_test tests/prepare_test.cpp)
+    target_link_libraries(mcnative_prepare_test PRIVATE mcnative_core)
+    add_test(NAME mcnative_prepare_test COMMAND mcnative_prepare_test)
