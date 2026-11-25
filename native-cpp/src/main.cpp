@@ -157,6 +157,64 @@ int index_classes(const std::filesystem::path& root, const std::filesystem::path
 }
 
 
+
+int index_dependencies(const std::filesystem::path& root, const std::filesystem::path& output_path) {
+    if (!std::filesystem::is_directory(root)) {
+        throw std::invalid_argument("class root is not a directory: " + root.string());
+    }
+    std::ofstream output(output_path, std::ios::binary);
+    if (!output) throw std::invalid_argument("cannot create dependency index: " + output_path.string());
+    output << "source_class,source_method,source_descriptor,bytecode_offset,opcode,target_class,target_method,target_descriptor,interface_reference\\n";
+
+    std::size_t classes = 0, invocations = 0, unresolved = 0;
+    for (const auto& entry : std::filesystem::recursive_directory_iterator(root)) {
+        if (!entry.is_regular_file() || entry.path().extension() != ".class") continue;
+        try {
+            const auto file = mcnative::jvm::ClassFileParser::parse_file(entry.path());
+            ++classes;
+            for (const auto& method : file.methods) {
+                const auto source_method = file.utf8(method.name_index);
+                const auto source_descriptor = file.utf8(method.descriptor_index);
+                for (const auto& attribute : method.attributes) {
+                    if (!attribute.code) continue;
+                    const auto instructions = mcnative::jvm::decode_bytecode(attribute.code->bytecode);
+                    for (const auto& instruction : instructions) {
+                        if (instruction.opcode < 0xb6U || instruction.opcode > 0xb9U) continue;
+                        try {
+                            const auto invocation = mcnative::jvm::resolve_method_invocation(file, instruction);
+                            output << csv_escape(file.this_name()) << ','
+                                   << csv_escape(source_method) << ','
+                                   << csv_escape(source_descriptor) << ','
+                                   << instruction.offset << ','
+                                   << csv_escape(std::string(mcnative::jvm::opcode_name(instruction.opcode))) << ','
+                                   << csv_escape(invocation.target.owner) << ','
+                                   << csv_escape(invocation.target.name) << ','
+                                   << csv_escape(invocation.target.descriptor) << ','
+                                   << (invocation.target.is_interface ? "true" : "false") << '\\n';
+                            ++invocations;
+                        } catch (const std::exception& error) {
+                            ++unresolved;
+                            std::cerr << "warning: unresolved invocation in " << file.this_name()
+                                      << "." << source_method << source_descriptor
+                                      << " at bytecode offset " << instruction.offset
+                                      << ": " << error.what() << '\\n';
+                        }
+                    }
+                }
+            }
+        } catch (const std::exception& error) {
+            ++unresolved;
+            std::cerr << "warning: cannot index " << entry.path().string() << ": " << error.what() << '\\n';
+        }
+    }
+    output.flush();
+    if (!output) throw std::runtime_error("failed writing dependency index: " + output_path.string());
+    std::cout << "Indexed " << classes << " classes and " << invocations
+              << " method invocations; " << unresolved << " unresolved records.\\n"
+              << "Dependency index: " << output_path << '\\n';
+    return unresolved == 0 ? 0 : 1;
+}
+
 int prepare_installation(const std::filesystem::path& minecraft_dir,
                          const std::filesystem::path& output_dir) {
     const auto result = mcnative::prepare_minecraft_26_3(minecraft_dir, output_dir);
@@ -214,7 +272,7 @@ int main(int argc, char** argv) {
         if (argc == 4 && std::string_view{argv[1]} == "index-classes") {
             return index_classes(argv[2], argv[3]);
         }
-        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
+        if (argc == 4 && std::string_view{argv[1]} == "index-dependencies") {\n            return index_dependencies(argv[2], argv[3]);\n        }\n        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
             return prepare_installation(argv[2], argv[3]);
         }
 
