@@ -28,5 +28,7 @@ void verify_int_local_dataflow(const std::vector<std::uint8_t>& bytecode,
 // Emits a declaration-only C++ namespace for every method in one parsed JVM class.
 // Instance methods receive an explicit JObject* receiver as their first ABI argument.
 [[nodiscard]] std::string generate_class_declarations_cpp(const ClassFile& class_file);
+// Emits definitions only for concrete static ()I methods supported by the integer backend.
+[[nodiscard]] std::string generate_class_implementations_cpp(const ClassFile& class_file);
 
 } // namespace mcnative::jvm
