@@ -33,4 +33,9 @@ void verify_int_local_dataflow(const std::vector<std::uint8_t>& bytecode,
 [[nodiscard]] std::string generate_static_int_invocation_cpp(
     const ClassFile& class_file, const Instruction& instruction);
 
+// Compiles a static ()I caller whose body is exactly invokestatic <method-ref>; ireturn.
+// The referenced class method must be emitted separately using the same C_<owner> symbol convention.
+[[nodiscard]] std::string generate_static_int_method_cpp(
+    const ClassFile& class_file, const MemberInfo& method);
+
 } // namespace mcnative::jvm
