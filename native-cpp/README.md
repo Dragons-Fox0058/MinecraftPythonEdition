@@ -15,7 +15,7 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
 - JVM method-reference and invocation-instruction resolution, including `invokeinterface` descriptor-slot validation.
 - C++ call-statement generation and a class-aware caller compiler for the exact `invokestatic <method-ref>; ireturn` pattern with static `()I` caller/callee signatures. Calls use the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention; class-level symbol declarations/linking and general method-body integration remain outstanding.
-- Local Minecraft 26.3 preparation command: validates the user's official-launcher folder, checks the client JAR size and SHA-1 against the version JSON, and writes a local preparation manifest without copying or modifying game files.
+- Local Minecraft 26.3 preparation command: validates the user's official-launcher folder, checks the client JAR size and SHA-1 against the version JSON, writes a local manifest, and extracts only `.class` entries from the verified JAR.
 - `inspect-class`, `translate-int`, `translate-method`, `index-classes`, and `prepare` CLI commands.
 - Tests and GitHub Actions builds for Linux and Windows.
 
@@ -27,7 +27,7 @@ The preparation flow follows the useful part of Horizon's approach: use the play
 mc-native-tool prepare "/path/to/.minecraft" "native-cpp/.local/26.3"
 ```
 
-The current command verifies the 26.3 client JAR and writes `prepare-manifest.json`. It deliberately does not extract or publish Minecraft binaries/assets yet.
+The current command verifies the 26.3 client JAR, writes `prepare-manifest.json`, and extracts class files into `classes/`. The ZIP reader supports stored and DEFLATE entries, checks CRC-32, rejects encrypted/ZIP64 entries and unsafe paths, and applies per-class and total extraction limits. It does not extract assets or libraries, and no game binaries are committed to the repository.
 
 ## Build
 
@@ -58,7 +58,7 @@ mc-native-tool index-classes path/to/extracted/classes classes.csv
 2. Extend invocation compilation to primitive arguments and integrate calls into the general method-body compiler.
 3. Extend local-variable dataflow to all JVM verification types and category-2 slot rules; then add fields, arrays, and object operations.
 4. Exception tables, stack-map verification, class initialization, and Java runtime compatibility.
-5. JAR ingestion and full classpath dependency resolution.
+5. Full JAR/classpath dependency indexing and class hierarchy resolution.
 6. Differential testing against the reference JVM, then Minecraft-specific class migration.
 
 ## Correctness and game-file policy
