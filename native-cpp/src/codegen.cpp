@@ -196,11 +196,11 @@ std::string generate_class_declarations_cpp(const ClassFile& class_file) {
     if (owner.empty()) throw CodegenError("cannot emit declarations for an unnamed JVM class");
 
     std::ostringstream output;
-    output << "// Generated declaration interface for JVM class " << owner << ".\\n"
-           << "#include <cstdint>\\n"
-           << "namespace mcnative::jvm { struct JObject; struct JArray; }\\n"
-           << "namespace mcnative_generated {\\n"
-           << "namespace " << cpp_class_namespace(owner) << " {\\n";
+    output << "// Generated declaration interface for JVM class " << owner << ".\n"
+           << "#include <cstdint>\n"
+           << "namespace mcnative::jvm { struct JObject; struct JArray; }\n"
+           << "namespace mcnative_generated {\n"
+           << "namespace " << cpp_class_namespace(owner) << " {\n";
 
     for (const auto& method : class_file.methods) {
         std::string name;
@@ -235,11 +235,11 @@ std::string generate_class_declarations_cpp(const ClassFile& class_file) {
             output << cpp_type_name(descriptor.parameters[i]) << " arg" << i;
             needs_comma = true;
         }
-        output << ");\\n";
+        output << ");\n";
     }
 
-    output << "} // namespace " << cpp_class_namespace(owner) << "\\n"
-           << "} // namespace mcnative_generated\\n";
+    output << "} // namespace " << cpp_class_namespace(owner) << "\n"
+           << "} // namespace mcnative_generated\n";
     return output.str();
 }
 
