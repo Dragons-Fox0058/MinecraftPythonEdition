@@ -16,7 +16,7 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - JVM method-reference and invocation-instruction resolution, including `invokeinterface` descriptor-slot validation.
 - C++ call-statement generation and a class-aware caller compiler for the exact `invokestatic <method-ref>; ireturn` pattern with static `()I` caller/callee signatures. Calls use the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention; class-level symbol declarations/linking and general method-body integration remain outstanding.
 - Local Minecraft 26.3 preparation command: validates the user's official-launcher folder, checks the client JAR size and SHA-1 against the version JSON, writes a local manifest, and extracts only `.class` entries from the verified JAR.
-- `inspect-class`, `translate-int`, `translate-method`, `index-classes`, and `prepare` CLI commands.
+- `inspect-class`, `translate-int`, `translate-method`, `index-classes`, `index-dependencies`, and `prepare` CLI commands. The dependency index resolves `invokevirtual`, `invokespecial`, `invokestatic`, and `invokeinterface` call sites into source/target class and method records.
 - Tests and GitHub Actions builds for Linux and Windows.
 
 ## Local game preparation
