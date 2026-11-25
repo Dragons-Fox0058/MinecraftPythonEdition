@@ -65,6 +65,46 @@ int main() {
     assert(caller_rejected);
 
 
+    ClassFile declaration_class;
+    declaration_class.constant_pool.resize(9);
+    declaration_class.constant_pool[1].tag = 1;
+    declaration_class.constant_pool[1].text = "sample/Widget";
+    declaration_class.constant_pool[2].tag = 7;
+    declaration_class.constant_pool[2].first_index = 1;
+    declaration_class.this_class = 2;
+    declaration_class.constant_pool[3].tag = 1;
+    declaration_class.constant_pool[3].text = "calculate";
+    declaration_class.constant_pool[4].tag = 1;
+    declaration_class.constant_pool[4].text = "(IJ)D";
+    declaration_class.constant_pool[5].tag = 1;
+    declaration_class.constant_pool[5].text = "name";
+    declaration_class.constant_pool[6].tag = 1;
+    declaration_class.constant_pool[6].text = "()Ljava/lang/String;";
+    declaration_class.constant_pool[7].tag = 1;
+    declaration_class.constant_pool[7].text = "<clinit>";
+    declaration_class.constant_pool[8].tag = 1;
+    declaration_class.constant_pool[8].text = "()V";
+    MemberInfo instance_method;
+    instance_method.name_index = 3;
+    instance_method.descriptor_index = 4;
+    MemberInfo static_method;
+    static_method.access_flags = 0x0008;
+    static_method.name_index = 5;
+    static_method.descriptor_index = 6;
+    MemberInfo class_initializer;
+    class_initializer.access_flags = 0x0008;
+    class_initializer.name_index = 7;
+    class_initializer.descriptor_index = 8;
+    declaration_class.methods = {instance_method, static_method, class_initializer};
+    const auto declarations = generate_class_declarations_cpp(declaration_class);
+    assert(declarations.find("namespace C_sample_Widget {") != std::string::npos);
+    assert(declarations.find("mcnative::jvm::JObject* self, std::int32_t arg0, std::int64_t arg1") != std::string::npos);
+    assert(declarations.find("mcnative::jvm::JArray") == std::string::npos);
+    assert(declarations.find("M_calculate_D_") != std::string::npos);
+    assert(declarations.find("M_name_D_") != std::string::npos);
+    assert(declarations.find("M__clinit__D_") == std::string::npos);
+    assert(declarations.find("\\\\n") == std::string::npos);
+
     verify_typed_stack({0x0a, 0xad}); // lconst_1; lreturn
     verify_typed_stack({0x0b, 0xae}); // fconst_0; freturn
     verify_typed_stack({0x0e, 0xaf}); // dconst_0; dreturn
