@@ -149,7 +149,9 @@ std::string generate_static_int_invocation_cpp(const ClassFile& class_file,
     const auto method = sanitize(invocation.target.name);
     std::ostringstream output;
     output << "stack.push_back(static_cast<std::uint32_t>("
-           << "mcnative_generated::C_" << owner << "::" << method << "()));";
+           << "mcnative_generated::" << cpp_class_namespace(invocation.target.owner)
+           << "::" << cpp_method_symbol(invocation.target.name, invocation.target.descriptor)
+           << "()));";
     return output.str();
 }
 
