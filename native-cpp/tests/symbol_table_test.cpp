@@ -12,7 +12,7 @@ int main() {
     const auto string_symbol = cpp_method_symbol("load", "()Ljava/lang/String;");
     assert(int_symbol != string_symbol);
     assert(int_symbol.find("M_load_D_") == 0);
-    assert(cpp_method_symbol("1<init>", "()V").find("M_1_init__D_") == 0);
+    assert(cpp_method_symbol("1<init>", "()V").find("M__1_init__D_") == 0);
 
     ClassFile file;
     file.constant_pool.resize(7);
