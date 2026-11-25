@@ -176,7 +176,7 @@ void print_usage() {
               << "  mc-native-tool inspect-class <path-to-class-file>\n"
               << "  mc-native-tool translate-int <hex-bytecode>\n"
               << "  mc-native-tool translate-method <class-file> <method-name> <descriptor>\n"
-              << "  mc-native-tool index-classes <extracted-classes-directory> <output.csv>\n";
+              << "  mc-native-tool index-classes <extracted-classes-directory> <output.csv>\n"\n              << "  mc-native-tool prepare <minecraft-dir> <output-dir>\n";
 }
 
 } // namespace
@@ -201,6 +201,9 @@ int main(int argc, char** argv) {
         }
         if (argc == 4 && std::string_view{argv[1]} == "index-classes") {
             return index_classes(argv[2], argv[3]);
+        }
+        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
+            return prepare_installation(argv[2], argv[3]);
         }
 
         print_usage();
