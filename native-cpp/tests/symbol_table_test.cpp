@@ -13,6 +13,7 @@ int main() {
     assert(int_symbol != string_symbol);
     assert(int_symbol.find("M_load_D_") == 0);
     assert(cpp_method_symbol("1<init>", "()V").find("M__1_init__D_") == 0);
+    assert(cpp_method_symbol("<init>", "()V") != cpp_method_symbol("_init_", "()V"));
 
     ClassFile file;
     file.constant_pool.resize(7);
@@ -62,6 +63,21 @@ int main() {
     duplicate_rejected = false;
     try {
         duplicate_methods.add_class(file);
+    } catch (const SymbolTableError&) {
+        duplicate_rejected = true;
+    }
+    assert(duplicate_rejected);
+
+    ClassFile colliding_class;
+    colliding_class.constant_pool.resize(3);
+    colliding_class.constant_pool[1].tag = 1;
+    colliding_class.constant_pool[1].text = "sample_Widget";
+    colliding_class.constant_pool[2].tag = 7;
+    colliding_class.constant_pool[2].first_index = 1;
+    colliding_class.this_class = 2;
+    duplicate_rejected = false;
+    try {
+        symbols.add_class(colliding_class);
     } catch (const SymbolTableError&) {
         duplicate_rejected = true;
     }
