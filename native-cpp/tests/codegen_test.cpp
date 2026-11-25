@@ -39,6 +39,30 @@ int main() {
     }
     assert(invocation_rejected);
 
+    MemberInfo caller;
+    caller.access_flags = 0x0008; // ACC_STATIC
+    caller.name_index = 3;
+    caller.descriptor_index = 4;
+    AttributeInfo caller_code;
+    caller_code.code = CodeAttribute{1, 0, {0xb8, 0x00, 0x06, 0xac}, {}};
+    caller.attributes.push_back(caller_code);
+    const auto compiled_caller = generate_static_int_method_cpp(invocation_class, caller);
+    assert(compiled_caller.find(
+        "stack.push_back(static_cast<std::uint32_t>(mcnative_generated::C_Test::call()));")
+        != std::string::npos);
+    assert(compiled_caller.find("return static_cast<std::int32_t>(result);")
+        != std::string::npos);
+
+    bool caller_rejected = false;
+    try {
+        auto non_static = caller;
+        non_static.access_flags = 0;
+        (void)generate_static_int_method_cpp(invocation_class, non_static);
+    } catch (const CodegenError&) {
+        caller_rejected = true;
+    }
+    assert(caller_rejected);
+
 
     verify_typed_stack({0x0a, 0xad}); // lconst_1; lreturn
     verify_typed_stack({0x0b, 0xae}); // fconst_0; freturn
