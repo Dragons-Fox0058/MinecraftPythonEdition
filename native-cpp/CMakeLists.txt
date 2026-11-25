@@ -6,11 +6,11 @@ project(MinecraftCppNative
     LANGUAGES CXX
 )
 
-option(MCNATIVE_BUILD_TESTS "Build unit and smoke tests" ON)
+find_package(ZLIB REQUIRED)\n\noption(MCNATIVE_BUILD_TESTS "Build unit and smoke tests" ON)
 
 add_library(mcnative_core
     src/version.cpp
-    src/prepare.cpp
+    src/prepare.cpp\n    src/jar.cpp
     src/class_file.cpp
     src/bytecode.cpp
     src/descriptor.cpp
@@ -18,7 +18,7 @@ add_library(mcnative_core
     src/control_flow.cpp
 )
 target_include_directories(mcnative_core PUBLIC include)
-target_compile_features(mcnative_core PUBLIC cxx_std_20)
+target_compile_features(mcnative_core PUBLIC cxx_std_20)\ntarget_link_libraries(mcnative_core PUBLIC ZLIB::ZLIB)
 
 if(MSVC)
     target_compile_options(mcnative_core PRIVATE /W4 /permissive- /EHsc)
@@ -57,6 +57,10 @@ if(MCNATIVE_BUILD_TESTS)
     add_executable(mcnative_control_flow_test tests/control_flow_test.cpp)
     target_link_libraries(mcnative_control_flow_test PRIVATE mcnative_core)
     add_test(NAME mcnative_control_flow_test COMMAND mcnative_control_flow_test)
+    add_executable(mcnative_jar_test tests/jar_test.cpp)
+    target_link_libraries(mcnative_jar_test PRIVATE mcnative_core)
+    add_test(NAME mcnative_jar_test COMMAND mcnative_jar_test)
+
     add_executable(mcnative_prepare_test tests/prepare_test.cpp)
     target_link_libraries(mcnative_prepare_test PRIVATE mcnative_core)
     add_test(NAME mcnative_prepare_test COMMAND mcnative_prepare_test)
