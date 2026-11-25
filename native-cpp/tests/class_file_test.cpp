@@ -111,6 +111,16 @@ int main() {
 
     rejected = false;
     try {
+        // ()I takes zero explicit parameters plus one receiver slot.
+        (void)mcnative::jvm::resolve_method_invocation(
+            refs_class, mcnative::jvm::Instruction{0, 0xb9, {0x00, 0x09, 0x02, 0x00}, 5});
+    } catch (const ClassFileError&) {
+        rejected = true;
+    }
+    assert(rejected);
+
+    rejected = false;
+    try {
         (void)mcnative::jvm::resolve_method_invocation(
             refs_class, mcnative::jvm::Instruction{0, 0xb9, {0x00, 0x08, 0x01, 0x00}, 5});
     } catch (const ClassFileError&) {
