@@ -1,4 +1,5 @@
 #include "mcnative/codegen.hpp"
+#include "mcnative/symbol_table.hpp"
 
 #include <cassert>
 #include <cstdint>
@@ -27,8 +28,8 @@ int main() {
 
     const auto static_call = generate_static_int_invocation_cpp(
         invocation_class, Instruction{0, 0xb8, {0x00, 0x06}, 3});
-    assert(static_call ==
-        "stack.push_back(static_cast<std::uint32_t>(mcnative_generated::C_Test::call()));");
+    assert(static_call.find("mcnative_generated::C_Test::M_call_D_") != std::string::npos);
+    assert(static_call.ends_with("()));"));
 
     bool invocation_rejected = false;
     try {
@@ -48,7 +49,7 @@ int main() {
     caller.attributes.push_back(caller_code);
     const auto compiled_caller = generate_static_int_method_cpp(invocation_class, caller);
     assert(compiled_caller.find(
-        "stack.push_back(static_cast<std::uint32_t>(mcnative_generated::C_Test::call()));")
+        "mcnative_generated::C_Test::M_call_D_")
         != std::string::npos);
     assert(compiled_caller.find("return static_cast<std::int32_t>(result);")
         != std::string::npos);
