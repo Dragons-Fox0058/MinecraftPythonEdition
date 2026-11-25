@@ -27,7 +27,7 @@ The preparation flow follows the useful part of Horizon's approach: use the play
 mc-native-tool prepare "/path/to/.minecraft" "native-cpp/.local/26.3"
 ```
 
-The current command verifies the 26.3 client JAR, writes `prepare-manifest.json`, and extracts class files into `classes/`. The ZIP reader supports stored and DEFLATE entries, checks CRC-32, rejects encrypted/ZIP64 entries and unsafe paths, and applies per-class and total extraction limits. It does not extract assets or libraries, and no game binaries are committed to the repository.
+The current command verifies the 26.3 client JAR, writes `prepare-manifest.json`, extracts class files into `classes/`, and automatically parses every extracted class into `class-index.csv` (path, internal class name, superclass, class-file version, interfaces, fields, and methods). The ZIP reader supports stored and DEFLATE entries, checks CRC-32, rejects encrypted/ZIP64 entries and unsafe paths, and applies per-class and total extraction limits. It does not extract assets or libraries, and no game binaries are committed to the repository.
 
 ## Build
 
