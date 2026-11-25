@@ -1,6 +1,7 @@
 #include "mcnative/codegen.hpp"
 #include "mcnative/control_flow.hpp"
 #include "mcnative/descriptor.hpp"
+#include "mcnative/symbol_table.hpp"
 
 #include <algorithm>
 #include <cctype>
@@ -133,20 +134,6 @@ std::string generate_static_int_invocation_cpp(const ClassFile& class_file,
         throw CodegenError("static invocation backend currently supports only ()I methods");
     }
 
-    auto sanitize = [](std::string_view value) {
-        std::string result;
-        result.reserve(value.size() + 2);
-        for (const unsigned char ch : value) {
-            result.push_back((std::isalnum(ch) || ch == '_') ? static_cast<char>(ch) : '_');
-        }
-        if (result.empty() || std::isdigit(static_cast<unsigned char>(result.front()))) {
-            result.insert(result.begin(), '_');
-        }
-        return result;
-    };
-
-    const auto owner = sanitize(invocation.target.owner);
-    const auto method = sanitize(invocation.target.name);
     std::ostringstream output;
     output << "stack.push_back(static_cast<std::uint32_t>("
            << "mcnative_generated::" << cpp_class_namespace(invocation.target.owner)
