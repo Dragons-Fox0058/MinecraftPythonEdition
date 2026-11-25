@@ -43,9 +43,12 @@ std::string cpp_method_symbol(std::string_view method_name, std::string_view des
     if (method_name.empty() || descriptor.empty()) {
         throw SymbolTableError("JVM method name and descriptor cannot be empty");
     }
+    std::string identity(method_name);
+    identity.push_back('\0');
+    identity.append(descriptor);
     std::ostringstream output;
     output << "M_" << sanitize(method_name) << "_D_" << std::hex << std::setfill('0')
-           << std::setw(16) << stable_hash(descriptor);
+           << std::setw(16) << stable_hash(identity);
     return output.str();
 }
 
@@ -56,9 +59,17 @@ void SymbolTable::add_class(const ClassFile& class_file) {
         throw SymbolTableError("duplicate JVM class definition: " + owner);
     }
 
+    const auto namespace_name = cpp_class_namespace(owner);
+    for (const auto& [existing_name, existing] : classes_) {
+        if (existing.cpp_namespace == namespace_name) {
+            throw SymbolTableError("C++ namespace collision between JVM classes: " +
+                                   existing_name + " and " + owner);
+        }
+    }
+
     ClassSymbol symbol;
     symbol.internal_name = owner;
-    symbol.cpp_namespace = cpp_class_namespace(owner);
+    symbol.cpp_namespace = namespace_name;
 
     for (const auto& method : class_file.methods) {
         const auto name = class_file.utf8(method.name_index);
