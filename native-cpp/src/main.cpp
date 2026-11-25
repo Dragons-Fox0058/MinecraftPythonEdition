@@ -276,7 +276,7 @@ int main(int argc, char** argv) {
         if (argc == 4 && std::string_view{argv[1]} == "index-dependencies") {
             return index_dependencies(argv[2], argv[3]);
         }
-        if (argc == 4 && std::string_view{argv[1]} == "prepare")
+        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
             return prepare_installation(argv[2], argv[3]);
         }
 
