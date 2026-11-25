@@ -22,9 +22,15 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
-      - name: Configure
-        run: cmake -S native-cpp -B native-cpp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+      - name: Install zlib (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev
+      - name: Install zlib (Windows)
         if: runner.os == 'Windows'
+        run: vcpkg install zlib:x64-windows
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: cmake -S native-cpp -B native-cpp/build -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
       - name: Configure (Linux)
         if: runner.os == 'Linux'
         run: cmake -S native-cpp -B native-cpp/build -DCMAKE_BUILD_TYPE=Release
