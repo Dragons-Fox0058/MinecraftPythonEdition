@@ -166,8 +166,9 @@ JarExtractionResult extract_jar_classes(const std::filesystem::path& jar_path,
         ++count;
         total_bytes += bytes.size();
     }
-    if (cursor != static_cast<std::size_t>(central_offset) + central_size)
-        throw JarError("central-directory size does not match its entries");
+    const auto central_end = static_cast<std::size_t>(central_offset) + central_size;
+    if (cursor > central_end)
+        throw JarError("central-directory entries exceed the declared directory size");
     return {count, total_bytes, output_directory};
 }
 
