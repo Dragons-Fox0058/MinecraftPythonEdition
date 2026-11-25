@@ -40,6 +40,12 @@ cmake --build build --config Release
 ctest --test-dir build --output-on-failure
 ```
 
+Generate a declaration-only C++ interface for a parsed JVM class (the generated header contains method prototypes, not method implementations):
+
+```bash
+mc-native-tool emit-class path/to/SomeClass.class generated/SomeClass.hpp
+```
+
 Inspect and translate a class method:
 
 ```bash
