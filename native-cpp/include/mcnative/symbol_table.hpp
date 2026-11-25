@@ -2,7 +2,10 @@
 
 #include "mcnative/class_file.hpp"
 
+#include <cstddef>
+#include <cstdint>
 #include <map>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <vector>
