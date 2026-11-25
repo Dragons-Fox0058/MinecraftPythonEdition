@@ -215,6 +215,23 @@ int index_dependencies(const std::filesystem::path& root, const std::filesystem:
     return unresolved == 0 ? 0 : 1;
 }
 
+int emit_class_declarations(const std::filesystem::path& class_path,
+                              const std::filesystem::path& output_path) {
+    const auto class_file = mcnative::jvm::ClassFileParser::parse_file(class_path);
+    const auto generated = mcnative::jvm::generate_class_declarations_cpp(class_file);
+    if (!output_path.parent_path().empty()) {
+        std::filesystem::create_directories(output_path.parent_path());
+    }
+    std::ofstream output(output_path, std::ios::binary | std::ios::trunc);
+    if (!output) throw std::runtime_error("cannot open generated declaration output: " + output_path.string());
+    output << generated;
+    output.flush();
+    if (!output) throw std::runtime_error("failed writing generated declaration output: " + output_path.string());
+    std::cout << "Generated declarations for " << class_file.this_name() << ".\\n"
+              << "Output: " << output_path << '\\n';
+    return 0;
+}
+
 int prepare_installation(const std::filesystem::path& minecraft_dir,
                          const std::filesystem::path& output_dir) {
     const auto result = mcnative::prepare_minecraft_26_3(minecraft_dir, output_dir);
@@ -276,7 +293,7 @@ int main(int argc, char** argv) {
         if (argc == 4 && std::string_view{argv[1]} == "index-dependencies") {
             return index_dependencies(argv[2], argv[3]);
         }
-        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
+        if (argc == 4 && std::string_view{argv[1]} == "emit-class") {\n            return emit_class_declarations(argv[2], argv[3]);\n        }\n        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
             return prepare_installation(argv[2], argv[3]);
         }
 
