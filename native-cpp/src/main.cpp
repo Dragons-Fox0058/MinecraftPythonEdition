@@ -161,6 +161,11 @@ int prepare_installation(const std::filesystem::path& minecraft_dir,
                          const std::filesystem::path& output_dir) {
     const auto result = mcnative::prepare_minecraft_26_3(minecraft_dir, output_dir);
     const auto extracted = mcnative::extract_jar_classes(result.client_jar, output_dir / "classes");
+    const auto index_path = output_dir / "class-index.csv";
+    const int index_status = index_classes(extracted.output_directory, index_path);
+    if (index_status != 0) {
+        throw std::runtime_error("one or more extracted class files could not be indexed");
+    }
     std::cout << "Verified Minecraft Java Edition 26.3 inputs.\n"
               << "Client JAR: " << result.client_jar << '\n'
               << "Size: " << result.client_jar_size << " bytes\n"
@@ -168,6 +173,7 @@ int prepare_installation(const std::filesystem::path& minecraft_dir,
               << "Extracted class files: " << extracted.class_files << '\n'
               << "Uncompressed class bytes: " << extracted.uncompressed_bytes << '\n'
               << "Class directory: " << extracted.output_directory << '\n'
+              << "Class metadata index: " << index_path << '\n'
               << "Local manifest: " << result.output_manifest << '\n'
               << "Original JAR and game installation were not modified.\n";
     return 0;
