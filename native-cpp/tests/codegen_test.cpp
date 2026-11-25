@@ -1,11 +1,45 @@
 #include "mcnative/codegen.hpp"
 
 #include <cassert>
+#include <cstdint>
 #include <string>
 
 using namespace mcnative::jvm;
 
 int main() {
+    // invokestatic #6 -> Test.call()I becomes a deterministic generated C++ symbol.
+    ClassFile invocation_class;
+    invocation_class.constant_pool.resize(7);
+    invocation_class.constant_pool[1].tag = 1;
+    invocation_class.constant_pool[1].text = "Test";
+    invocation_class.constant_pool[2].tag = 7;
+    invocation_class.constant_pool[2].first_index = 1;
+    invocation_class.constant_pool[3].tag = 1;
+    invocation_class.constant_pool[3].text = "call";
+    invocation_class.constant_pool[4].tag = 1;
+    invocation_class.constant_pool[4].text = "()I";
+    invocation_class.constant_pool[5].tag = 12;
+    invocation_class.constant_pool[5].first_index = 3;
+    invocation_class.constant_pool[5].second_index = 4;
+    invocation_class.constant_pool[6].tag = 10;
+    invocation_class.constant_pool[6].first_index = 2;
+    invocation_class.constant_pool[6].second_index = 5;
+
+    const auto static_call = generate_static_int_invocation_cpp(
+        invocation_class, Instruction{0, 0xb8, {0x00, 0x06}, 3});
+    assert(static_call ==
+        "stack.push_back(static_cast<std::uint32_t>(mcnative_generated::C_Test::call()));");
+
+    bool invocation_rejected = false;
+    try {
+        (void)generate_static_int_invocation_cpp(
+            invocation_class, Instruction{0, 0xb6, {0x00, 0x06}, 3});
+    } catch (const CodegenError&) {
+        invocation_rejected = true;
+    }
+    assert(invocation_rejected);
+
+
     verify_typed_stack({0x0a, 0xad}); // lconst_1; lreturn
     verify_typed_stack({0x0b, 0xae}); // fconst_0; freturn
     verify_typed_stack({0x0e, 0xaf}); // dconst_0; dreturn
