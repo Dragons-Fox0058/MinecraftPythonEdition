@@ -47,7 +47,7 @@ std::string client_download_object(const std::string& json) {
 }
 
 std::string required_string(const std::string& object, const std::string& key) {
-    const std::regex pattern("\"" + key + R"("\s*:\s*"([0-9a-fA-F]+)")");
+    const std::regex pattern = std::regex("\"" + key + "\"\\s*:\\s*\"([0-9a-fA-F]+)\"");
     std::smatch match;
     if (!std::regex_search(object, match, pattern)) {
         throw PrepareError("version JSON downloads.client is missing " + key);
