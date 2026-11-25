@@ -15,8 +15,19 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
 - JVM method-reference and invocation-instruction resolution, including `invokeinterface` descriptor-slot validation.
 - C++ call-statement generation and a class-aware caller compiler for the exact `invokestatic <method-ref>; ireturn` pattern with static `()I` caller/callee signatures. Calls use the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention; class-level symbol declarations/linking and general method-body integration remain outstanding.
-- `inspect-class`, `translate-int`, `translate-method`, and `index-classes` CLI commands.
+- Local Minecraft 26.3 preparation command: validates the user's official-launcher folder, checks the client JAR size and SHA-1 against the version JSON, and writes a local preparation manifest without copying or modifying game files.
+- `inspect-class`, `translate-int`, `translate-method`, `index-classes`, and `prepare` CLI commands.
 - Tests and GitHub Actions builds for Linux and Windows.
+
+## Local game preparation
+
+The preparation flow follows the useful part of Horizon's approach: use the player's own installed game, verify the exact pinned inputs, and keep all derived/private files local. It is **not** a Java-to-C++ translator by itself. Horizon's public source describes a from-scratch Rust port plus a preparation tool that imports verified game resources and runs reference-game exporters; it does not simply patch Java bytecode into Rust. This project will build a C++ native implementation and use the local installation as a checked reference/input source.
+
+```bash
+mc-native-tool prepare "/path/to/.minecraft" "native-cpp/.local/26.3"
+```
+
+The current command verifies the 26.3 client JAR and writes `prepare-manifest.json`. It deliberately does not extract or publish Minecraft binaries/assets yet.
 
 ## Build
 
