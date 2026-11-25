@@ -14,7 +14,7 @@ A C++20 native-port toolchain targeting **Minecraft Java Edition 26.3**. This is
 - Typed operand-stack verification and definite-initialization analysis for integer locals across reachable control-flow merges.
 - Integer bytecode-to-C++ generation for constants, arithmetic, division/remainder, bitwise operations, shifts, local loads/stores, `iinc`, integer conditionals, `goto`, and `ireturn`.
 - JVM method-reference and invocation-instruction resolution, including `invokeinterface` descriptor-slot validation.
-- Deterministic class/method symbol registry keyed by JVM owner, method name, and full descriptor. Overloaded methods receive distinct stable C++ names; duplicate class and method definitions are rejected. Static-call code generation now uses the same descriptor-aware naming function.
+- Deterministic class/method symbol registry keyed by JVM owner, method name, and full descriptor. A declaration emitter now produces C++ namespace-level prototypes for every method, maps JVM parameter/return descriptors to ABI types, and supplies an explicit receiver pointer for instance methods. Overloaded methods receive distinct stable C++ names; duplicate class and method definitions are rejected. Static-call code generation now uses the same descriptor-aware naming function.
 - C++ call-statement generation and a class-aware caller compiler for the exact `invokestatic <method-ref>; ireturn` pattern with static `()I` caller/callee signatures. Calls use the deterministic `mcnative_generated::C_<sanitized-owner>::<method>()` symbol convention; class-level symbol declarations/linking and general method-body integration remain outstanding.
 - Local Minecraft 26.3 preparation command: validates the user's official-launcher folder, checks the client JAR size and SHA-1 against the version JSON, writes a local manifest, and extracts only `.class` entries from the verified JAR.
 - `inspect-class`, `translate-int`, `translate-method`, `index-classes`, `index-dependencies`, and `prepare` CLI commands. The dependency index resolves `invokevirtual`, `invokespecial`, `invokestatic`, and `invokeinterface` call sites into source/target class and method records.
@@ -55,7 +55,7 @@ mc-native-tool index-classes path/to/extracted/classes classes.csv
 
 ## Next engineering milestones
 
-1. Emit class-level method declarations/definitions from the symbol registry so generated invocation symbols link into one native translation unit.
+1. Generate method definitions for supported JVM bodies and connect them to the emitted class declaration interfaces.
 2. Extend invocation compilation to primitive arguments and integrate calls into the general method-body compiler.
 3. Extend local-variable dataflow to all JVM verification types and category-2 slot rules; then add fields, arrays, and object operations.
 4. Exception tables, stack-map verification, class initialization, and Java runtime compatibility.
