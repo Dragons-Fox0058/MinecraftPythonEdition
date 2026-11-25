@@ -3,6 +3,7 @@
 #include "mcnative/descriptor.hpp"
 #include "mcnative/version.hpp"
 #include "mcnative/prepare.hpp"
+#include "mcnative/jar.hpp"
 
 #include <exception>
 #include <filesystem>
@@ -159,12 +160,16 @@ int index_classes(const std::filesystem::path& root, const std::filesystem::path
 int prepare_installation(const std::filesystem::path& minecraft_dir,
                          const std::filesystem::path& output_dir) {
     const auto result = mcnative::prepare_minecraft_26_3(minecraft_dir, output_dir);
-    std::cout << "Verified Minecraft Java Edition 26.3 inputs.\\n"
-              << "Client JAR: " << result.client_jar << '\\n'
-              << "Size: " << result.client_jar_size << " bytes\\n"
-              << "SHA-1: " << result.client_jar_sha1 << '\\n'
-              << "Local manifest: " << result.output_manifest << '\\n'
-              << "No game files were copied or modified.\\n";
+    const auto extracted = mcnative::extract_jar_classes(result.client_jar, output_dir / "classes");
+    std::cout << "Verified Minecraft Java Edition 26.3 inputs.\n"
+              << "Client JAR: " << result.client_jar << '\n'
+              << "Size: " << result.client_jar_size << " bytes\n"
+              << "SHA-1: " << result.client_jar_sha1 << '\n'
+              << "Extracted class files: " << extracted.class_files << '\n'
+              << "Uncompressed class bytes: " << extracted.uncompressed_bytes << '\n'
+              << "Class directory: " << extracted.output_directory << '\n'
+              << "Local manifest: " << result.output_manifest << '\n'
+              << "Original JAR and game installation were not modified.\n";
     return 0;
 }
 
