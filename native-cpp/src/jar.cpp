@@ -62,13 +62,13 @@ bool safe_class_path(std::string_view name) {
 std::vector<std::uint8_t> inflate_raw(const std::uint8_t* input, std::size_t input_size,
                                       std::size_t output_size) {
     std::vector<std::uint8_t> output(output_size);
+    if (input_size > std::numeric_limits<uInt>::max() || output_size > std::numeric_limits<uInt>::max())
+        throw JarError("individual class entry exceeds zlib limits");
     z_stream stream{};
     stream.next_in = const_cast<Bytef*>(reinterpret_cast<const Bytef*>(input));
     stream.avail_in = static_cast<uInt>(input_size);
     stream.next_out = reinterpret_cast<Bytef*>(output.data());
     stream.avail_out = static_cast<uInt>(output.size());
-    if (input_size > std::numeric_limits<uInt>::max() || output_size > std::numeric_limits<uInt>::max())
-        throw JarError("individual class entry exceeds zlib limits");
     if (inflateInit2(&stream, -MAX_WBITS) != Z_OK) throw JarError("could not initialize DEFLATE decoder");
     const int status = inflate(&stream, Z_FINISH);
     inflateEnd(&stream);
