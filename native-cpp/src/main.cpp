@@ -2,6 +2,7 @@
 #include "mcnative/codegen.hpp"
 #include "mcnative/descriptor.hpp"
 #include "mcnative/version.hpp"
+#include "mcnative/prepare.hpp"
 
 #include <exception>
 #include <filesystem>
@@ -152,6 +153,19 @@ int index_classes(const std::filesystem::path& root, const std::filesystem::path
     std::cout << "Indexed " << parsed << " class files; " << failed
               << " failed. Output: " << output_path.string() << '\n';
     return failed == 0 ? 0 : 1;
+}
+
+
+int prepare_installation(const std::filesystem::path& minecraft_dir,
+                         const std::filesystem::path& output_dir) {
+    const auto result = mcnative::prepare_minecraft_26_3(minecraft_dir, output_dir);
+    std::cout << "Verified Minecraft Java Edition 26.3 inputs.\\n"
+              << "Client JAR: " << result.client_jar << '\\n'
+              << "Size: " << result.client_jar_size << " bytes\\n"
+              << "SHA-1: " << result.client_jar_sha1 << '\\n'
+              << "Local manifest: " << result.output_manifest << '\\n'
+              << "No game files were copied or modified.\\n";
+    return 0;
 }
 
 void print_usage() {
