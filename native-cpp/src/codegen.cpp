@@ -191,6 +191,59 @@ std::string generate_static_int_method_cpp(const ClassFile& class_file,
     return output.str();
 }
 
+std::string generate_class_declarations_cpp(const ClassFile& class_file) {
+    const auto owner = class_file.this_name();
+    if (owner.empty()) throw CodegenError("cannot emit declarations for an unnamed JVM class");
+
+    std::ostringstream output;
+    output << "// Generated declaration interface for JVM class " << owner << ".\\n"
+           << "#include <cstdint>\\n"
+           << "namespace mcnative::jvm { struct JObject; struct JArray; }\\n"
+           << "namespace mcnative_generated {\\n"
+           << "namespace " << cpp_class_namespace(owner) << " {\\n";
+
+    for (const auto& method : class_file.methods) {
+        std::string name;
+        std::string descriptor_text;
+        try {
+            name = class_file.utf8(method.name_index);
+            descriptor_text = class_file.utf8(method.descriptor_index);
+        } catch (const ClassFileError& error) {
+            throw CodegenError(std::string("cannot read class method metadata: ") + error.what());
+        }
+        if (name == "<clinit>") continue;
+
+        MethodDescriptor descriptor;
+        try {
+            descriptor = parse_method_descriptor(descriptor_text);
+            validate_method_parameter_slots(descriptor, (method.access_flags & 0x0008U) == 0);
+        } catch (const DescriptorError& error) {
+            throw CodegenError("cannot emit declaration for " + owner + "." + name +
+                               descriptor_text + ": " + error.what());
+        }
+
+        const bool is_static = (method.access_flags & 0x0008U) != 0;
+        output << cpp_type_name(descriptor.return_type) << " "
+               << cpp_method_symbol(name, descriptor_text) << "(";
+        bool needs_comma = false;
+        if (!is_static) {
+            output << "mcnative::jvm::JObject* self";
+            needs_comma = true;
+        }
+        for (std::size_t i = 0; i < descriptor.parameters.size(); ++i) {
+            if (needs_comma) output << ", ";
+            output << cpp_type_name(descriptor.parameters[i]) << " arg" << i;
+            needs_comma = true;
+        }
+        output << ");\\n";
+    }
+
+    output << "} // namespace " << cpp_class_namespace(owner) << "\\n"
+           << "} // namespace mcnative_generated\\n";
+    return output.str();
+}
+
+
 void verify_typed_stack(const std::vector<std::uint8_t>& bytecode) {
     const auto graph = build_control_flow_graph(bytecode);
     if (graph.blocks.empty()) throw CodegenError("method has no basic blocks");
