@@ -1,7 +1,9 @@
 #include "mcnative/codegen.hpp"
 #include "mcnative/control_flow.hpp"
+#include "mcnative/descriptor.hpp"
 
 #include <algorithm>
+#include <cctype>
 #include <bit>
 #include <limits>
 #include <cstdint>
@@ -101,6 +103,55 @@ void require_local(std::uint16_t index, std::uint16_t max_locals,
 }
 
 } // namespace
+
+
+std::string generate_static_int_invocation_cpp(const ClassFile& class_file,
+                                               const Instruction& instruction) {
+    if (instruction.opcode != 0xb8) {
+        throw CodegenError("static invocation code generation requires invokestatic");
+    }
+
+    MethodInvocation invocation;
+    try {
+        invocation = resolve_method_invocation(class_file, instruction);
+    } catch (const ClassFileError& error) {
+        throw CodegenError(std::string("cannot resolve static invocation: ") + error.what());
+    }
+    if (invocation.target.name == "<init>" || invocation.target.name == "<clinit>") {
+        throw CodegenError("constructor and class-initializer calls are not supported by this backend");
+    }
+
+    MethodDescriptor descriptor;
+    try {
+        descriptor = parse_method_descriptor(invocation.target.descriptor);
+    } catch (const DescriptorError& error) {
+        throw CodegenError(std::string("invalid static invocation descriptor: ") + error.what());
+    }
+    if (!descriptor.parameters.empty() ||
+        descriptor.return_type.kind != TypeKind::int_type ||
+        descriptor.return_type.array_dimensions != 0) {
+        throw CodegenError("static invocation backend currently supports only ()I methods");
+    }
+
+    auto sanitize = [](std::string_view value) {
+        std::string result;
+        result.reserve(value.size() + 2);
+        for (const unsigned char ch : value) {
+            result.push_back((std::isalnum(ch) || ch == '_') ? static_cast<char>(ch) : '_');
+        }
+        if (result.empty() || std::isdigit(static_cast<unsigned char>(result.front()))) {
+            result.insert(result.begin(), '_');
+        }
+        return result;
+    };
+
+    const auto owner = sanitize(invocation.target.owner);
+    const auto method = sanitize(invocation.target.name);
+    std::ostringstream output;
+    output << "stack.push_back(static_cast<std::uint32_t>("
+           << "mcnative_generated::C_" << owner << "::" << method << "()));";
+    return output.str();
+}
 
 void verify_typed_stack(const std::vector<std::uint8_t>& bytecode) {
     const auto graph = build_control_flow_graph(bytecode);
