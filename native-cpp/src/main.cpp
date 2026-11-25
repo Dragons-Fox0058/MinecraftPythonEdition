@@ -246,6 +246,7 @@ void print_usage() {
               << "  mc-native-tool translate-int <hex-bytecode>\n"
               << "  mc-native-tool translate-method <class-file> <method-name> <descriptor>\n"
               << "  mc-native-tool index-classes <extracted-classes-directory> <output.csv>\n"
+              << "  mc-native-tool index-dependencies <extracted-classes-directory> <output.csv>\n"
               << "  mc-native-tool prepare <minecraft-dir> <output-dir>\n";
 }
 
@@ -272,7 +273,10 @@ int main(int argc, char** argv) {
         if (argc == 4 && std::string_view{argv[1]} == "index-classes") {
             return index_classes(argv[2], argv[3]);
         }
-        if (argc == 4 && std::string_view{argv[1]} == "index-dependencies") {\n            return index_dependencies(argv[2], argv[3]);\n        }\n        if (argc == 4 && std::string_view{argv[1]} == "prepare") {
+        if (argc == 4 && std::string_view{argv[1]} == "index-dependencies") {
+            return index_dependencies(argv[2], argv[3]);
+        }
+        if (argc == 4 && std::string_view{argv[1]} == "prepare")
             return prepare_installation(argv[2], argv[3]);
         }
 
