@@ -176,7 +176,8 @@ void print_usage() {
               << "  mc-native-tool inspect-class <path-to-class-file>\n"
               << "  mc-native-tool translate-int <hex-bytecode>\n"
               << "  mc-native-tool translate-method <class-file> <method-name> <descriptor>\n"
-              << "  mc-native-tool index-classes <extracted-classes-directory> <output.csv>\n"\n              << "  mc-native-tool prepare <minecraft-dir> <output-dir>\n";
+              << "  mc-native-tool index-classes <extracted-classes-directory> <output.csv>\n"
+              << "  mc-native-tool prepare <minecraft-dir> <output-dir>\n";
 }
 
 } // namespace
